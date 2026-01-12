@@ -1,0 +1,17 @@
+Solo conectarte al repositorio desde un usb (ya estas linkado al repositorio automáticamente):
+
+git clone https://github.com/Manaviiii/Proyecto_2.git (obtienes los archivos del github)
+
+Primera vez para conectarte (solo propietario)
+git init
+git branch -M main
+git add .
+git commit -m "mensaje"
+git remote add origin https://github.com/Manaviiii/Proyecto_2.git
+git push -u origin main
+
+Mecanica cuando ya estas linkado y quieres guardar archivos
+git add .
+git commit -m "Descripción del cambio"
+git push
+
