@@ -13,13 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('trajes', function (Blueprint $table) {
+        Schema::create('clientes', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre'); // nombre del traje
-            $table->decimal('precio', 10, 2); // precio con hasta 10 dígitos y 2 decimales
-            $table->integer('stock');
+            $table->string('nombre');
+            $table->string('email')->unique();
+            $table->string('telefono')->nullable();
+            $table->string('stripe_customer_id')->nullable();
             $table->timestamps();
         });
+        
     }
 
     /**
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('trajes');
+        Schema::dropIfExists('clientes');
     }
 };

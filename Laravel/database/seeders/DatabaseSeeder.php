@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
+    
     /**
      * Seed the application's database.
      *
@@ -14,6 +15,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call([
+            ClienteSeeder::class,
+            ItemSeeder::class,
+            ItemTrajesSeeder::class,
+            ItemAccesoriosSeeder::class,
+            ItemPacksSeeder::class,
+            EventosSeeder::class,
+            EventoItemsSeeder::class,
+            ResidenciasSeeder::class,
+        ]);
     }
 }
