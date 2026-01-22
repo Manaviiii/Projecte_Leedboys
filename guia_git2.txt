@@ -1,0 +1,98 @@
+========================================
+GUÍA DE USO DE GIT Y GITHUB DEL PROYECTO
+========================================
+
+----------------------------------------
+REGLAS GENERALES
+----------------------------------------
+- Nadie trabaja directamente en main
+- Cada persona trabaja en su propia rama
+- main contiene la versión final del proyecto
+- Siempre hacer pull de main antes de trabajar
+- El creador del proyecto es quien hace los merges a main
+- git push sube los cambios a la rama en la que estés
+
+----------------------------------------
+GUÍA PARA VÍCTOR
+----------------------------------------
+
+1. Entrar en el proyecto
+cd proyecto
+
+2. Crear la rama de trabajo (solo la primera vez)
+git checkout -b frontend
+git push -u origin frontend
+
+3. Antes de trabajar (cada día)
+git checkout frontend (en el caso de trabajar en frontend)
+git pull origin main
+
+4. Trabajar
+(vistas, rutas, css, html, etc.)
+
+5. Ver cambios
+git status
+
+6. Añadir cambios
+git add .
+
+7. Hacer commit
+git commit -m "Frontend: descripción de los cambios"
+
+8. Subir cambios a la rama frontend (en el caso de trabajar en frontend)
+git push
+
+9. Juntar cambios en main (cuando toque)
+Desde GitHub:
+- Pull Request frontend → main
+- Merge
+
+10. Actualizar la rama tras el merge
+git checkout frontend
+git pull origin main
+
+----------------------------------------
+GUÍA PARA IKER (Minguito)
+----------------------------------------
+
+IMPORTANTE:
+Este proceso debe hacerse CADA VEZ que se enciende el ordenador.
+
+1. Clonar el repositorio
+git clone https://github.com/usuario/proyecto.git
+cd proyecto
+
+2. Crear la rama de trabajo
+git checkout -b backend
+git push -u origin backend
+
+3. Actualizar desde main antes de trabajar
+git pull origin main
+
+4. Trabajar
+(migrations, seeders, modelos, base de datos)
+
+5. Ver cambios
+git status
+
+6. Añadir cambios
+git add .
+
+7. Hacer commit
+git commit -m "Backend: descripción de los cambios"
+
+8. Subir cambios a la rama backend
+git push
+
+9. Cuando Víctor haga merge a main
+
+Actualizar el proyecto:
+git checkout backend
+git pull origin main
+
+----------------------------------------
+NOTAS FINALES
+----------------------------------------
+- Usar git branch para comprobar la rama actual
+- No subir el archivo .env
+- No trabajar nunca directamente en main
