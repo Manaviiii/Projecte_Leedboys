@@ -1,0 +1,167 @@
+/* ------------------------------
+   app.css - Estilos globales
+-------------------------------*/
+
+/* Body y tipografía general */
+body {
+    background: radial-gradient(circle at center, #0a0a0a, #111111, #000000);
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* ------------------------------
+   Neon Text
+------------------------------- */
+.text-neon {
+    color: #0ff;
+    text-shadow: 
+        0 0 5px #0ff,
+        0 0 10px #0ff,
+        0 0 20px #0ff,
+        0 0 40px #0ff;
+}
+
+/* ------------------------------
+   Botones Neon
+------------------------------- */
+.btn-neon {
+    background: linear-gradient(90deg, #ff00ff, #00ffff);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff;
+    transition: all 0.3s ease;
+}
+
+.btn-neon:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+}
+
+/* ------------------------------
+   Inputs y formularios
+------------------------------- */
+.input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #222;
+    color: white;
+    font-size: 1rem;
+}
+
+.input:focus {
+    border-color: #0ff;
+    outline: none;
+    box-shadow: 0 0 5px #0ff;
+}
+
+/* ------------------------------
+   Formularios generales
+------------------------------- */
+.form-container {
+    background-color: #111;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    text-align: center;
+}
+
+/* ------------------------------
+   Cards (Trajes / Packs / Accesorios)
+------------------------------- */
+.card {
+    background-color: #222;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 12px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+    transform: translateY(-5px);
+}
+
+/* Título de card */
+.card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+}
+
+/* ------------------------------
+   Header y menú
+------------------------------- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    border-bottom: 1px solid #333;
+    background-color: #111;
+}
+
+.header a {
+    color: white;
+    text-decoration: none;
+    margin-left: 16px;
+    font-weight: bold;
+}
+
+.header a:hover {
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+}
+
+/* ------------------------------
+   Hero principal
+------------------------------- */
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.hero h1 {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    color: #0ff;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff, 0 0 20px #0ff;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    color: #aaa;
+    max-width: 600px;
+    margin-bottom: 24px;
+}
+
+/* ------------------------------
+   Footer
+------------------------------- */
+.footer {
+    text-align: center;
+    padding: 16px;
+    border-top: 1px solid #333;
+    color: #888;
+    font-size: 0.9rem;
+}
+
