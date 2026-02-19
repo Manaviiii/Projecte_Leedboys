@@ -2,13 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class User extends \Illuminate\Foundation\Auth\User implements Authenticatable
+class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
     
-    // Otros atributos y métodos del modelo User
+    // Un helper rápido para saber si es admin
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
 }

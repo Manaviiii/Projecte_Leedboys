@@ -3,27 +3,51 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Hash;
+use Filament\Resources\Pages\CreateRecord;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationLabel = 'Usuarios';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('name')
+                    ->label('Nombre')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('email')
+                    ->label('Email')
+                    ->email()
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Select::make('role')
+                    ->label('Rol')
+                    ->options([
+                        'user' => 'Usuario',
+                        'admin' => 'Administrador',
+                    ])
+                    ->default('user')
+                    ->required(),
+                Forms\Components\TextInput::make('password')
+                    ->label('Contraseña')
+                    ->password()
+                    // Solo requerida si estamos creando un usuario nuevo
+                    ->required(fn ($livewire) => $livewire instanceof CreateRecord)
+                    // Si el campo está vacío al editar, no actualizamos la contraseña
+                    ->dehydrated(fn ($state) => filled($state))
+                    // Encriptamos antes de guardar
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
             ]);
     }
 
@@ -31,24 +55,22 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                //
-            ])
-            ->filters([
-                //
+                Tables\Columns\TextColumn::make('name')->label('Nombre')->searchable(),
+                Tables\Columns\TextColumn::make('email')->label('Email')->searchable(),
+                Tables\Columns\BadgeColumn::make('role')
+                    ->label('Rol')
+                    ->colors([
+                        'primary',
+                        'success' => 'admin',
+                    ]),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Creado')
+                    ->dateTime('d/m/Y'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ]);
-    }
-    
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
     
     public static function getPages(): array
