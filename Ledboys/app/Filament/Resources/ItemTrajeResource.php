@@ -2,143 +2,107 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Item;
 use App\Filament\Resources\ItemTrajeResource\Pages;
-use App\Filament\Resources\ItemTrajeResource\RelationManagers;
 use App\Models\ItemTraje;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Forms\Components\TextInput;
-use Filament\Resources\Pages\CreateRecord;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Forms;
 use Filament\Resources\Form;
+use Filament\Resources\Resource;
+use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Select;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Section;
 
 class ItemTrajeResource extends Resource
 {
     protected static ?string $model = ItemTraje::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-
-    protected static ?string $navigationLabel = 'Trajes'; // Nombre que aparecerá en el menú de Filament
+    protected static ?string $navigationIcon = 'heroicon-o-sparkles'; // Icono mas chulo
+    protected static ?string $navigationLabel = 'Trajes';
 
     public static function form(Form $form): Form
     {
         return $form
         ->schema([
-            // Crear un nuevo Item dentro de este formulario
-            TextInput::make('nombre')
-                ->label('Nombre del Traje')
-                ->required(),
+            Section::make('Datos Generales (Tabla Items)')
+                ->schema([
+                    // Estos campos NO existen en item_trajes, existen en items.
+                    // Los procesaremos en el CreateItemTraje.
+                    Forms\Components\TextInput::make('nombre_item')
+                        ->label('Nombre del Traje')
+                        ->required(),
 
-            TextInput::make('precio')
-                ->label('Precio del Traje')
-                ->numeric()
-                ->required(),
+                    Forms\Components\TextInput::make('precio_item')
+                        ->label('Precio')
+                        ->numeric()
+                        ->prefix('€')
+                        ->required(),
 
-            Textarea::make('descripcion')
-                ->label('Descripción del Traje')
-                ->required(),
+                    Forms\Components\Textarea::make('descripcion_item')
+                        ->label('Descripción')
+                        ->rows(3),
+                    
+                    Forms\Components\FileUpload::make('imagen_item')
+                        ->label('Imagen')
+                        ->image()
+                        ->directory('items'),
+                ]),
 
-            // Después de crear el Item, creamos el ItemTraje
-            Select::make('tipo_traje')
-                ->options([
-                    'zancos' => 'Zancos',
-                    'sin_zancos' => 'Sin Zancos',
-                ])
-                ->required()
-                ->label('Tipo de Traje'),
+            Section::make('Detalles del Traje (Tabla Trajes)')
+                ->schema([
+                    Forms\Components\Select::make('tipo_traje')
+                        ->options([
+                            'zancos' => 'Zancos',
+                            'sin_zancos' => 'Sin Zancos',
+                        ])
+                        ->required(),
 
-                Select::make('genero')
-                ->options([
-                    'chico' => 'Chico',
-                    'chica' => 'Chica',
-                    'unisex' => 'Unisex',
-                ])
-                ->default('unisex')
-                ->required()
-                ->label('Género'),
+                    Forms\Components\Select::make('genero')
+                        ->options([
+                            'chico' => 'Chico',
+                            'chica' => 'Chica',
+                            'unisex' => 'Unisex',
+                        ])
+                        ->default('unisex')
+                        ->required(),
 
-            TextInput::make('stock_total')
-                ->numeric()
-                ->required()
-                ->label('Stock Total'),
+                    Forms\Components\TextInput::make('stock_total')
+                        ->numeric()
+                        ->required()
+                        ->label('Stock Total'),
+                ]),
         ]);
     }
-
-    public static function create(array $data)
-    {
-        // crear item
-        $item = new Item([
-            'nombre' => $data['nombre'],
-            'tipo' => 'traje',  // tipo traje
-            'precio' => $data['precio'],
-            'descripcion' => $data['descripcion'],
-            'activo' => true, // valor por defecto
-        ]);
-
-        // Guardar Item
-        $item->save();
-
-        dd($item);  
-
-
-        ItemTraje::create([
-            'item_id' => $item->id,  // Usamos el ID generado por el modelo `Item`
-            'tipo_traje' => $data['tipo_traje'],
-            'genero' => $data['genero'],
-            'stock_total' => $data['stock_total'],
-        ]);
-    }
-    
-    
-
-
 
     public static function table(Table $table): Table
     {
-    return $table
-        ->columns([
-            TextColumn::make('item.nombre')->label('Item'),
-            TextColumn::make('tipo_traje')->label('Tipo de Traje'),
-            TextColumn::make('genero')->label('Género'),
-            TextColumn::make('stock_total')->label('Stock Total'),
-        ])
-        ->filters([
-            // SelectFilter::make('item_tipo')  // Asegúrate de usar el SelectFilter
-            //     ->label('Tipo de Item')  // Nombre que aparecerá en el filtro
-            //     ->options([
-            //         'traje' => 'Traje',
-            //     ])
-            //     ->query(function (Builder $query, $value) {
-            //         // Verifica si se pasa un valor para aplicar el filtro
-            //         if ($value) {
-            //             return $query->whereHas('item', function (Builder $query) use ($value) {
-            //                 $query->where('tipo', $value);
-            //             });
-            //         }
-            //     }),
-         ])
-        ->actions([
-            Tables\Actions\EditAction::make(),
-            Tables\Actions\DeleteAction::make(),
-        ])
-        ->bulkActions([]);
-}
+        return $table
+            ->columns([
+                // Usamos la relación 'item' definida en el Modelo para sacar el nombre
+                Tables\Columns\ImageColumn::make('item.imagen')->label('Img'),
+                Tables\Columns\TextColumn::make('item.nombre')->label('Nombre')->searchable(),
+                Tables\Columns\TextColumn::make('tipo_traje')->label('Tipo')->sortable(),
+                Tables\Columns\BadgeColumn::make('genero')
+                    ->colors(['primary' => 'unisex', 'danger' => 'chica', 'success' => 'chico']),
+                Tables\Columns\TextColumn::make('stock_total')->label('Stock'),
+                Tables\Columns\TextColumn::make('item.precio')->label('Precio')->money('eur'),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('tipo_traje')
+                    ->options([
+                        'zancos' => 'Con Zancos',
+                        'sin_zancos' => 'Sin Zancos',
+                    ]),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(), // Ojo, necesitarás cascadeOnDelete en la BD
+            ]);
+    }
 
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListItemTrajes::route('/'),
             'create' => Pages\CreateItemTraje::route('/create'),
-            //'edit' => Pages\EditItemTraje::route('/{record}/edit'),
+            'edit' => Pages\EditItemTraje::route('/{record}/edit'),
         ];
     }
 }
