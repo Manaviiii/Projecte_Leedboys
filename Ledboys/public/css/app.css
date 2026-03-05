@@ -433,9 +433,7 @@ img { max-width: 100%; display: block; }
 /* CATALOG */
 .catalog-section {
     padding: 4rem 2rem 8rem;
-    background:
-        radial-gradient(ellipse at 50% 40%, rgba(201,168,76,0.04) 0%, transparent 65%),
-        #141414;
+    background: var(--dark-bg);
 }
 
 .catalog-grid {
@@ -607,7 +605,7 @@ img { max-width: 100%; display: block; }
 .tipo-hero-content h1 span { color: var(--gold); }
 .tipo-hero-content p { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-top: 1rem; }
 .tipo-gallery { padding: 6rem 2rem; max-width: 1400px; margin: 0 auto; }
-.tipo-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2px; }
+.tipo-gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
 
 /* CONTACT */
 .contact { padding: 8rem 2rem; background: var(--gray-dark); }
