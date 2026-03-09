@@ -12,11 +12,107 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Main)
 /* harmony export */ });
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _components_Navbar__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./components/Navbar */ "./resources/js/components/Navbar.js");
+/* harmony import */ var _pages_Home__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pages/Home */ "./resources/js/pages/Home.js");
+/* harmony import */ var _pages_Catalogo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./pages/Catalogo */ "./resources/js/pages/Catalogo.js");
+/* harmony import */ var _pages_TipoPage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./pages/TipoPage */ "./resources/js/pages/TipoPage.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
 
+
+
+
+
+
+function getRoute() {
+  return window.location.pathname;
+}
 function Main() {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", {
-    children: "Ledboys React"
+  var _React$useState = react__WEBPACK_IMPORTED_MODULE_0___default().useState(getRoute()),
+    _React$useState2 = _slicedToArray(_React$useState, 2),
+    path = _React$useState2[0],
+    setPath = _React$useState2[1];
+  react__WEBPACK_IMPORTED_MODULE_0___default().useEffect(function () {
+    var handlePopState = function handlePopState() {
+      return setPath(getRoute());
+    };
+    window.addEventListener("popstate", handlePopState);
+    return function () {
+      return window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+  react__WEBPACK_IMPORTED_MODULE_0___default().useEffect(function () {
+    var handleClick = function handleClick(e) {
+      var link = e.target.closest("a[href]");
+      if (!link) return;
+      var href = link.getAttribute("href");
+      if (href && href.startsWith("/") && !href.startsWith("//")) {
+        e.preventDefault();
+        window.history.pushState(null, "", href);
+        setPath(href);
+        window.scrollTo(0, 0);
+      }
+    };
+    document.addEventListener("click", handleClick);
+    return function () {
+      return document.removeEventListener("click", handleClick);
+    };
+  }, []);
+  var renderPage = function renderPage() {
+    if (path === "/" || path === "") return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_pages_Home__WEBPACK_IMPORTED_MODULE_2__["default"], {});
+    if (path === "/catalogo" || path.startsWith("/catalogo")) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_pages_Catalogo__WEBPACK_IMPORTED_MODULE_3__["default"], {});
+    if (path.startsWith("/tipo/")) {
+      var tipo = path.replace("/tipo/", "").replace(/\/$/, "");
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_pages_TipoPage__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        tipo: tipo
+      });
+    }
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        gap: "1.5rem",
+        textAlign: "center",
+        padding: "2rem"
+      },
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("h1", {
+        style: {
+          fontFamily: "var(--font-display)",
+          fontSize: "8rem",
+          letterSpacing: "8px",
+          color: "var(--gold)"
+        },
+        children: "404"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("p", {
+        style: {
+          color: "rgba(255,255,255,0.5)",
+          letterSpacing: "3px",
+          textTransform: "uppercase"
+        },
+        children: "P\xE1gina no encontrada"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("a", {
+        href: "/",
+        className: "hero-btn",
+        children: "Volver al inicio"
+      })]
+    });
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_components_Navbar__WEBPACK_IMPORTED_MODULE_1__["default"], {
+      currentPath: path
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("main", {
+      children: renderPage()
+    })]
   });
 }
 
@@ -40,6 +136,1006 @@ __webpack_require__.r(__webpack_exports__);
 
 
 react_dom_client__WEBPACK_IMPORTED_MODULE_2__.createRoot(document.getElementById("app")).render(/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_Main__WEBPACK_IMPORTED_MODULE_0__["default"], {}));
+
+/***/ },
+
+/***/ "./resources/js/components/Footer.js"
+/*!*******************************************!*\
+  !*** ./resources/js/components/Footer.js ***!
+  \*******************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Footer)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
+
+function Footer() {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("footer", {
+    className: "footer",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+      className: "footer-main",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+        className: "footer-brand",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("img", {
+          src: "/images/ledboyss_logo.png",
+          alt: "Ledboyss",
+          style: {
+            height: 60,
+            width: "auto"
+          }
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("p", {
+          children: "Transformamos tus eventos en experiencias inolvidables. Animaci\xF3n, espect\xE1culo y baile para todo tipo de eventos."
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+        className: "footer-links",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("h4", {
+          children: "Navegaci\xF3n"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("ul", {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+              href: "/",
+              children: "Inicio"
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+              href: "/catalogo",
+              children: "Cat\xE1logo"
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+              href: "/tipo/bodas",
+              children: "Bodas"
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+              href: "/tipo/discotecas",
+              children: "Discotecas"
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+              href: "/tipo/eventos",
+              children: "Eventos"
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+              href: "/tipo/eventos",
+              children: "Pasacalles"
+            })
+          })]
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+        className: "footer-social",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("h4", {
+          children: "S\xEDguenos"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+          className: "footer-social-links",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("a", {
+            className: "footer-social-link",
+            href: "https://www.instagram.com/ledboyss/?hl=es",
+            target: "_blank",
+            rel: "noopener noreferrer",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+              className: "footer-social-icon",
+              children: "\uD83D\uDCF8"
+            }), "@Ledboyss"]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("a", {
+            className: "footer-social-link",
+            href: "https://www.instagram.com/ledgirlss/",
+            target: "_blank",
+            rel: "noopener noreferrer",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+              className: "footer-social-icon",
+              children: "\uD83D\uDCF8"
+            }), "@Ledgirlss"]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("a", {
+            className: "footer-social-link",
+            href: "tel:+34644784285",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+              className: "footer-social-icon",
+              children: "\uD83D\uDCDE"
+            }), "644 78 42 85"]
+          })]
+        })]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+      className: "footer-bottom",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("p", {
+        children: "Copyright LedBoyss"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+        className: "footer-bottom-links",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+          href: "/politica-de-cookies",
+          children: "Pol\xEDtica de cookies"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+          href: "/politica-de-privacidad",
+          children: "Pol\xEDtica de privacidad"
+        })]
+      })]
+    })]
+  });
+}
+
+/***/ },
+
+/***/ "./resources/js/components/Navbar.js"
+/*!*******************************************!*\
+  !*** ./resources/js/components/Navbar.js ***!
+  \*******************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Navbar)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+
+
+function Navbar(_ref) {
+  var _ref$currentPath = _ref.currentPath,
+    currentPath = _ref$currentPath === void 0 ? "/" : _ref$currentPath;
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+    _useState2 = _slicedToArray(_useState, 2),
+    scrolled = _useState2[0],
+    setScrolled = _useState2[1];
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+    _useState4 = _slicedToArray(_useState3, 2),
+    menuOpen = _useState4[0],
+    setMenuOpen = _useState4[1];
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var handleScroll = function handleScroll() {
+      return setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return function () {
+      return window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+  var handleAnchor = function handleAnchor(e, href) {
+    if (href === "#contacto") {
+      e.preventDefault();
+      setMenuOpen(false);
+      if (currentPath !== "/") {
+        window.location.href = "/#contacto";
+        return;
+      }
+      var el = document.getElementById("contacto");
+      if (el) el.scrollIntoView({
+        behavior: "smooth"
+      });
+    } else {
+      setMenuOpen(false);
+    }
+  };
+  var links = [{
+    label: "Inicio",
+    href: "/"
+  }, {
+    label: "Catálogo",
+    href: "/catalogo"
+  }, {
+    label: "Bodas",
+    href: "/tipo/bodas"
+  }, {
+    label: "Discotecas",
+    href: "/tipo/discotecas"
+  }, {
+    label: "Eventos",
+    href: "/tipo/eventos"
+  }, {
+    label: "Contacto",
+    href: "#contacto"
+  }];
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.Fragment, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("nav", {
+      className: "navbar".concat(scrolled ? " scrolled" : ""),
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+        className: "navbar-logo-left",
+        href: "/tipo/ledboyss",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("img", {
+          src: "/images/ledboyss_logo.png",
+          alt: "Ledboyss Performance"
+        })
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("ul", {
+        className: "navbar-links",
+        children: links.map(function (link) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("li", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+              href: link.href,
+              className: currentPath === link.href ? "active" : "",
+              onClick: function onClick(e) {
+                return handleAnchor(e, link.href);
+              },
+              children: link.label
+            })
+          }, link.label);
+        })
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+        className: "navbar-logo-right",
+        href: "/tipo/ledgirlss",
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("img", {
+          src: "/images/ledgirls_logo.png",
+          alt: "Ledgirlss Dancers"
+        })
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("button", {
+        className: "navbar-hamburger".concat(menuOpen ? " open" : ""),
+        onClick: function onClick() {
+          return setMenuOpen(!menuOpen);
+        },
+        "aria-label": "Menu",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {})]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+      className: "navbar-mobile".concat(menuOpen ? " open" : ""),
+      children: links.map(function (link) {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("a", {
+          href: link.href,
+          onClick: function onClick(e) {
+            return handleAnchor(e, link.href);
+          },
+          children: link.label
+        }, link.label);
+      })
+    })]
+  });
+}
+
+/***/ },
+
+/***/ "./resources/js/pages/Catalogo.js"
+/*!****************************************!*\
+  !*** ./resources/js/pages/Catalogo.js ***!
+  \****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Catalogo)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _components_Footer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Footer */ "./resources/js/components/Footer.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+
+
+
+var ALL_ITEMS = [{
+  id: 1,
+  name: "Daft Punk",
+  img: "/images/daft_punk.jpg",
+  tags: ["Discotecas", "Eventos"]
+}, {
+  id: 2,
+  name: "Iluminati",
+  img: "/images/iluminati.jpg",
+  tags: ["Eventos"]
+}, {
+  id: 3,
+  name: "Bad Bunny x Rauw",
+  img: "/images/Bad_bunny_x_rauw.jpg",
+  tags: ["Discotecas", "Bodas"]
+}, {
+  id: 4,
+  name: "Mariachis",
+  img: "/images/mariachis.jpg",
+  tags: ["Bodas", "Eventos"]
+}, {
+  id: 5,
+  name: "Flower Power",
+  img: "/images/flower_power.jpg",
+  tags: ["Bodas", "Eventos"]
+}, {
+  id: 6,
+  name: "Árboles",
+  img: "/images/arboles.jpg",
+  tags: ["Eventos", "Pasacalles"]
+}, {
+  id: 7,
+  name: "Anubis",
+  img: "/images/anubis.jpg",
+  tags: ["Discotecas", "Eventos"]
+}, {
+  id: 8,
+  name: "Gladiadores",
+  img: "/images/gladiadores.jpg",
+  tags: ["Eventos"]
+}, {
+  id: 9,
+  name: "Motomamis",
+  img: "/images/motomamis.jpg",
+  tags: ["Discotecas"]
+}, {
+  id: 10,
+  name: "Disco Girls",
+  img: "/images/disco_girls.jpg",
+  tags: ["Discotecas"]
+}, {
+  id: 11,
+  name: "Ángeles",
+  img: "/images/angeles.jpg",
+  tags: ["Bodas"]
+}, {
+  id: 12,
+  name: "Future Girls",
+  img: "/images/future_girls.jpg",
+  tags: ["Discotecas", "Eventos"]
+}];
+var FILTERS = ["Todos", "Discotecas", "Bodas", "Eventos", "Pasacalles"];
+var PER_PAGE = 12;
+function Catalogo() {
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("Todos"),
+    _useState2 = _slicedToArray(_useState, 2),
+    activeFilter = _useState2[0],
+    setActiveFilter = _useState2[1];
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(1),
+    _useState4 = _slicedToArray(_useState3, 2),
+    page = _useState4[0],
+    setPage = _useState4[1];
+  var filtered = activeFilter === "Todos" ? ALL_ITEMS : ALL_ITEMS.filter(function (item) {
+    return item.tags.includes(activeFilter);
+  });
+  var totalPages = Math.ceil(filtered.length / PER_PAGE);
+  var paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  var handleFilter = function handleFilter(f) {
+    setActiveFilter(f);
+    setPage(1);
+  };
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry, i) {
+        if (entry.isIntersecting) {
+          setTimeout(function () {
+            entry.target.classList.add("visible");
+          }, i * 60);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.01,
+      rootMargin: "200px"
+    });
+    document.querySelectorAll(".catalog-item").forEach(function (el) {
+      return observer.observe(el);
+    });
+    return function () {
+      return observer.disconnect();
+    };
+  }, [paginated]);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+    style: {
+      background: "#141414",
+      minHeight: "100vh"
+    },
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+      className: "page-hero",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("h1", {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+          children: "CAT\xC1"
+        }), "LOGO"]
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+      className: "filter-tabs",
+      children: FILTERS.map(function (f) {
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+          className: "filter-tab".concat(activeFilter === f ? " active" : ""),
+          onClick: function onClick() {
+            return handleFilter(f);
+          },
+          children: f
+        }, f);
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("section", {
+      className: "catalog-section",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "catalog-grid",
+        children: paginated.map(function (item) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+            className: "catalog-item",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("img", {
+              src: item.img,
+              alt: item.name
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+              className: "catalog-item-overlay"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+              className: "catalog-item-info",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("h3", {
+                children: item.name
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+                className: "tags",
+                children: item.tags.map(function (tag) {
+                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+                    className: "tag",
+                    children: tag
+                  }, tag);
+                })
+              })]
+            })]
+          }, item.id);
+        })
+      }), totalPages > 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+        className: "pagination",
+        children: [page > 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+          onClick: function onClick() {
+            return setPage(function (p) {
+              return p - 1;
+            });
+          },
+          children: "\u2190"
+        }), Array.from({
+          length: totalPages
+        }, function (_, i) {
+          return i + 1;
+        }).map(function (p) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+            className: p === page ? "active" : "",
+            onClick: function onClick() {
+              return setPage(p);
+            },
+            children: p
+          }, p);
+        }), page < totalPages && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+          onClick: function onClick() {
+            return setPage(function (p) {
+              return p + 1;
+            });
+          },
+          children: "\u2192"
+        })]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_components_Footer__WEBPACK_IMPORTED_MODULE_1__["default"], {})]
+  });
+}
+
+/***/ },
+
+/***/ "./resources/js/pages/Home.js"
+/*!************************************!*\
+  !*** ./resources/js/pages/Home.js ***!
+  \************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ Home)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _components_Footer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Footer */ "./resources/js/components/Footer.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
+function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
+function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+
+
+
+var CATEGORIES = [{
+  label: "Discotecas",
+  href: "/tipo/discotecas",
+  img: "/images/disco_girls.jpg"
+}, {
+  label: "Bodas",
+  href: "/tipo/bodas",
+  img: "/images/angeles.jpg"
+}, {
+  label: "Eventos",
+  href: "/tipo/eventos",
+  img: "/images/opcion_eventos.png"
+}, {
+  label: "Pasacalles",
+  href: "/tipo/eventos",
+  img: "/images/arboles.jpg"
+}];
+function Home() {
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)({
+      nombre: "",
+      email: "",
+      telefono: "",
+      tipo: "",
+      mensaje: ""
+    }),
+    _useState2 = _slicedToArray(_useState, 2),
+    formData = _useState2[0],
+    setFormData = _useState2[1];
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
+    _useState4 = _slicedToArray(_useState3, 2),
+    submitted = _useState4[0],
+    setSubmitted = _useState4[1];
+  var handleChange = function handleChange(e) {
+    return setFormData(_objectSpread(_objectSpread({}, formData), {}, _defineProperty({}, e.target.name, e.target.value)));
+  };
+  var handleSubmit = function handleSubmit(e) {
+    e.preventDefault();
+    setSubmitted(true);
+  };
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("section", {
+      className: "hero",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("video", {
+        className: "hero-video",
+        autoPlay: true,
+        muted: true,
+        loop: true,
+        playsInline: true,
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("source", {
+          src: "/videos/inicio_ledboys.mp4",
+          type: "video/mp4"
+        })
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "hero-overlay"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+        className: "hero-content",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("h1", {
+          children: ["LEDBOYSS ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+            children: "&"
+          }), " LEDGIRLSS"]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+          children: "Performance \xB7 Zancudos \xB7 Animaci\xF3n y Baile"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("a", {
+          href: "/catalogo",
+          className: "hero-btn",
+          children: "Ver Cat\xE1logo"
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+        className: "hero-scroll",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+          children: "Scroll"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+          className: "hero-scroll-line"
+        })]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("section", {
+      className: "about",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+        className: "section-label",
+        children: "Sobre nosotros"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "gold-divider"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("h2", {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+          children: "LEDBOYSS & LEDGIRLSS"
+        }), " Performance \u2013", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("br", {}), "Zancudos, Animaci\xF3n y Baile"]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+        children: "Transformamos tus eventos en experiencias inolvidables. Con nuestra pasi\xF3n por la m\xFAsica, danza y el entretenimiento, ofrecemos servicios de animaci\xF3n personalizados para discotecas, bodas y eventos de todo tipo, asegurando que cada celebraci\xF3n sea \xFAnica y llena de energ\xEDa."
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+        children: "Nuestro equipo de profesionales se encarga de cada detalle, desde ofrecer la tem\xE1tica que m\xE1s se adapte a tu fiesta, hasta la interacci\xF3n con el p\xFAblico divertida, creando sonrisas e inolvidables momentos \xFAnicos que quedar\xE1n para siempre en el recuerdo."
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+        children: "D\xE9janos ser parte de tu gran d\xEDa o de tu fiesta, y juntos haremos que sea espectacular e inmejorable. \xA1Cont\xE1ctanos y descubre c\xF3mo podemos hacer de tu evento algo realmente diferente y especial!"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "about-cta",
+        style: {
+          marginTop: "3rem"
+        },
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("a", {
+          href: "/catalogo",
+          className: "hero-btn",
+          children: "Ver cat\xE1logo"
+        })
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("section", {
+      className: "categories",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+        className: "categories-title",
+        children: "Nuestros servicios"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "categories-grid",
+        children: CATEGORIES.map(function (cat) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("a", {
+            href: cat.href,
+            className: "category-card",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("img", {
+              src: cat.img,
+              alt: cat.label
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+              className: "category-card-overlay"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+              className: "category-card-content",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("h3", {
+                children: cat.label
+              })
+            })]
+          }, cat.label);
+        })
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("section", {
+      className: "partners",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("h2", {
+        children: "LUGARES DONDE HEMOS TRABAJADO"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "partners-grid",
+        children: ["Celosa", "Go Beach", "Sala 2", "Venue 4", "Venue 5", "Venue 6"].map(function (p, i) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+            className: "partner-placeholder",
+            children: p
+          }, i);
+        })
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("section", {
+      className: "contact",
+      id: "contacto",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+        className: "contact-inner",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+          className: "section-label",
+          children: "Cont\xE1ctanos"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+          className: "gold-divider"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("h2", {
+          children: ["HAZ TU ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+            children: "EVENTO"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("br", {}), "\xDANICO"]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+          className: "contact-subtitle",
+          children: "Cu\xE9ntanos qu\xE9 necesitas y te preparamos una propuesta"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("a", {
+          className: "contact-phone",
+          href: "tel:+34644784285",
+          children: "\uD83D\uDCDE 644 78 42 85"
+        }), submitted ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+          className: "form-success",
+          children: "\u2713 Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto."
+        }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("form", {
+          className: "contact-form",
+          onSubmit: handleSubmit,
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+            className: "form-row",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+              className: "form-group",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("label", {
+                children: "Nombre"
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
+                type: "text",
+                name: "nombre",
+                value: formData.nombre,
+                onChange: handleChange,
+                placeholder: "Tu nombre",
+                required: true
+              })]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+              className: "form-group",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("label", {
+                children: "Email"
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
+                type: "email",
+                name: "email",
+                value: formData.email,
+                onChange: handleChange,
+                placeholder: "tu@email.com",
+                required: true
+              })]
+            })]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+            className: "form-row",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+              className: "form-group",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("label", {
+                children: "Tel\xE9fono"
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("input", {
+                type: "tel",
+                name: "telefono",
+                value: formData.telefono,
+                onChange: handleChange,
+                placeholder: "666 000 000"
+              })]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+              className: "form-group",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("label", {
+                children: "Tipo de evento"
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("select", {
+                name: "tipo",
+                value: formData.tipo,
+                onChange: handleChange,
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("option", {
+                  value: "",
+                  children: "Selecciona..."
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("option", {
+                  value: "boda",
+                  children: "Boda"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("option", {
+                  value: "discoteca",
+                  children: "Discoteca"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("option", {
+                  value: "evento",
+                  children: "Evento"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("option", {
+                  value: "pasacalles",
+                  children: "Pasacalles"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("option", {
+                  value: "otro",
+                  children: "Otro"
+                })]
+              })]
+            })]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+            className: "form-group",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("label", {
+              children: "Mensaje"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("textarea", {
+              name: "mensaje",
+              value: formData.mensaje,
+              onChange: handleChange,
+              placeholder: "Cu\xE9ntanos sobre tu evento..."
+            })]
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+            className: "form-submit",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+              type: "submit",
+              className: "btn-primary",
+              children: "Enviar"
+            })
+          })]
+        })]
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_components_Footer__WEBPACK_IMPORTED_MODULE_1__["default"], {})]
+  });
+}
+
+/***/ },
+
+/***/ "./resources/js/pages/TipoPage.js"
+/*!****************************************!*\
+  !*** ./resources/js/pages/TipoPage.js ***!
+  \****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ TipoPage)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _components_Footer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/Footer */ "./resources/js/components/Footer.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
+
+
+var TIPO_CONFIG = {
+  bodas: {
+    title: "BODAS",
+    subtitle: "Hacemos de tu boda un momento mágico e irrepetible",
+    bg: "/images/angeles.jpg",
+    description: "Convertimos tu boda en un espectáculo de luz y color. Nuestros performers con trajes LED iluminan la pista de baile y crean momentos únicos que tus invitados recordarán siempre.",
+    items: [{
+      name: "Mariachis",
+      img: "/images/mariachis.jpg"
+    }, {
+      name: "Flower Power",
+      img: "/images/flower_power.jpg"
+    }, {
+      name: "Ángeles",
+      img: "/images/angeles.jpg"
+    }, {
+      name: "Daft Punk",
+      img: "/images/daft_punk.jpg"
+    }]
+  },
+  discotecas: {
+    title: "DISCOTECAS",
+    subtitle: "La energía perfecta para tu noche",
+    bg: "/images/motomamis.jpg",
+    description: "Llevamos el espectáculo a otro nivel en clubs y discotecas. Nuestros performers LED se integran perfectamente con la música y el ambiente para crear una noche inolvidable.",
+    items: [{
+      name: "Daft Punk",
+      img: "/images/daft_punk.jpg"
+    }, {
+      name: "Motomamis",
+      img: "/images/motomamis.jpg"
+    }, {
+      name: "Disco Girls",
+      img: "/images/disco_girls.jpg"
+    }, {
+      name: "Future Girls",
+      img: "/images/future_girls.jpg"
+    }, {
+      name: "Anubis",
+      img: "/images/anubis.jpg"
+    }, {
+      name: "Bad Bunny x Rauw",
+      img: "/images/Bad_bunny_x_rauw.jpg"
+    }]
+  },
+  eventos: {
+    title: "EVENTOS",
+    subtitle: "Para cualquier tipo de celebración especial",
+    bg: "/images/opcion_eventos.png",
+    description: "Desde festivales hasta eventos corporativos, pasando por fiestas privadas y pasacalles. Adaptamos nuestro espectáculo a cualquier tipo de evento para garantizar una experiencia única.",
+    items: [{
+      name: "Iluminati",
+      img: "/images/iluminati.jpg"
+    }, {
+      name: "Gladiadores",
+      img: "/images/gladiadores.jpg"
+    }, {
+      name: "Árboles",
+      img: "/images/arboles.jpg"
+    }, {
+      name: "Future Girls",
+      img: "/images/future_girls.jpg"
+    }]
+  },
+  ledboyss: {
+    title: "LEDBOYSS",
+    subtitle: "Performance masculino LED de alta energía",
+    bg: "/images/anubis.jpg",
+    description: "Los Ledboyss son nuestro equipo masculino de performers con trajes LED de última generación. Su presencia imponente y energética transforma cualquier evento en un espectáculo visual único.",
+    items: [{
+      name: "Anubis",
+      img: "/images/anubis.jpg"
+    }, {
+      name: "Gladiadores",
+      img: "/images/gladiadores.jpg"
+    }, {
+      name: "Daft Punk",
+      img: "/images/daft_punk.jpg"
+    }, {
+      name: "Iluminati",
+      img: "/images/iluminati.jpg"
+    }, {
+      name: "Mariachis",
+      img: "/images/mariachis.jpg"
+    }]
+  },
+  ledgirlss: {
+    title: "LEDGIRLSS",
+    subtitle: "Elegancia y espectáculo en cada movimiento",
+    bg: "/images/future_girls.jpg",
+    description: "Las Ledgirlss son nuestras performers femeninas, combinando elegancia, técnica de baile y espectaculares trajes LED para crear actuaciones de alto impacto visual.",
+    items: [{
+      name: "Flower Power",
+      img: "/images/flower_power.jpg"
+    }, {
+      name: "Disco Girls",
+      img: "/images/disco_girls.jpg"
+    }, {
+      name: "Motomamis",
+      img: "/images/motomamis.jpg"
+    }, {
+      name: "Future Girls",
+      img: "/images/future_girls.jpg"
+    }, {
+      name: "Ángeles",
+      img: "/images/angeles.jpg"
+    }]
+  }
+};
+function TipoPage(_ref) {
+  var tipo = _ref.tipo;
+  var config = TIPO_CONFIG[tipo] || TIPO_CONFIG["eventos"];
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+    className: "tipo-page",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+      className: "tipo-hero",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("img", {
+        className: "tipo-hero-bg",
+        src: config.bg,
+        alt: config.title
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "tipo-hero-overlay"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+        className: "tipo-hero-content",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("h1", {
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+            children: config.title.slice(0, 3)
+          }), config.title.slice(3)]
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+          children: config.subtitle
+        })]
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+      style: {
+        padding: "5rem 2rem",
+        maxWidth: 800,
+        margin: "0 auto",
+        textAlign: "center"
+      },
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "gold-divider"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("p", {
+        style: {
+          fontSize: "1rem",
+          fontWeight: 300,
+          lineHeight: 1.9,
+          color: "rgba(255,255,255,0.75)"
+        },
+        children: config.description
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        style: {
+          marginTop: "2.5rem"
+        },
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("a", {
+          href: "/catalogo",
+          className: "hero-btn",
+          children: "Ver cat\xE1logo completo"
+        })
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+      className: "tipo-gallery",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "tipo-gallery-grid",
+        children: config.items.map(function (item, i) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
+            className: "catalog-item",
+            style: {
+              aspectRatio: "4/5"
+            },
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("img", {
+              src: item.img,
+              alt: item.name
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+              className: "catalog-item-overlay"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+              className: "catalog-item-info",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("h3", {
+                children: item.name
+              })
+            })]
+          }, i);
+        })
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("section", {
+      style: {
+        padding: "6rem 2rem",
+        textAlign: "center",
+        background: "var(--gray-dark)",
+        borderTop: "1px solid rgba(201,168,76,0.15)"
+      },
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+        className: "section-label",
+        children: "\xBFInteresado?"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+        className: "gold-divider"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("h2", {
+        style: {
+          fontFamily: "var(--font-display)",
+          fontSize: "clamp(2rem, 5vw, 4rem)",
+          letterSpacing: "6px",
+          marginBottom: "2rem"
+        },
+        children: ["CONTRATA ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+          style: {
+            color: "var(--gold)"
+          },
+          children: "NUESTRO"
+        }), " SHOW"]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("a", {
+        href: "/#contacto",
+        className: "hero-btn",
+        children: "Contactar ahora"
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_components_Footer__WEBPACK_IMPORTED_MODULE_1__["default"], {})]
+  });
+}
 
 /***/ },
 
