@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '7bf22de6b8545702ffe9e8f18cc1b4683b1a29bb',
+        'pretty_version' => '1.0.0+no-version-set',
+        'version' => '1.0.0.0',
+        'reference' => null,
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '7bf22de6b8545702ffe9e8f18cc1b4683b1a29bb',
+            'pretty_version' => '1.0.0+no-version-set',
+            'version' => '1.0.0.0',
+            'reference' => null,
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -622,6 +622,15 @@
             'reference' => '62fd2ecb50b938a46025093bcb64fcaddd531f89',
             'type' => 'library',
             'install_path' => __DIR__ . '/../ryangjchandler/blade-capture-directive',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'saade/filament-fullcalendar' => array(
+            'pretty_version' => 'v1.9.0',
+            'version' => '1.9.0.0',
+            'reference' => '3142b64918521f76620bb7c0ce20ab6b8c018a80',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../saade/filament-fullcalendar',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
