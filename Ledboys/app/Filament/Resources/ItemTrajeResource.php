@@ -14,7 +14,7 @@ use Filament\Forms\Components\Section;
 class ItemTrajeResource extends Resource
 {
     protected static ?string $model = ItemTraje::class;
-    protected static ?string $navigationIcon = 'heroicon-o-sparkles'; // Icono mas chulo
+    protected static ?string $navigationIcon = 'heroicon-o-sparkles'; 
     protected static ?string $navigationLabel = 'Trajes';
 
     public static function form(Form $form): Form

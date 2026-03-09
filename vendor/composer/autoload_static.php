@@ -27,9 +27,9 @@ class ComposerStaticInit3c330f12fd1f2fcb3ad9ff4b673eb718
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
         'e1e8b49c332434256b5df11b0f0c2a62' => __DIR__ . '/..' . '/league/uri-parser/src/functions_include.php',
-        '29ffe97919493792170d47eb03a68da9' => __DIR__ . '/..' . '/blade-ui-kit/blade-icons/src/helpers.php',
         'e125f489d647ae664b0af7b573079de7' => __DIR__ . '/..' . '/filament/support/src/helpers.php',
         '40275907c8566c390185147049ef6e5d' => __DIR__ . '/..' . '/livewire/livewire/src/helpers.php',
+        '29ffe97919493792170d47eb03a68da9' => __DIR__ . '/..' . '/blade-ui-kit/blade-icons/src/helpers.php',
         'b69d5f1f95cd1ed438c038b6cbcc45b5' => __DIR__ . '/..' . '/filament/notifications/src/Testing/Autoload.php',
         '9261e07cd92c53dcc971c7c88c176c04' => __DIR__ . '/..' . '/danharrin/date-format-converter/src/helpers.php',
         '9720327d09ed9a4ba00c9b5071b71c7d' => __DIR__ . '/..' . '/danharrin/date-format-converter/src/standards.php',
@@ -78,6 +78,7 @@ class ComposerStaticInit3c330f12fd1f2fcb3ad9ff4b673eb718
             'Symfony\\Component\\Console\\' => 26,
             'Spatie\\LaravelPackageTools\\' => 27,
             'Spatie\\Invade\\' => 14,
+            'Saade\\FilamentFullCalendar\\' => 27,
         ),
         'R' =>
         array (
@@ -305,6 +306,10 @@ class ComposerStaticInit3c330f12fd1f2fcb3ad9ff4b673eb718
         'Spatie\\Invade\\' =>
         array (
             0 => __DIR__ . '/..' . '/spatie/invade/src',
+        ),
+        'Saade\\FilamentFullCalendar\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/saade/filament-fullcalendar/src',
         ),
         'RyanChandler\\BladeCaptureDirective\\Database\\Factories\\' =>
         array (
