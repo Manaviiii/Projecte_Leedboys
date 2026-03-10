@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('evento_id')->nullable()->constrained('eventos')->nullOnDelete();
             $table->foreignId('residencia_id')->nullable()->constrained('residencias')->nullOnDelete();
             $table->decimal('amount', 8, 2);
+            $table->text('detalles_items'); // Aquí guardaremos: "Traje Marshmello, Corbata Azul"
             $table->enum('estado', ['pendiente', 'pagado', 'fallido', 'reembolsado']);
             $table->string('stripe_payment_intent_id')->nullable();
             $table->timestamps();

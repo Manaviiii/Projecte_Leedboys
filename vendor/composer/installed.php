@@ -652,6 +652,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'stripe/stripe-php' => array(
+            'pretty_version' => 'v19.4.1',
+            'version' => '19.4.1.0',
+            'reference' => '095384404587d07de2ad1154c389c4051c5ed92f',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../stripe/stripe-php',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'symfony/console' => array(
             'pretty_version' => 'v6.4.32',
             'version' => '6.4.32.0',

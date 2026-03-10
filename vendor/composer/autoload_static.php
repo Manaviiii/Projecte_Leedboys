@@ -76,6 +76,7 @@ class ComposerStaticInit3c330f12fd1f2fcb3ad9ff4b673eb718
             'Symfony\\Component\\ErrorHandler\\' => 31,
             'Symfony\\Component\\CssSelector\\' => 30,
             'Symfony\\Component\\Console\\' => 26,
+            'Stripe\\' => 7,
             'Spatie\\LaravelPackageTools\\' => 27,
             'Spatie\\Invade\\' => 14,
             'Saade\\FilamentFullCalendar\\' => 27,
@@ -298,6 +299,10 @@ class ComposerStaticInit3c330f12fd1f2fcb3ad9ff4b673eb718
         'Symfony\\Component\\Console\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
+        ),
+        'Stripe\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
         ),
         'Spatie\\LaravelPackageTools\\' =>
         array (
