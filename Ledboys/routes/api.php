@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrajeController;
 use App\Http\Controllers\AccesorioController;
 use App\Http\Controllers\PackController;
+use App\Http\Controllers\PaymentController;
 
 /*
 IMPORTANTE:
@@ -57,6 +58,16 @@ Route::get('/packs/buscar', PackController::class . '@buscar');
 
 //Mostrar un pack
 Route::get('/packs/{id}', PackController::class . '@mostrar');
+
+#endregion
+
+#region PAYMENTS
+
+// 1. Iniciar el proceso y obtener el clientSecret de Stripe
+Route::post('/pagos/intento', [PaymentController::class, 'crearIntento']);
+
+// 2. Confirmar que el pago fue OK para cambiar el estado a 'pagado'
+Route::put('/pagos/{id}/confirmar', [PaymentController::class, 'confirmarPago']);
 
 #endregion
 
