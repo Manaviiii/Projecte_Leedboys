@@ -1,0 +1,173 @@
+Solo conectarte al repositorio desde un usb (ya estas linkado al repositorio automáticamente):
+
+git clone https://github.com/Manaviiii/Projecte_Leedboys.git (obtienes los archivos del github)
+
+Primera vez para conectarte (solo propietario)
+git init
+git branch -M main
+git add .
+git commit -m "mensaje"
+git remote add origin https://github.com/Manaviiii/Projecte_Leedboys.git
+git push -u origin main
+
+Mecanica cuando ya estas linkado y quieres guardar archivos
+git add .
+git commit -m "Descripción del cambio"
+git push
+
+IMPORTANTE!!!!!!!
+
+No tengo la carpeta → git clone https.....
+Ya tengo la carpeta → git pull
+
+<<<<<<< HEAD
+Obtener archivos
+No tengo la carpeta → git clone http.....
+Ya tengo la carpeta → git pull
+=======
+
+Perfecto 😎, vamos a generar tu SSH temporal paso a paso para el PC de clase. Todo lo que hagamos funciona mientras la sesión esté activa.
+
+1️⃣ Abre Git Bash
+
+Abre Git Bash en tu PC de clase.
+
+2️⃣ Genera la clave SSH
+
+Escribe esto y pulsa ENTER en todos los pasos:
+
+ssh-keygen -t ed25519 -C "ikerguien"
+
+
+Te pedirá ruta: pulsa ENTER (usa la ruta por defecto)
+
+Te pedirá passphrase: pulsa ENTER dos veces (dejamos en blanco)
+
+Esto crea dos archivos:
+
+id_ed25519 → tu clave privada (no compartir)
+
+id_ed25519.pub → tu clave pública (la que vamos a subir a GitHub)
+
+3️⃣ Copia la clave pública
+cat ~/.ssh/id_ed25519.pub
+
+
+Se mostrará un texto largo que empieza por ssh-ed25519
+
+Cópialo todo, eso es tu clave pública
+
+4️⃣ Añádela a GitHub
+
+Ve a 👉 https://github.com/settings/ssh/new
+
+Title: PC de clase (o cualquier nombre)
+
+Key: pega la clave pública que copiaste
+
+Guardar
+
+5️⃣ Prueba que funciona
+ssh -T git@github.com
+
+
+Debería salir algo como:
+
+Hi ikerguien! You've successfully authenticated
+
+
+✅ Si sale eso, SSH ya funciona.
+
+6️⃣ Cambia tu repo a SSH
+
+Si ya tienes un repo local:
+
+git remote set-url origin git@github.com:Manaviiii/Projecte_Leedboys.git
+
+7️⃣ Haz push/clonación
+
+Ahora puedes hacer:
+
+git push -u origin master
+
+
+o
+
+git clone git@github.com:Manaviiii/Projecte_Leedboys.git
+
+
+Importante: esto solo durará mientras el PC no se reinicie, porque todo lo que generaste desaparece al apagar.
+
+Si quieres, te puedo dar una versión súper resumida de todos estos pasos en 5 comandos que puedes copiar y pegar, lista para hacer un push en el PC de clase antes de que se reinicie.
+
+¿Quieres que haga eso?
+
+Usuari@P154 MINGW64 /e/Projecte/PROJ2/Ledboys/Projecte_Leedboys (main)
+$ git push
+To github.com:Manaviiii/Projecte_Leedboys.git
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'git@github.com:Manaviiii/Projecte_Leedboys.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+
+¡Perfecto! Esto ya es un error normal de Git, no tiene nada que ver con permisos ni tokens 😄.
+
+Te explico qué significa y cómo arreglarlo.
+
+❌ Qué significa
+Updates were rejected because the remote contains work that you do
+not have locally
+
+
+El repositorio remoto (main en GitHub) tiene commits que tú no tienes en tu copia local.
+
+Git no puede hacer un push directo porque se perderían esos cambios remotos.
+
+Esto pasa mucho cuando:
+
+Creaste un README o .gitignore desde GitHub
+
+Otro compañero hizo cambios
+
+Inicialmente el repo no estaba vacío
+
+✅ Cómo solucionarlo
+Opción 1: Traer los cambios remotos y combinar (recomendado)
+git pull --rebase origin main
+
+
+Esto trae los cambios remotos y los pone antes de tus commits locales
+
+Evita los “merge commits” automáticos
+
+Después haces push:
+
+git push
+
+Opción 2: Forzar el push (solo si estás seguro)
+
+⚠️ Esto BORRA lo que haya en GitHub que no tengas localmente.
+No lo uses si hay trabajo de otra persona.
+
+git push --force
+
+🔍 Flujo recomendado en tu caso (PC de clase, repo limpio)
+
+Asegúrate de estar en la rama correcta:
+
+git branch
+
+
+Trae los cambios remotos:
+
+git pull --rebase origin main
+
+
+Haz push:
+
+git push
+>>>>>>> acb680fa24ea0a208fb526f41edc9c9a8680c4c6
