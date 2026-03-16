@@ -1,0 +1,60 @@
+@import './variables.less';
+
+.navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 80px;
+    background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    transition: all 0.3s ease;
+
+    &.scrolled { height: 65px; }
+
+    &-logo-left, &-logo-right {
+        display: flex; flex-direction: column; align-items: center;
+        gap: 4px; cursor: pointer; transition: opacity 0.3s; text-decoration: none;
+        &:hover { opacity: 0.8; }
+        img { height: 90px; width: auto; }
+    }
+
+    &-links {
+        display: flex; align-items: center; gap: 2.5rem; list-style: none;
+        a {
+            font-size: 0.75rem; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; color: @white; position: relative; transition: color 0.3s;
+            &::after {
+                content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+                height: 1px; background: @gold; transform: scaleX(0); transition: transform 0.3s ease;
+            }
+            &:hover, &.active {
+                color: @gold;
+                &::after { transform: scaleX(1); }
+            }
+        }
+    }
+
+    &-hamburger {
+        display: none; flex-direction: column; gap: 5px;
+        cursor: pointer; padding: 5px; background: none; border: none;
+        span { display: block; width: 25px; height: 2px; background: @white; transition: all 0.3s ease; }
+        &.open {
+            span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+            span:nth-child(2) { opacity: 0; }
+            span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+        }
+    }
+
+    &-mobile {
+        display: none; position: fixed; top: 80px; left: 0; right: 0;
+        background: rgba(0,0,0,0.98); padding: 2rem; z-index: 999;
+        border-bottom: 1px solid rgba(201,168,76,0.2);
+        flex-direction: column; gap: 1.5rem; align-items: center;
+        &.open { display: flex; }
+        a { font-size: 1rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: @white; transition: color 0.3s; &:hover { color: @gold; } }
+    }
+}
+
+@media (max-width: 900px) {
+    .navbar-links { display: none; }
+    .navbar-hamburger { display: flex; }
+}

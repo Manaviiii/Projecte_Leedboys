@@ -1,0 +1,127 @@
+@import './variables.less';
+
+// =============================================
+// Reset + Base
+// =============================================
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+@property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+:root {
+    --black: @black;
+    --white: @white;
+    --gold: @gold;
+    --gold-light: @gold-light;
+    --dark-bg: @dark-bg;
+    --gray-dark: @gray-dark;
+    --gray-mid: @gray-mid;
+    --text-muted: @text-muted;
+    --font-display: @font-display;
+    --font-body: @font-body;
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: @font-body; background-color: @black; color: @white; overflow-x: hidden; line-height: 1.6; }
+a { text-decoration: none; color: inherit; }
+img { max-width: 100%; display: block; }
+
+// =============================================
+// Utilidades compartidas
+// =============================================
+.gold-divider { width: 60px; height: 2px; background: @gold; margin: 0 auto 2rem; }
+.section-label { font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; color: @gold; margin-bottom: 1rem; display: block; }
+.loading { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
+.loading-spinner {
+    width: 40px; height: 40px;
+    border: 2px solid rgba(201,168,76,0.2);
+    border-top-color: @gold;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// =============================================
+// Botones compartidos
+// =============================================
+.hero-btn { .btn-base(); }
+.btn-primary { .btn-base(); padding: 1rem 3.5rem; font-family: @font-body; }
+
+// =============================================
+// Page Hero compartido
+// =============================================
+.page-hero {
+    padding-top: 80px; padding-bottom: 4rem;
+    text-align: center; background: @dark-bg; position: relative;
+
+    &::after {
+        content: ''; position: absolute;
+        bottom: 0; left: 10%; right: 10%; height: 1px;
+        background: linear-gradient(to right, transparent, @gold, transparent);
+    }
+    h1 {
+        font-family: @font-display;
+        font-size: clamp(3rem, 8vw, 7rem);
+        letter-spacing: 8px; color: @white; padding-top: 4rem;
+        span { color: @gold; }
+    }
+}
+
+// =============================================
+// Catalog Item compartido (Catalogo + TipoPage)
+// =============================================
+@keyframes borderSpin { from { --angle: 0deg; } to { --angle: 360deg; } }
+
+.catalog-item {
+    position: relative; overflow: hidden; cursor: pointer;
+    aspect-ratio: 2/3; background: @gray-mid; border-radius: 2px;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
+
+    .light-sweep();
+
+    &::after {
+        content: ''; position: absolute; inset: -2px; border-radius: 2px;
+        background: conic-gradient(from var(--angle), transparent 0deg, @gold 40deg, @gold-light 60deg, #fff 70deg, @gold-light 80deg, @gold 100deg, transparent 140deg);
+        opacity: 0; z-index: 5; pointer-events: none;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor; mask-composite: exclude;
+        padding: 3px; transition: opacity 0.3s ease;
+        filter: brightness(1.8) drop-shadow(0 0 6px @gold);
+    }
+    &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 20px rgba(201,168,76,0.12), 0 0 1px rgba(201,168,76,0.25);
+        &::after { opacity: 1; animation: borderSpin 1.8s linear infinite; }
+    }
+
+    img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+    &:hover img { transform: scale(1.05); }
+
+    &-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+        opacity: 0; transition: opacity 0.4s ease; z-index: 1;
+    }
+    &:hover &-overlay { opacity: 1; }
+
+    &-info {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        padding: 1.5rem; transform: translateY(10px); opacity: 0;
+        transition: all 0.35s ease; z-index: 4;
+
+        h3 {
+            font-family: @font-display; font-size: 1.5rem; letter-spacing: 3px; color: @white;
+            text-shadow: 0 0 12px rgba(201,168,76,0.5), 0 0 30px rgba(201,168,76,0.2);
+        }
+        .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .tag { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; padding: 2px 8px; border: 1px solid @gold; color: @gold; }
+    }
+    &:hover &-info { transform: translateY(0); opacity: 1; }
+}
+
+// =============================================
+// Responsive global
+// =============================================
+@media (max-width: 600px) {
+    .navbar { padding: 0 1rem; }
+    .navbar-logo-left img, .navbar-logo-right img { height: 32px; }
+}
