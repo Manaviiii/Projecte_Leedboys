@@ -1,19 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\ItemTrajeResource\Pages;
+namespace App\Filament\Resources\ItemPackResource\Pages;
 
-use App\Filament\Resources\ItemTrajeResource;
+use App\Filament\Resources\ItemPackResource;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 
-class EditItemTraje extends EditRecord
+class EditItemPack extends EditRecord
 {
-    protected static string $resource = ItemTrajeResource::class;
+    protected static string $resource = ItemPackResource::class;
 
-    /**
-     * Al cargar el formulario, combinamos los campos de `items` y de `item_trajes`
-     * en un único array de estado para que el formulario los muestre correctamente.
-     */
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $item = $this->record->item;
@@ -26,12 +22,8 @@ class EditItemTraje extends EditRecord
         return $data;
     }
 
-    /**
-     * Al guardar, actualizamos el Item base y el ItemTraje por separado.
-     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        // Actualizar el Item base
         $record->item->update([
             'nombre'      => $data['nombre_item'],
             'precio'      => $data['precio_item'],
@@ -39,11 +31,8 @@ class EditItemTraje extends EditRecord
             'imagen'      => $data['imagen_item'] ?? null,
         ]);
 
-        // Actualizar el ItemTraje
         $record->update([
-            'tipo_traje'  => $data['tipo_traje'],
-            'genero'      => $data['genero'],
-            'stock_total' => $data['stock_total'],
+            'numero_zancudos' => $data['numero_zancudos'],
         ]);
 
         return $record;

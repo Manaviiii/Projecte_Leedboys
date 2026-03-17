@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ItemTrajeResource\Pages;
-use App\Models\ItemTraje;
+use App\Filament\Resources\ItemAccesorioResource\Pages;
+use App\Models\ItemAccesorio;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -11,20 +11,20 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Forms\Components\Section;
 
-class ItemTrajeResource extends Resource
+class ItemAccesorioResource extends Resource
 {
-    protected static ?string $model = ItemTraje::class;
-    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
-    protected static ?string $navigationLabel = 'Trajes';
+    protected static ?string $model = ItemAccesorio::class;
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $navigationLabel = 'Accesorios';
     protected static ?string $navigationGroup = 'Catálogo';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make('Datos Generales')->schema([
                 Forms\Components\TextInput::make('nombre_item')
-                    ->label('Nombre del Traje')
+                    ->label('Nombre del Accesorio')
                     ->required()
                     ->maxLength(255),
 
@@ -46,30 +46,13 @@ class ItemTrajeResource extends Resource
                     ->columnSpan(2),
             ])->columns(2),
 
-            Section::make('Detalles del Traje')->schema([
-                Forms\Components\Select::make('tipo_traje')
-                    ->label('Tipo')
-                    ->options([
-                        'zancos'     => 'Con Zancos',
-                        'sin_zancos' => 'Sin Zancos',
-                    ])
-                    ->required(),
-
-                Forms\Components\Select::make('genero')
-                    ->options([
-                        'chico'  => 'Chico',
-                        'chica'  => 'Chica',
-                        'unisex' => 'Unisex',
-                    ])
-                    ->default('unisex')
-                    ->required(),
-
+            Section::make('Stock')->schema([
                 Forms\Components\TextInput::make('stock_total')
                     ->label('Stock Total')
                     ->numeric()
                     ->minValue(0)
                     ->required(),
-            ])->columns(3),
+            ]),
         ]);
     }
 
@@ -82,18 +65,6 @@ class ItemTrajeResource extends Resource
                     ->label('Nombre')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\BadgeColumn::make('tipo_traje')
-                    ->label('Tipo')
-                    ->colors([
-                        'primary' => 'zancos',
-                        'secondary' => 'sin_zancos',
-                    ]),
-                Tables\Columns\BadgeColumn::make('genero')
-                    ->colors([
-                        'primary' => 'unisex',
-                        'danger'  => 'chica',
-                        'success' => 'chico',
-                    ]),
                 Tables\Columns\TextColumn::make('stock_total')->label('Stock'),
                 Tables\Columns\TextColumn::make('item.precio')
                     ->label('Precio')
@@ -101,19 +72,6 @@ class ItemTrajeResource extends Resource
                 Tables\Columns\IconColumn::make('item.activo')
                     ->label('Activo')
                     ->boolean(),
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('tipo_traje')
-                    ->options([
-                        'zancos'     => 'Con Zancos',
-                        'sin_zancos' => 'Sin Zancos',
-                    ]),
-                Tables\Filters\SelectFilter::make('genero')
-                    ->options([
-                        'chico'  => 'Chico',
-                        'chica'  => 'Chica',
-                        'unisex' => 'Unisex',
-                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -127,9 +85,9 @@ class ItemTrajeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListItemTrajes::route('/'),
-            'create' => Pages\CreateItemTraje::route('/create'),
-            'edit'   => Pages\EditItemTraje::route('/{record}/edit'),
+            'index'  => Pages\ListItemAccesorios::route('/'),
+            'create' => Pages\CreateItemAccesorio::route('/create'),
+            'edit'   => Pages\EditItemAccesorio::route('/{record}/edit'),
         ];
     }
 }
