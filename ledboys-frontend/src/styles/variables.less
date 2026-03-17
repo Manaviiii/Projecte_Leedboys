@@ -1,0 +1,68 @@
+// =============================================
+// LEDBOYSS - Variables globales
+// =============================================
+
+@black:        #000000;
+@white:        #ffffff;
+@gold:         #c9a84c;
+@gold-light:   #e8c97a;
+@dark-bg:      #0a0a0a;
+@gray-dark:    #111111;
+@gray-mid:     #1a1a1a;
+@text-muted:   #888888;
+
+@font-display: 'Bebas Neue', sans-serif;
+@font-body:    'Montserrat', sans-serif;
+
+// Mixins reutilizables
+.gold-border() {
+    border: 1px solid @gold;
+}
+
+.btn-base() {
+    display: inline-block;
+    padding: 1rem 3rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    .gold-border();
+    color: @white;
+    background: transparent;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: @gold;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+        z-index: -1;
+    }
+    &:hover {
+        color: @black;
+        &::before { transform: scaleX(1); }
+    }
+}
+
+.light-sweep() {
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -75%; width: 50%; height: 100%;
+        background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%);
+        transform: skewX(-15deg);
+        z-index: 3;
+        pointer-events: none;
+    }
+    &:hover::before {
+        left: 130%;
+        transition: left 0.5s ease;
+    }
+}

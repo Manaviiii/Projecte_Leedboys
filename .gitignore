@@ -1,0 +1,7 @@
+node_modules/
+vendor/
+ledboys-frontend/node_modules/
+ledboys-frontend/public/videos/
+Ledboys/vendor/
+Ledboys/node_modules/
+*.exe
