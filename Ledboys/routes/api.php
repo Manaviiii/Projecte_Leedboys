@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\EventoController;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\ResidenciaController;
 use App\Http\Controllers\Api\PagoController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WebhookController;
 
 /*
 IMPORTANTE:
@@ -104,11 +106,31 @@ Route::get('/packs/{id}', PackController::class . '@mostrar');
 
 #region PAYMENTS
 
-// 1. Iniciar el proceso y obtener el clientSecret de Stripe
-Route::post('/pagos/intento', [PaymentController::class, 'crearIntento']);
+Route::middleware('auth:sanctum')->prefix('pagos')->group(function () {
 
-// 2. Confirmar que el pago fue OK para cambiar el estado a 'pagado'
-Route::put('/pagos/{id}/confirmar', [PaymentController::class, 'confirmarPago']);
+    // Crear intento de pago
+    Route::post('/crear-intento', [PaymentController::class, 'crearIntento']);
+
+    // Confirmar pago tras completarse en el frontend
+    Route::post('/{id}/confirmar', [PaymentController::class, 'confirmarPago']);
+
+    // Historial de pagos del usuario autenticado
+    Route::get('/', [PaymentController::class, 'historial']);
+
+    // Detalle de un pago concreto
+    Route::get('/{id}', [PaymentController::class, 'detalle']);
+
+    // Solicitar reembolso
+    Route::post('/{id}/reembolso', [PaymentController::class, 'reembolso']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Webhook de Stripe — SIN autenticación Bearer (usa firma HMAC propia)
+| IMPORTANTE: excluir de CSRF en bootstrap/app.php o VerifyCsrfToken
+|--------------------------------------------------------------------------
+*/
+Route::post('/stripe/webhook', [WebhookController::class, 'handle']);
 
 #endregion
 
