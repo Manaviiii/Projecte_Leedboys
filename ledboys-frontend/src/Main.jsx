@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Catalogo from "./pages/Catalogo";
 import TipoPage from "./pages/TipoPage";
 import TrajeDetalle from "./pages/TrajeDetalle";
+import Login from "./pages/Login";
 
 function getRoute() {
     return window.location.pathname;
@@ -11,9 +12,17 @@ function getRoute() {
 
 export default function Main() {
     const [path, setPath] = React.useState(getRoute());
+    const [user, setUser] = React.useState(() => {
+        const u = localStorage.getItem("user");
+        return u ? JSON.parse(u) : null;
+    });
 
     React.useEffect(() => {
-        const handlePopState = () => setPath(getRoute());
+        const handlePopState = () => {
+            setPath(getRoute());
+            const u = localStorage.getItem("user");
+            setUser(u ? JSON.parse(u) : null);
+        };
         window.addEventListener("popstate", handlePopState);
         return () => window.removeEventListener("popstate", handlePopState);
     }, []);
@@ -34,8 +43,23 @@ export default function Main() {
         return () => document.removeEventListener("click", handleClick);
     }, []);
 
+    const handleLogout = () => {
+        const token = localStorage.getItem("token");
+        fetch("/api/logout", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" },
+        }).finally(() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            setUser(null);
+            window.history.pushState(null, "", "/");
+            setPath("/");
+        });
+    };
+
     const renderPage = () => {
         if (path === "/" || path === "") return <Home />;
+        if (path === "/login") return <Login />;
         if (path === "/catalogo" || path.startsWith("/catalogo")) return <Catalogo />;
         if (path.startsWith("/tipo/")) {
             const tipo = path.replace("/tipo/", "").replace(/\/$/, "");
@@ -56,7 +80,7 @@ export default function Main() {
 
     return (
         <>
-            <Navbar currentPath={path} />
+            <Navbar currentPath={path} user={user} onLogout={handleLogout} />
             <main>{renderPage()}</main>
         </>
     );

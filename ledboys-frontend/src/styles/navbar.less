@@ -58,3 +58,48 @@
     .navbar-links { display: none; }
     .navbar-hamburger { display: flex; }
 }
+
+// AUTH
+.navbar-auth {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-login-btn {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: @white;
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 0.4rem 1.2rem;
+    transition: all 0.3s;
+    text-decoration: none;
+    &:hover { border-color: @gold; color: @gold; }
+}
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    &-name {
+        font-size: 0.7rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: @gold;
+    }
+}
+
+.navbar-logout {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: @text-muted;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s;
+    font-family: @font-body;
+    &:hover { color: @white; }
+}

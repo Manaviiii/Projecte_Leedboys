@@ -4,7 +4,7 @@ import "../styles/catalogo.less";
 
 const API_URL    = "/api/trajes";
 const SEARCH_URL = "/api/trajes/buscar";
-const FILTERS    = ["Todos", "Ledboys", "Ledgirls"];
+const FILTERS    = ["Ledboys", "Ledgirls"];
 const PER_PAGE   = 12;
 
 export default function Catalogo() {
