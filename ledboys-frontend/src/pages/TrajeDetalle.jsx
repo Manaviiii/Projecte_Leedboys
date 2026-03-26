@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer";
+import Configurador from "../components/Configurador";
 import "../styles/trajedetalle.less";
 
 export default function TrajeDetalle({ id }) {
-    const [traje, setTraje] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError]   = useState(null);
+    const [traje, setTraje]           = useState(null);
+    const [loading, setLoading]       = useState(true);
+    const [error, setError]           = useState(null);
+    const [showConfig, setShowConfig] = useState(false);
 
     useEffect(() => {
         fetch(`/api/trajes/${id}`)
@@ -18,7 +20,7 @@ export default function TrajeDetalle({ id }) {
     }, [id]);
 
     if (loading) return <div className="loading"><div className="loading-spinner" /></div>;
-    if (error)   return (
+    if (error) return (
         <div className="detalle-error">
             <h2>404</h2>
             <p>{error}</p>
@@ -78,11 +80,22 @@ export default function TrajeDetalle({ id }) {
                     )}
 
                     <div className="detalle-actions">
-                        <a href="/#contacto" className="hero-btn">Contratar</a>
+                        <button className="hero-btn" onClick={() => setShowConfig(true)}>
+                            Contratar
+                        </button>
                         <a href="/catalogo" className="detalle-btn-secondary">Ver más trajes</a>
                     </div>
                 </div>
             </div>
+
+            {/* CONFIGURADOR */}
+            {showConfig && (
+                <Configurador
+                    traje={traje}
+                    stock={stock}
+                    onClose={() => setShowConfig(false)}
+                />
+            )}
 
             <Footer />
         </div>

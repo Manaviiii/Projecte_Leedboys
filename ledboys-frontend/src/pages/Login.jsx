@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import "../styles/login.less";
 
 export default function Login() {
-    const [formData, setFormData]   = useState({ email: "", password: "" });
-    const [loading, setLoading]     = useState(false);
-    const [error, setError]         = useState(null);
+    const [formData, setFormData] = useState({ email: "", password: "" });
+    const [loading, setLoading]   = useState(false);
+    const [error, setError]       = useState(null);
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -14,7 +14,7 @@ export default function Login() {
         setError(null);
 
         try {
-            const res = await fetch("/api/login", {
+            const res  = await fetch("/api/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },
                 body: JSON.stringify(formData),
@@ -28,11 +28,13 @@ export default function Login() {
                 return;
             }
 
-            // Guardamos el token y el usuario
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
+            // La API devuelve { success, message, data: { token, user } }
+            const token = data.data?.token || data.token;
+            const user  = data.data?.user  || data.user;
 
-            // Redirigir al inicio
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(user));
+
             window.history.pushState(null, "", "/");
             window.dispatchEvent(new PopStateEvent("popstate"));
 
@@ -44,16 +46,12 @@ export default function Login() {
 
     return (
         <div className="login-page">
-
-            {/* Fondo con partículas de luz */}
             <div className="login-bg">
                 <div className="login-bg-glow login-bg-glow--1" />
                 <div className="login-bg-glow login-bg-glow--2" />
             </div>
 
             <div className="login-card">
-
-                {/* Logo */}
                 <div className="login-logo">
                     <img src="/images/ledboyss_logo.png" alt="Ledboyss" />
                 </div>
@@ -62,11 +60,7 @@ export default function Login() {
                 <div className="gold-divider" />
                 <p className="login-subtitle">Inicia sesión para continuar</p>
 
-                {error && (
-                    <div className="login-error">
-                        {error}
-                    </div>
-                )}
+                {error && <div className="login-error">{error}</div>}
 
                 <form className="login-form" onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -93,12 +87,7 @@ export default function Login() {
                             autoComplete="current-password"
                         />
                     </div>
-
-                    <button
-                        type="submit"
-                        className="login-btn"
-                        disabled={loading}
-                    >
+                    <button type="submit" className="login-btn" disabled={loading}>
                         {loading ? <span className="login-btn-spinner" /> : "ENTRAR"}
                     </button>
                 </form>
@@ -106,7 +95,6 @@ export default function Login() {
                 <p className="login-back">
                     <a href="/">← Volver al inicio</a>
                 </p>
-
             </div>
         </div>
     );

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useCart } from "../context/CartContext";
 import "../styles/navbar.less";
 
 export default function Navbar({ currentPath = "/", user = null, onLogout }) {
-    const [scrolled, setScrolled]   = useState(false);
-    const [menuOpen, setMenuOpen]   = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const { count, setOpen }      = useCart();
 
     useEffect(() => {
         const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -56,19 +58,25 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                     ))}
                 </ul>
 
-                {/* Auth */}
-                <div className="navbar-auth">
+                <div className="navbar-actions">
+                    {/* Icono carrito */}
+                    <button className="navbar-cart-btn" onClick={() => setOpen(true)} aria-label="Carrito">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="9" cy="21" r="1"/>
+                            <circle cx="20" cy="21" r="1"/>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.61L23 6H6"/>
+                        </svg>
+                        {count > 0 && <span className="navbar-cart-count">{count}</span>}
+                    </button>
+
+                    {/* Auth */}
                     {user ? (
                         <div className="navbar-user">
                             <span className="navbar-user-name">{user.name}</span>
-                            <button className="navbar-logout" onClick={onLogout}>
-                                Salir
-                            </button>
+                            <button className="navbar-logout" onClick={onLogout}>Salir</button>
                         </div>
                     ) : (
-                        <a href="/login" className="navbar-login-btn">
-                            Iniciar sesión
-                        </a>
+                        <a href="/login" className="navbar-login-btn">Iniciar sesión</a>
                     )}
                 </div>
 
@@ -91,10 +99,11 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                         {link.label}
                     </a>
                 ))}
+                <button className="navbar-cart-btn" onClick={() => { setOpen(true); setMenuOpen(false); }}>
+                    🛍️ Carrito {count > 0 && `(${count})`}
+                </button>
                 {user ? (
-                    <button className="navbar-logout" onClick={onLogout} style={{ background:"none", border:"1px solid #888", color:"#888", padding:"0.5rem 1.5rem", cursor:"pointer", letterSpacing:"2px", fontSize:"0.7rem", textTransform:"uppercase" }}>
-                        Salir
-                    </button>
+                    <button className="navbar-logout" onClick={onLogout}>Salir</button>
                 ) : (
                     <a href="/login">Iniciar sesión</a>
                 )}

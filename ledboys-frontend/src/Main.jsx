@@ -1,5 +1,7 @@
 import React from "react";
 import Navbar from "./components/Navbar";
+import CartDrawer from "./components/CartDrawer";
+import { CartProvider, useCart } from "./context/CartContext";
 import Home from "./pages/Home";
 import Catalogo from "./pages/Catalogo";
 import TipoPage from "./pages/TipoPage";
@@ -10,18 +12,20 @@ function getRoute() {
     return window.location.pathname;
 }
 
-export default function Main() {
+function parseUser() {
+    const u = localStorage.getItem("user");
+    return u && u !== "undefined" && u !== "null" ? JSON.parse(u) : null;
+}
+
+function App() {
     const [path, setPath] = React.useState(getRoute());
-    const [user, setUser] = React.useState(() => {
-        const u = localStorage.getItem("user");
-        return u ? JSON.parse(u) : null;
-    });
+    const [user, setUser] = React.useState(parseUser);
+    const { clearCart }   = useCart();
 
     React.useEffect(() => {
         const handlePopState = () => {
             setPath(getRoute());
-            const u = localStorage.getItem("user");
-            setUser(u ? JSON.parse(u) : null);
+            setUser(parseUser());
         };
         window.addEventListener("popstate", handlePopState);
         return () => window.removeEventListener("popstate", handlePopState);
@@ -51,11 +55,14 @@ export default function Main() {
         }).finally(() => {
             localStorage.removeItem("token");
             localStorage.removeItem("user");
+            clearCart();
             setUser(null);
             window.history.pushState(null, "", "/");
             setPath("/");
         });
     };
+
+    const isLogin = path === "/login";
 
     const renderPage = () => {
         if (path === "/" || path === "") return <Home />;
@@ -80,8 +87,17 @@ export default function Main() {
 
     return (
         <>
-            <Navbar currentPath={path} user={user} onLogout={handleLogout} />
+            {!isLogin && <Navbar currentPath={path} user={user} onLogout={handleLogout} />}
+            <CartDrawer />
             <main>{renderPage()}</main>
         </>
+    );
+}
+
+export default function Main() {
+    return (
+        <CartProvider>
+            <App />
+        </CartProvider>
     );
 }
