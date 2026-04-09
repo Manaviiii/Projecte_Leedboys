@@ -47,6 +47,15 @@ function App() {
         return () => document.removeEventListener("click", handleClick);
     }, []);
 
+    React.useEffect(() => {
+        if (window.location.hash === "#contacto") {
+            setTimeout(() => {
+                const el = document.getElementById("contacto");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+            }, 100);
+        }
+    }, [path]);
+
     const handleLogout = () => {
         const token = localStorage.getItem("token");
         fetch("/api/logout", {

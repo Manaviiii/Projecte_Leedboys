@@ -37,9 +37,24 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
         { label: "Contacto",   href: "#contacto" },
     ];
 
+    const userLinks = [
+        { label: "Perfil",   href: "/perfil" },
+        { label: "Reservas", href: "/reservas" },
+        { label: "Facturas", href: "/facturas" },
+    ];
+
     return (
         <>
             <nav className={`navbar${scrolled ? " scrolled" : ""}`}>
+
+                <button
+                    className={`navbar-hamburger${menuOpen ? " open" : ""}`}
+                    onClick={() => setMenuOpen(!menuOpen)}
+                    aria-label="Menu"
+                >
+                    <span></span><span></span><span></span>
+                </button>
+
                 <a className="navbar-logo-left" href="/tipo/ledboyss">
                     <img src="/images/ledboyss_logo.png" alt="Ledboyss Performance" />
                 </a>
@@ -58,8 +73,11 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                     ))}
                 </ul>
 
+                <a className="navbar-logo-right" href="/tipo/ledgirlss">
+                    <img src="/images/ledgirls_logo.png" alt="Ledgirlss Dancers" />
+                </a>
+
                 <div className="navbar-actions">
-                    {/* Icono carrito */}
                     <button className="navbar-cart-btn" onClick={() => setOpen(true)} aria-label="Carrito">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                             <circle cx="9" cy="21" r="1"/>
@@ -68,45 +86,49 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                         </svg>
                         {count > 0 && <span className="navbar-cart-count">{count}</span>}
                     </button>
-
-                    {/* Auth */}
-                    {user ? (
-                        <div className="navbar-user">
-                            <span className="navbar-user-name">{user.name}</span>
-                            <button className="navbar-logout" onClick={onLogout}>Salir</button>
-                        </div>
-                    ) : (
-                        <a href="/login" className="navbar-login-btn">Iniciar sesión</a>
-                    )}
                 </div>
 
-                <a className="navbar-logo-right" href="/tipo/ledgirlss">
-                    <img src="/images/ledgirls_logo.png" alt="Ledgirlss Dancers" />
-                </a>
-
-                <button
-                    className={`navbar-hamburger${menuOpen ? " open" : ""}`}
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    aria-label="Menu"
-                >
-                    <span></span><span></span><span></span>
-                </button>
             </nav>
 
+            <div
+                className={`navbar-overlay${menuOpen ? " visible" : ""}`}
+                onClick={() => setMenuOpen(false)}
+            />
+
             <div className={`navbar-mobile${menuOpen ? " open" : ""}`}>
-                {links.map((link) => (
-                    <a key={link.label} href={link.href} onClick={(e) => handleAnchor(e, link.href)}>
-                        {link.label}
-                    </a>
-                ))}
-                <button className="navbar-cart-btn" onClick={() => { setOpen(true); setMenuOpen(false); }}>
-                    🛍️ Carrito {count > 0 && `(${count})`}
-                </button>
+
+                <div className="navbar-mobile-header">
+                    <span>MENÚ</span>
+                    <button onClick={() => setMenuOpen(false)}>✕</button>
+                </div>
+
                 {user ? (
-                    <button className="navbar-logout" onClick={onLogout}>Salir</button>
+                    <>
+                        <div className="navbar-mobile-user">
+                            <span className="navbar-mobile-user-name">{user.name}</span>
+                            <div className="navbar-mobile-user-links">
+                                {userLinks.map(link => (
+                                    <a key={link.label} href={link.href} onClick={() => setMenuOpen(false)}>
+                                        {link.label}
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="navbar-mobile-footer">
+                            <button className="navbar-logout" onClick={() => { onLogout(); setMenuOpen(false); }}>
+                                Cerrar sesión
+                            </button>
+                        </div>
+                    </>
                 ) : (
-                    <a href="/login">Iniciar sesión</a>
+                    <div className="navbar-mobile-center">
+                        <a href="/login" className="navbar-login-btn" onClick={() => setMenuOpen(false)}>
+                            Iniciar sesión
+                        </a>
+                    </div>
                 )}
+
             </div>
         </>
     );
