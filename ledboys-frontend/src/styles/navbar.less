@@ -238,6 +238,11 @@
     to   { left: 150%; }
 }
 
+@keyframes textShine {
+    from { background-position: 200% center; }
+    to   { background-position: -200% center; }
+}
+
 // Sección usuario en el drawer
 .navbar-mobile-user {
     flex: 1;
@@ -251,23 +256,27 @@
         font-family: @font-display;
         font-size: 1.4rem;
         letter-spacing: 4px;
-        color: @gold;
         text-transform: uppercase;
         padding-bottom: 1rem;
         border-bottom: 1px solid rgba(201,168,76,0.2);
         position: relative;
         overflow: hidden;
-        animation: fadeSlideIn 0.5s ease;
 
-        &::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 60%;
-            height: 100%;
-            background: linear-gradient(to right, transparent, rgba(201,168,76,0.3), transparent);
-            animation: goldShine 1.5s ease 0.4s forwards;
-        }
+        // Efecto brillo en las letras del nombre
+        background: linear-gradient(
+            90deg,
+            @gold 0%,
+            @gold 40%,
+            @white 50%,
+            @gold-light 55%,
+            @gold 60%,
+            @gold 100%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: textShine 2.5s linear infinite;
     }
 
     &-links {

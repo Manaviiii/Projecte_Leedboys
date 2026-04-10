@@ -302,6 +302,14 @@
     left: 150%;
   }
 }
+@keyframes textShine {
+  from {
+    background-position: 200% center;
+  }
+  to {
+    background-position: -200% center;
+  }
+}
 .navbar-mobile-user {
   flex: 1;
   padding: 2rem;
@@ -314,23 +322,17 @@
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1.4rem;
   letter-spacing: 4px;
-  color: #c9a84c;
   text-transform: uppercase;
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(201, 168, 76, 0.2);
   position: relative;
   overflow: hidden;
-  animation: fadeSlideIn 0.5s ease;
-}
-.navbar-mobile-user-name::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(to right, transparent, rgba(201, 168, 76, 0.3), transparent);
-  animation: goldShine 1.5s ease 0.4s forwards;
+  background: linear-gradient(90deg, #c9a84c 0%, #c9a84c 40%, #ffffff 50%, #e8c97a 55%, #c9a84c 60%, #c9a84c 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: textShine 2.5s linear infinite;
 }
 .navbar-mobile-user-links {
   display: flex;
