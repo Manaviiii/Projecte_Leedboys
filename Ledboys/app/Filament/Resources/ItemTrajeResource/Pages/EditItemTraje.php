@@ -10,31 +10,36 @@ class EditItemTraje extends EditRecord
 {
     protected static string $resource = ItemTrajeResource::class;
 
-    // 1. Rellenar el formulario con datos de las dos tablas al abrir
+    /**
+     * Al cargar el formulario, combinamos los campos de `items` y de `item_trajes`
+     * en un único array de estado para que el formulario los muestre correctamente.
+     */
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        // $this->record es el ItemTraje actual
-        // Accedemos a su padre ($this->record->item)
-        $data['nombre_item']      = $this->record->item->nombre;
-        $data['precio_item']      = $this->record->item->precio;
-        $data['descripcion_item'] = $this->record->item->descripcion;
-        $data['imagen_item']      = $this->record->item->imagen;
-        
+        $item = $this->record->item;
+
+        $data['nombre_item']      = $item?->nombre;
+        $data['precio_item']      = $item?->precio;
+        $data['descripcion_item'] = $item?->descripcion;
+        $data['imagen_item']      = $item?->imagen;
+
         return $data;
     }
 
-    // 2. Guardar en las dos tablas al dar "Guardar"
+    /**
+     * Al guardar, actualizamos el Item base y el ItemTraje por separado.
+     */
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        // Actualizamos el Padre (Item)
+        // Actualizar el Item base
         $record->item->update([
             'nombre'      => $data['nombre_item'],
             'precio'      => $data['precio_item'],
-            'descripcion' => $data['descripcion_item'],
-            'imagen'      => $data['imagen_item'] ?? $record->item->imagen,
+            'descripcion' => $data['descripcion_item'] ?? null,
+            'imagen'      => $data['imagen_item'] ?? null,
         ]);
 
-        // Actualizamos el Hijo (ItemTraje) - $record es el ItemTraje
+        // Actualizar el ItemTraje
         $record->update([
             'tipo_traje'  => $data['tipo_traje'],
             'genero'      => $data['genero'],
@@ -42,5 +47,10 @@ class EditItemTraje extends EditRecord
         ]);
 
         return $record;
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

@@ -15,7 +15,139 @@
     }
 }
 
-.tipo-gallery {
-    padding: 6rem 2rem; max-width: 1400px; margin: 0 auto;
-    &-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 5px; }
+// Wrapper del carrusel
+.tipo-carrusel-wrap {
+    padding: 0 0 6rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+// CARRUSEL
+.carrusel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 2rem;
+}
+
+// Slide principal
+.carrusel-main {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    background: @gray-mid;
+}
+
+.carrusel-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+
+    &.active { opacity: 1; }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+    }
+
+    &-name {
+        position: absolute;
+        bottom: 1.5rem;
+        left: 2rem;
+        font-family: @font-display;
+        font-size: clamp(1.5rem, 4vw, 3rem);
+        letter-spacing: 6px;
+        color: @white;
+        text-shadow: 0 0 20px rgba(201,168,76,0.3);
+        z-index: 2;
+    }
+}
+
+// Flechas
+.carrusel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: @white;
+    font-size: 2rem;
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    backdrop-filter: blur(4px);
+
+    &:hover {
+        background: rgba(201,168,76,0.2);
+        border-color: @gold;
+        color: @gold;
+    }
+
+    &--prev { left: 1rem; }
+    &--next { right: 1rem; }
+}
+
+// Miniaturas
+.carrusel-thumbs {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.carrusel-thumb {
+    width: 70px;
+    height: 50px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s;
+    opacity: 0.5;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+
+    &.active {
+        border-color: @gold;
+        opacity: 1;
+    }
+
+    &:hover { opacity: 0.8; }
+}
+
+// Dots
+.carrusel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.carrusel-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 0;
+
+    &.active {
+        background: @gold;
+        width: 20px;
+        border-radius: 3px;
+    }
+}
+
+@media (max-width: 600px) {
+    .carrusel-thumbs { display: none; }
+    .carrusel-arrow { width: 36px; height: 36px; font-size: 1.5rem; }
 }

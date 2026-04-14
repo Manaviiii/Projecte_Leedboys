@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Footer from "../components/Footer";
 import "../styles/tipopage.less";
 
@@ -69,6 +69,63 @@ const TIPO_CONFIG = {
     },
 };
 
+function Carrusel({ items }) {
+    const [current, setCurrent] = useState(0);
+    const timerRef = useRef(null);
+
+    const goTo = (i) => {
+        setCurrent(i);
+        resetTimer();
+    };
+
+    const prev = () => goTo((current - 1 + items.length) % items.length);
+    const next = () => goTo((current + 1) % items.length);
+
+    const resetTimer = () => {
+        clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+            setCurrent(c => (c + 1) % items.length);
+        }, 4000);
+    };
+
+    useEffect(() => {
+        timerRef.current = setInterval(() => {
+            setCurrent(c => (c + 1) % items.length);
+        }, 4000);
+        return () => clearInterval(timerRef.current);
+    }, [items.length]);
+
+    return (
+        <div className="carrusel">
+            <div className="carrusel-main">
+                {items.map((item, i) => (
+                    <div key={i} className={`carrusel-slide${i === current ? " active" : ""}`}>
+                        <img src={item.img} alt={item.name} />
+                        <div className="carrusel-slide-overlay" />
+                        <div className="carrusel-slide-name">{item.name}</div>
+                    </div>
+                ))}
+                <button className="carrusel-arrow carrusel-arrow--prev" onClick={prev}>‹</button>
+                <button className="carrusel-arrow carrusel-arrow--next" onClick={next}>›</button>
+            </div>
+
+            <div className="carrusel-thumbs">
+                {items.map((item, i) => (
+                    <div key={i} className={`carrusel-thumb${i === current ? " active" : ""}`} onClick={() => goTo(i)}>
+                        <img src={item.img} alt={item.name} />
+                    </div>
+                ))}
+            </div>
+
+            <div className="carrusel-dots">
+                {items.map((_, i) => (
+                    <button key={i} className={`carrusel-dot${i === current ? " active" : ""}`} onClick={() => goTo(i)} />
+                ))}
+            </div>
+        </div>
+    );
+}
+
 export default function TipoPage({ tipo }) {
     const config = TIPO_CONFIG[tipo] || TIPO_CONFIG["eventos"];
 
@@ -93,18 +150,8 @@ export default function TipoPage({ tipo }) {
                 </div>
             </div>
 
-            <div className="tipo-gallery">
-                <div className="tipo-gallery-grid">
-                    {config.items.map((item, i) => (
-                        <div key={i} className="catalog-item" style={{ aspectRatio: "4/5" }}>
-                            <img src={item.img} alt={item.name} />
-                            <div className="catalog-item-overlay" />
-                            <div className="catalog-item-info">
-                                <h3>{item.name}</h3>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+            <div className="tipo-carrusel-wrap">
+                <Carrusel items={config.items} />
             </div>
 
             <section style={{ padding: "6rem 2rem", textAlign: "center", background: "var(--gray-dark)", borderTop: "1px solid rgba(201,168,76,0.15)" }}>
@@ -113,7 +160,12 @@ export default function TipoPage({ tipo }) {
                 <h2 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(2rem, 5vw, 4rem)", letterSpacing: "6px", marginBottom: "2rem" }}>
                     CONTRATA <span style={{ color: "var(--gold)" }}>NUESTRO</span> SHOW
                 </h2>
-                <a href="/#contacto" className="hero-btn">Contactar ahora</a>
+                <button
+                    className="hero-btn"
+                    onClick={() => { window.location.href = "/#contacto"; }}
+                >
+                    Contactar ahora
+                </button>
             </section>
 
             <Footer />

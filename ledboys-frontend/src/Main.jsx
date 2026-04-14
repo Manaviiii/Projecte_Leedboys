@@ -1,19 +1,32 @@
 import React from "react";
 import Navbar from "./components/Navbar";
+import CartDrawer from "./components/CartDrawer";
+import { CartProvider, useCart } from "./context/CartContext";
 import Home from "./pages/Home";
 import Catalogo from "./pages/Catalogo";
 import TipoPage from "./pages/TipoPage";
 import TrajeDetalle from "./pages/TrajeDetalle";
+import Login from "./pages/Login";
 
 function getRoute() {
     return window.location.pathname;
 }
 
-export default function Main() {
+function parseUser() {
+    const u = localStorage.getItem("user");
+    return u && u !== "undefined" && u !== "null" ? JSON.parse(u) : null;
+}
+
+function App() {
     const [path, setPath] = React.useState(getRoute());
+    const [user, setUser] = React.useState(parseUser);
+    const { clearCart }   = useCart();
 
     React.useEffect(() => {
-        const handlePopState = () => setPath(getRoute());
+        const handlePopState = () => {
+            setPath(getRoute());
+            setUser(parseUser());
+        };
         window.addEventListener("popstate", handlePopState);
         return () => window.removeEventListener("popstate", handlePopState);
     }, []);
@@ -34,8 +47,35 @@ export default function Main() {
         return () => document.removeEventListener("click", handleClick);
     }, []);
 
+    React.useEffect(() => {
+        if (window.location.hash === "#contacto") {
+            setTimeout(() => {
+                const el = document.getElementById("contacto");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+            }, 100);
+        }
+    }, [path]);
+
+    const handleLogout = () => {
+        const token = localStorage.getItem("token");
+        fetch("/api/logout", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" },
+        }).finally(() => {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            clearCart();
+            setUser(null);
+            window.history.pushState(null, "", "/");
+            setPath("/");
+        });
+    };
+
+    const isLogin = path === "/login";
+
     const renderPage = () => {
         if (path === "/" || path === "") return <Home />;
+        if (path === "/login") return <Login />;
         if (path === "/catalogo" || path.startsWith("/catalogo")) return <Catalogo />;
         if (path.startsWith("/tipo/")) {
             const tipo = path.replace("/tipo/", "").replace(/\/$/, "");
@@ -56,8 +96,17 @@ export default function Main() {
 
     return (
         <>
-            <Navbar currentPath={path} />
+            {!isLogin && <Navbar currentPath={path} user={user} onLogout={handleLogout} />}
+            <CartDrawer />
             <main>{renderPage()}</main>
         </>
+    );
+}
+
+export default function Main() {
+    return (
+        <CartProvider>
+            <App />
+        </CartProvider>
     );
 }
