@@ -102,6 +102,21 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                     <button onClick={() => setMenuOpen(false)}>✕</button>
                 </div>
 
+                {/* Navegación — siempre visible */}
+                <div className="navbar-mobile-links">
+                    {links.map((link) => (
+                        <a
+                            key={link.label}
+                            href={link.href}
+                            className={currentPath === link.href ? "active" : ""}
+                            onClick={(e) => handleAnchor(e, link.href)}
+                        >
+                            {link.label}
+                        </a>
+                    ))}
+                </div>
+
+                {/* Usuario o login */}
                 {user ? (
                     <>
                         <div className="navbar-mobile-user">
@@ -114,7 +129,6 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                                 ))}
                             </div>
                         </div>
-
                         <div className="navbar-mobile-footer">
                             <button className="navbar-logout" onClick={() => { onLogout(); setMenuOpen(false); }}>
                                 Cerrar sesión
@@ -122,7 +136,7 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                         </div>
                     </>
                 ) : (
-                    <div className="navbar-mobile-center">
+                    <div className="navbar-mobile-footer">
                         <a href="/login" className="navbar-login-btn" onClick={() => setMenuOpen(false)}>
                             Iniciar sesión
                         </a>
