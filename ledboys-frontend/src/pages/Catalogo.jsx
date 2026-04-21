@@ -4,12 +4,12 @@ import "../styles/catalogo.less";
 
 const API_URL    = "/api/trajes";
 const SEARCH_URL = "/api/trajes/buscar";
-const FILTERS = ["Todos", "Ledboys", "Ledgirls"];
+const FILTERS    = ["Todos", "Ledboys", "Ledgirls"];
 const PER_PAGE   = 12;
 
 export default function Catalogo() {
     const [allItems, setAllItems]         = useState([]);
-    const [searchItems, setSearchItems]   = useState(null); // null = no hay búsqueda activa
+    const [searchItems, setSearchItems]   = useState(null);
     const [loading, setLoading]           = useState(true);
     const [searching, setSearching]       = useState(false);
     const [error, setError]               = useState(null);
@@ -18,29 +18,19 @@ export default function Catalogo() {
     const [query, setQuery]               = useState("");
     const debounceRef                     = useRef(null);
 
-    // Carga inicial
     useEffect(() => {
         fetch(API_URL)
             .then(res => {
                 if (!res.ok) throw new Error("Error al cargar el catálogo");
                 return res.json();
             })
-            .then(data => {
-                setAllItems(mapItems(data));
-                setLoading(false);
-            })
+            .then(data => { setAllItems(mapItems(data)); setLoading(false); })
             .catch(err => { setError(err.message); setLoading(false); });
     }, []);
 
-    // Búsqueda con debounce (espera 350ms tras dejar de escribir)
     useEffect(() => {
         if (debounceRef.current) clearTimeout(debounceRef.current);
-
-        if (!query.trim()) {
-            setSearchItems(null);
-            return;
-        }
-
+        if (!query.trim()) { setSearchItems(null); return; }
         debounceRef.current = setTimeout(() => {
             setSearching(true);
             fetch(`${SEARCH_URL}?q=${encodeURIComponent(query.trim())}`)
@@ -48,7 +38,6 @@ export default function Catalogo() {
                 .then(data => { setSearchItems(mapItems(data)); setSearching(false); })
                 .catch(() => { setSearchItems([]); setSearching(false); });
         }, 350);
-
         return () => clearTimeout(debounceRef.current);
     }, [query]);
 
@@ -62,9 +51,7 @@ export default function Catalogo() {
         }));
     }
 
-    // Si hay búsqueda activa usamos esos resultados, si no el catálogo con filtro
     const baseItems = searchItems !== null ? searchItems : allItems;
-
     const filtered = activeFilter === "Todos" || searchItems !== null
         ? baseItems
         : baseItems.filter(item => {
@@ -102,7 +89,6 @@ export default function Catalogo() {
                 <h1><span>CATÁ</span>LOGO</h1>
             </div>
 
-            {/* BUSCADOR */}
             <div className="catalog-search-wrap">
                 <div className="catalog-search">
                     <span className="catalog-search-icon">🔍</span>
@@ -113,13 +99,10 @@ export default function Catalogo() {
                         onChange={handleSearch}
                         className="catalog-search-input"
                     />
-                    {query && (
-                        <button className="catalog-search-clear" onClick={clearSearch}>✕</button>
-                    )}
+                    {query && <button className="catalog-search-clear" onClick={clearSearch}>✕</button>}
                 </div>
             </div>
 
-            {/* FILTROS — se ocultan si hay búsqueda activa */}
             {!query && (
                 <div className="filter-tabs">
                     {FILTERS.map(f => (
@@ -140,7 +123,6 @@ export default function Catalogo() {
 
                 {!loading && !searching && !error && (
                     <>
-                        {/* Resultado búsqueda */}
                         {searchItems !== null && (
                             <p className="catalog-search-result">
                                 {searchItems.length} resultado{searchItems.length !== 1 ? "s" : ""} para <span>"{query}"</span>
