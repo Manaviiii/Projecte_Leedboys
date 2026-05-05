@@ -7,10 +7,11 @@ import Catalogo from "./pages/Catalogo";
 import TipoPage from "./pages/TipoPage";
 import TrajeDetalle from "./pages/TrajeDetalle";
 import Login from "./pages/Login";
+import Checkout from "./pages/Checkout";
+import Facturas from "./pages/Facturas";
+import Perfil from "./pages/Perfil";
 
-function getRoute() {
-    return window.location.pathname;
-}
+function getRoute() { return window.location.pathname; }
 
 function parseUser() {
     const u = localStorage.getItem("user");
@@ -23,10 +24,7 @@ function App() {
     const { clearCart }   = useCart();
 
     React.useEffect(() => {
-        const handlePopState = () => {
-            setPath(getRoute());
-            setUser(parseUser());
-        };
+        const handlePopState = () => { setPath(getRoute()); setUser(parseUser()); };
         window.addEventListener("popstate", handlePopState);
         return () => window.removeEventListener("popstate", handlePopState);
     }, []);
@@ -71,11 +69,15 @@ function App() {
         });
     };
 
-    const isLogin = path === "/login";
+    const isLogin    = path === "/login";
+    const isCheckout = path === "/checkout";
 
     const renderPage = () => {
-        if (path === "/" || path === "") return <Home />;
-        if (path === "/login") return <Login />;
+        if (path === "/" || path === "")   return <Home />;
+        if (path === "/login")             return <Login />;
+        if (path === "/checkout")          return <Checkout />;
+        if (path === "/facturas")          return <Facturas />;
+        if (path === "/perfil")            return <Perfil onLogout={handleLogout} />;
         if (path === "/catalogo" || path.startsWith("/catalogo")) return <Catalogo />;
         if (path.startsWith("/tipo/")) {
             const tipo = path.replace("/tipo/", "").replace(/\/$/, "");
@@ -96,8 +98,8 @@ function App() {
 
     return (
         <>
-            {!isLogin && <Navbar currentPath={path} user={user} onLogout={handleLogout} />}
-            <CartDrawer />
+            {!isLogin && !isCheckout && <Navbar currentPath={path} user={user} onLogout={handleLogout} />}
+            {!isCheckout && <CartDrawer />}
             <main>{renderPage()}</main>
         </>
     );

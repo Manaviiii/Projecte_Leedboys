@@ -1,0 +1,400 @@
+@import './variables.less';
+
+.checkout-page {
+    min-height: 100vh;
+    background: @dark-bg;
+}
+
+.checkout-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2rem 8rem;
+}
+
+// LAYOUT DOS COLUMNAS
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+
+    @media (max-width: 800px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.checkout-section-title {
+    font-family: @font-display;
+    font-size: 1.5rem;
+    letter-spacing: 5px;
+    color: @white;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+
+// ==============================
+// IZQUIERDA — PAGO
+// ==============================
+.checkout-left {
+    position: sticky;
+    top: 100px;
+}
+
+.checkout-payment {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.checkout-card-label {
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: @text-muted;
+    margin-bottom: 0.5rem;
+}
+
+.checkout-card-wrap {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 1rem 1.2rem;
+    transition: border-color 0.3s;
+    &:focus-within { border-color: @gold; }
+}
+
+.checkout-test-hint {
+    font-size: 0.68rem;
+    color: @text-muted;
+    letter-spacing: 1px;
+    line-height: 1.7;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.02);
+    strong { color: @gold; }
+}
+
+.checkout-error {
+    background: rgba(255, 80, 80, 0.08);
+    border: 1px solid rgba(255, 80, 80, 0.3);
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    padding: 0.75rem 1rem;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 1.2rem;
+    background: transparent;
+    border: 1px solid @gold;
+    color: @white;
+    font-family: @font-body;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+
+    &::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: @gold;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+        z-index: -1;
+    }
+    &:hover:not(:disabled) {
+        color: @black;
+        &::before { transform: scaleX(1); }
+    }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.checkout-spinner {
+    width: 20px; height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: @white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+}
+
+.checkout-secure {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    color: @text-muted;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+// ==============================
+// DERECHA — RESUMEN
+// ==============================
+.checkout-right {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 2rem;
+}
+
+.checkout-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 1.5rem;
+}
+
+.checkout-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+
+    &:last-child { border-bottom: none; }
+
+    &-img {
+        width: 60px;
+        height: 80px;
+        flex-shrink: 0;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.06);
+
+        img { width: 100%; height: 100%; object-fit: cover; }
+        &-placeholder { width: 100%; height: 100%; background: @gray-mid; }
+    }
+
+    &-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    &-name {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: @white;
+    }
+
+    &-tipo {
+        font-size: 0.58rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: @text-muted;
+    }
+
+    &-qty {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+        color: @gold;
+    }
+
+    &-price {
+        font-family: @font-display;
+        font-size: 1.3rem;
+        letter-spacing: 1px;
+        color: @white;
+        flex-shrink: 0;
+    }
+}
+
+.checkout-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(201,168,76,0.2);
+
+    span {
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: @text-muted;
+    }
+
+    &-price {
+        font-family: @font-display;
+        font-size: 2.5rem !important;
+        letter-spacing: 2px;
+        color: @gold !important;
+    }
+}
+
+// ==============================
+// ÉXITO
+// ==============================
+.checkout-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    gap: 1.5rem;
+    text-align: center;
+    padding: 2rem;
+
+    &-icon {
+        width: 80px; height: 80px;
+        border-radius: 50%;
+        border: 2px solid @gold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: @gold;
+    }
+
+    h2 {
+        font-family: @font-display;
+        font-size: 3rem;
+        letter-spacing: 6px;
+        color: @white;
+    }
+}
+
+.checkout-success-brand {
+    font-family: @font-display;
+    font-size: 1.2rem;
+    letter-spacing: 6px;
+    color: @gold;
+    text-transform: uppercase;
+}
+
+.checkout-success-msg {
+    font-size: 0.85rem;
+    color: @text-muted;
+    letter-spacing: 1px;
+    max-width: 450px;
+    line-height: 1.9;
+    text-align: center;
+}
+
+.checkout-success-total {
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: @text-muted;
+
+    span {
+        font-family: @font-display;
+        font-size: 1.8rem;
+        color: @gold;
+        letter-spacing: 2px;
+        margin-left: 0.5rem;
+    }
+}
+
+// VACÍO
+.checkout-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    gap: 2rem;
+    text-align: center;
+
+    p {
+        font-size: 0.8rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: @text-muted;
+    }
+}
+
+// ÉXITO - acciones
+.checkout-success-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.checkout-pdf-btn {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: @gold;
+    font-family: @font-body;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 0.75rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+        background: @gold;
+        color: @black;
+        border-color: @gold;
+    }
+}
+
+// ==============================
+// FACTURACIÓN
+// ==============================
+.checkout-billing {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.checkout-billing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    @media (max-width: 500px) { grid-template-columns: 1fr; }
+}
+
+.checkout-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    &--full { grid-column: 1 / -1; }
+
+    label {
+        font-size: 0.6rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: @text-muted;
+    }
+
+    input {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: @white;
+        padding: 0.75rem 1rem;
+        font-family: @font-body;
+        font-size: 0.85rem;
+        outline: none;
+        transition: border-color 0.3s;
+
+        &::placeholder { color: rgba(255,255,255,0.2); }
+        &:focus { border-color: @gold; }
+    }
+}
+
+// Cantidad más grande en resumen
+.checkout-item-qty {
+    font-size: 0.75rem !important;
+    letter-spacing: 1px;
+    color: @gold !important;
+    font-weight: 600;
+}
