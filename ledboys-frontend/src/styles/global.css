@@ -1,0 +1,289 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+:root {
+  --black: #000000;
+  --white: #ffffff;
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --dark-bg: #0a0a0a;
+  --gray-dark: #111111;
+  --gray-mid: #1a1a1a;
+  --text-muted: #888888;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #000000;
+  color: #ffffff;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+img {
+  max-width: 100%;
+  display: block;
+}
+.gold-divider {
+  width: 60px;
+  height: 2px;
+  background: #c9a84c;
+  margin: 0 auto 2rem;
+}
+.section-label {
+  font-size: 0.65rem;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: #c9a84c;
+  margin-bottom: 1rem;
+  display: block;
+}
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 2px solid rgba(201, 168, 76, 0.2);
+  border-top-color: #c9a84c;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.hero-btn {
+  display: inline-block;
+  padding: 1rem 3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid #c9a84c;
+  color: #ffffff;
+  background: transparent;
+}
+.hero-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #c9a84c;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  z-index: -1;
+}
+.hero-btn:hover {
+  color: #000000;
+}
+.hero-btn:hover::before {
+  transform: scaleX(1);
+}
+.btn-primary {
+  display: inline-block;
+  padding: 1rem 3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid #c9a84c;
+  color: #ffffff;
+  background: transparent;
+  padding: 1rem 3.5rem;
+  font-family: 'Montserrat', sans-serif;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #c9a84c;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  z-index: -1;
+}
+.btn-primary:hover {
+  color: #000000;
+}
+.btn-primary:hover::before {
+  transform: scaleX(1);
+}
+.page-hero {
+  padding-top: 80px;
+  padding-bottom: 4rem;
+  text-align: center;
+  background: #0a0a0a;
+  position: relative;
+}
+.page-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #c9a84c, transparent);
+}
+.page-hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 8vw, 7rem);
+  letter-spacing: 8px;
+  color: #ffffff;
+  padding-top: 4rem;
+}
+.page-hero h1 span {
+  color: #c9a84c;
+}
+@keyframes borderSpin {
+  from {
+    --angle: 0deg;
+  }
+  to {
+    --angle: 360deg;
+  }
+}
+.catalog-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 2/3;
+  background: #1a1a1a;
+  border-radius: 2px;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s ease;
+}
+.catalog-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.06) 50%, transparent 100%);
+  transform: skewX(-15deg);
+  z-index: 3;
+  pointer-events: none;
+}
+.catalog-item:hover::before {
+  left: 130%;
+  transition: left 0.5s ease;
+}
+.catalog-item::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 2px;
+  background: conic-gradient(from var(--angle), transparent 0deg, #c9a84c 40deg, #e8c97a 60deg, #fff 70deg, #e8c97a 80deg, #c9a84c 100deg, transparent 140deg);
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 3px;
+  transition: opacity 0.3s ease;
+  filter: brightness(1.8) drop-shadow(0 0 6px #c9a84c);
+}
+.catalog-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(201, 168, 76, 0.12), 0 0 1px rgba(201, 168, 76, 0.25);
+}
+.catalog-item:hover::after {
+  opacity: 1;
+  animation: borderSpin 1.8s linear infinite;
+}
+.catalog-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+.catalog-item:hover img {
+  transform: scale(1.05);
+}
+.catalog-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.1) 55%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+.catalog-item:hover .catalog-item-overlay {
+  opacity: 1;
+}
+.catalog-item-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: all 0.35s ease;
+  z-index: 4;
+}
+.catalog-item-info h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 3px;
+  color: #ffffff;
+  text-shadow: 0 0 12px rgba(201, 168, 76, 0.5), 0 0 30px rgba(201, 168, 76, 0.2);
+}
+.catalog-item-info .tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.catalog-item-info .tag {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border: 1px solid #c9a84c;
+  color: #c9a84c;
+}
+.catalog-item:hover .catalog-item-info {
+  transform: translateY(0);
+  opacity: 1;
+}
+@media (max-width: 600px) {
+  .navbar {
+    padding: 0 1rem;
+  }
+  .navbar-logo-left img,
+  .navbar-logo-right img {
+    height: 32px;
+  }
+}

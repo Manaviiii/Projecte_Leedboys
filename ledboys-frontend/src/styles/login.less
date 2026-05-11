@@ -1,0 +1,202 @@
+@import './variables.less';
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: @black;
+    position: relative;
+    overflow: hidden;
+    padding: 2rem;
+    padding-top: 120px;
+}
+
+// Fondo con glows dorados
+.login-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    &-glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.12;
+
+        &--1 {
+            width: 600px; height: 600px;
+            background: @gold;
+            top: -200px; left: -200px;
+            animation: glowFloat1 8s ease-in-out infinite;
+        }
+        &--2 {
+            width: 400px; height: 400px;
+            background: @gold-light;
+            bottom: -150px; right: -100px;
+            animation: glowFloat2 10s ease-in-out infinite;
+        }
+    }
+}
+
+@keyframes glowFloat1 {
+    0%, 100% { transform: translate(0, 0); }
+    50%       { transform: translate(40px, 30px); }
+}
+@keyframes glowFloat2 {
+    0%, 100% { transform: translate(0, 0); }
+    50%       { transform: translate(-30px, -20px); }
+}
+
+// Card
+.login-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 440px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.2);
+    padding: 3.5rem 3rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+
+    // Borde top dorado
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 10%; right: 10%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, @gold, transparent);
+    }
+}
+
+.login-logo {
+    margin-bottom: 2rem;
+    img {
+        height: 70px;
+        width: auto;
+        margin: 0 auto;
+    }
+}
+
+.login-title {
+    font-family: @font-display;
+    font-size: 3rem;
+    letter-spacing: 8px;
+    color: @white;
+    margin-bottom: 1rem;
+}
+
+.login-subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: @text-muted;
+    margin-bottom: 2.5rem;
+}
+
+.login-error {
+    background: rgba(255, 80, 80, 0.08);
+    border: 1px solid rgba(255, 80, 80, 0.3);
+    color: #ff6b6b;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    text-align: left;
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        label {
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: @text-muted;
+        }
+
+        input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: @white;
+            padding: 1rem;
+            font-family: @font-body;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+            width: 100%;
+
+            &::placeholder { color: rgba(255,255,255,0.2); }
+            &:focus { border-color: @gold; }
+        }
+    }
+}
+
+.login-btn {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 1rem;
+    background: transparent;
+    border: 1px solid @gold;
+    color: @white;
+    font-family: @font-body;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: @gold;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+        z-index: -1;
+    }
+    &:hover:not(:disabled) {
+        color: @black;
+        &::before { transform: scaleX(1); }
+    }
+    &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.login-btn-spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: @white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+}
+
+.login-back {
+    margin-top: 2rem;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    a {
+        color: @text-muted;
+        text-decoration: none;
+        transition: color 0.3s;
+        text-transform: uppercase;
+        &:hover { color: @gold; }
+    }
+}

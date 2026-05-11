@@ -66,11 +66,11 @@ export default function Home() {
 
             {/* PARTNERS */}
             <section className="partners">
-                <h2>LUGARES DONDE HEMOS TRABAJADO</h2>
-                <div className="partners-grid">
-                    {["Celosa", "Go Beach", "Sala 2", "Venue 4", "Venue 5", "Venue 6"].map((p, i) => (
-                        <div key={i} className="partner-placeholder">{p}</div>
-                    ))}
+                <span className="section-label">Presencia nacional</span>
+                <div className="gold-divider" />
+                <h2>DONDE HEMOS<br /><span>TRABAJADO</span></h2>
+                <div className="partners-map">
+                    <img src="/images/mapa_trabajo.png" alt="Mapa de trabajos realizados en España" />
                 </div>
             </section>
 
@@ -81,7 +81,7 @@ export default function Home() {
                     <div className="gold-divider" />
                     <h2>HAZ TU <span>EVENTO</span><br />ÚNICO</h2>
                     <p className="contact-subtitle">Cuéntanos qué necesitas y te preparamos una propuesta</p>
-                    <a className="contact-phone" href="tel:+34644784285">📞 644 78 42 85</a>
+                    <a className="contact-phone" href="tel:+34637645824">📞 637 64 58 24</a>
                     {submitted ? (
                         <div className="form-success">✓ Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.</div>
                     ) : (

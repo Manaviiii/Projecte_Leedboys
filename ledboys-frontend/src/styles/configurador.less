@@ -1,0 +1,303 @@
+@import './variables.less';
+
+.config-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1100;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.config-drawer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    max-height: 85vh;
+    background: @gray-dark;
+    border-top: 2px solid @gold;
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px 16px 0 0;
+    animation: slideUp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    @media (min-width: 768px) {
+        left: auto;
+        top: 0; bottom: 0; right: 0;
+        width: 480px;
+        max-height: 100vh;
+        border-radius: 0;
+        border-top: none;
+        border-left: 1px solid rgba(201,168,76,0.2);
+        animation: slideRight 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, @gold, transparent);
+        }
+    }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+@keyframes slideRight {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+
+.config-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-shrink: 0;
+
+    h2 {
+        font-family: @font-display;
+        font-size: 1.3rem;
+        letter-spacing: 5px;
+        color: @white;
+    }
+}
+
+.config-close {
+    background: none;
+    border: none;
+    color: @text-muted;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s;
+    &:hover { color: @white; }
+}
+
+.config-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background: rgba(201,168,76,0.3); border-radius: 2px; }
+}
+
+// Traje seleccionado
+.config-traje {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+
+    &-img {
+        width: 60px; height: 80px;
+        flex-shrink: 0;
+        overflow: hidden;
+        img { width: 100%; height: 100%; object-fit: cover; }
+    }
+
+    &-placeholder { width: 100%; height: 100%; background: @gray-mid; }
+
+    &-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+
+        h3 {
+            font-family: @font-display;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: @white;
+        }
+        span {
+            font-size: 0.75rem;
+            color: @gold;
+            letter-spacing: 1px;
+        }
+    }
+}
+
+.config-stock {
+    color: @text-muted !important;
+    font-size: 0.65rem !important;
+}
+
+// Secciones
+.config-section {
+    h4 {
+        font-size: 0.65rem;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: @text-muted;
+        margin-bottom: 1rem;
+    }
+}
+
+// Cantidad
+.config-cantidad {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+
+    button {
+        width: 36px; height: 36px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.15);
+        color: @white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex; align-items: center; justify-content: center;
+
+        &:hover:not(:disabled) { border-color: @gold; color: @gold; }
+        &:disabled { opacity: 0.3; cursor: not-allowed; }
+    }
+
+    span {
+        font-family: @font-display;
+        font-size: 2rem;
+        letter-spacing: 2px;
+        color: @white;
+        min-width: 40px;
+        text-align: center;
+    }
+}
+
+// Extras
+.config-extras {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.config-extra-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(255,255,255,0.02);
+
+    &:hover { border-color: rgba(201,168,76,0.3); }
+
+    &.selected {
+        border-color: @gold;
+        background: rgba(201,168,76,0.06);
+    }
+}
+
+.config-extra-check {
+    width: 20px; height: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    color: @gold;
+    flex-shrink: 0;
+    transition: all 0.2s;
+
+    .config-extra-item.selected & {
+        border-color: @gold;
+        background: rgba(201,168,76,0.15);
+    }
+}
+
+.config-extra-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+
+    span {
+        font-size: 0.8rem;
+        color: @white;
+        letter-spacing: 1px;
+    }
+}
+
+.config-extra-price {
+    color: @gold !important;
+    font-size: 0.75rem !important;
+    font-weight: 600;
+}
+
+// Footer
+.config-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+.config-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    span {
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: @text-muted;
+    }
+
+    &-price {
+        font-family: @font-display;
+        font-size: 2rem !important;
+        letter-spacing: 2px;
+        color: @gold !important;
+    }
+}
+
+.config-add-btn {
+    width: 100%;
+    padding: 1rem;
+    background: transparent;
+    border: 1px solid @gold;
+    color: @white;
+    font-family: @font-body;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: @gold;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+        z-index: -1;
+    }
+    &:hover:not(:disabled) {
+        color: @black;
+        &::before { transform: scaleX(1); }
+    }
+
+    &.added {
+        background: @gold;
+        color: @black;
+        border-color: @gold;
+        cursor: default;
+    }
+}

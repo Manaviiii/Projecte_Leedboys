@@ -29,8 +29,8 @@ export default function Footer() {
                         <a className="footer-social-link" href="https://www.instagram.com/ledgirlss/" target="_blank" rel="noopener noreferrer">
                             <div className="footer-social-icon">📸</div>@Ledgirlss
                         </a>
-                        <a className="footer-social-link" href="tel:+34644784285">
-                            <div className="footer-social-icon">📞</div>644 78 42 85
+                        <a className="footer-social-link" href="tel:+34637645824">
+                            <div className="footer-social-icon">📞</div>637 64 58 24
                         </a>
                     </div>
                 </div>

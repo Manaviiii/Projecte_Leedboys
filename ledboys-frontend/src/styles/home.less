@@ -64,24 +64,33 @@
     }
     &:hover &-content h3 { color: @gold; }
 
-    // light sweep
     &::before { content: ''; position: absolute; top: 0; left: -75%; width: 50%; height: 100%; background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%); transform: skewX(-15deg); z-index: 3; pointer-events: none; }
     &:hover::before { left: 130%; transition: left 0.5s ease; }
 }
 
-// PARTNERS
+// PARTNERS - MAPA
 .partners {
-    padding: 6rem 2rem; text-align: center; background: @gray-dark;
-    h2 { font-family: @font-display; font-size: clamp(1.5rem, 3vw, 2.5rem); letter-spacing: 6px; margin-bottom: 4rem; color: @white; }
-    &-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 3rem; max-width: 1000px; margin: 0 auto; }
-}
-.partner-placeholder {
-    width: 120px; height: 120px; border-radius: 50%;
-    border: 2px solid rgba(201,168,76,0.2); background: rgba(201,168,76,0.05);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase;
-    color: @text-muted; text-align: center; transition: all 0.3s;
-    &:hover { border-color: @gold; color: @gold; }
+    padding: 6rem 2rem; text-align: center; background: @black;
+
+    h2 {
+        font-family: @font-display;
+        font-size: clamp(2rem, 5vw, 4rem);
+        letter-spacing: 8px;
+        color: @white;
+        margin-bottom: 4rem;
+        span { color: @gold; }
+    }
+
+    &-map {
+        max-width: 900px;
+        margin: 0 auto;
+
+        img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    } 
 }
 
 // CONTACT
