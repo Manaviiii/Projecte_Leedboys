@@ -16,9 +16,10 @@ class LoginController extends Controller
         return view('login'); // apunta a resources/views/login.blade.php
     }
 
-    ///<summary>
-    ///Intenta hacer login
-    ///</summary>
+    /**
+     * @param Request $request
+     * @return view /dashboard
+     */
     public function login(Request $request)
     {
         // Validación básica
@@ -39,9 +40,10 @@ class LoginController extends Controller
         ])->onlyInput('email'); // solo muestra el campo de email que habia escrito el usuario
     }
 
-    ///<summary>
-    ///hace logout
-    ///</summary>
+    /**
+     * @param Request $request
+     * @return view /login
+     */
     public function logout(Request $request)
     {
         Auth::logout();

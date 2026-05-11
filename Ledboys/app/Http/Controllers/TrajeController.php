@@ -9,6 +9,7 @@ class TrajeController extends Controller
 {
     /**
      * Obtiene todos los items que tienen relación con un traje
+     * @return Json
      */
     public function index()
     {
@@ -16,6 +17,10 @@ class TrajeController extends Controller
         return response()->json($trajes);
     }
 
+    /**
+     * @param int $id
+     * @return Json
+     */
     public function mostrarTraje($id)
     {
         // Buscamos el item por su ID, incluyendo su relación 'traje'
@@ -29,6 +34,10 @@ class TrajeController extends Controller
         return response()->json($traje);
     }
 
+    /**
+     * @param string $genero
+     * @return Json
+     */
     public function filtrarPorGenero($genero) {
         $trajes = Item::whereHas('traje', function($q) use ($genero) {
             $q->where('genero', $genero);
@@ -36,6 +45,10 @@ class TrajeController extends Controller
         return response()->json($trajes);
     }
 
+    /**
+     * @param Request $request
+     * @return Json $resultados
+     */
     public function buscar(Request $request) {
         $termino = $request->query('q');
         $resultados = Item::has('traje')

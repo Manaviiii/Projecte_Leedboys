@@ -38,8 +38,10 @@ class PaymentController extends Controller
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         // Sacar items de la DB y calcular total
-        $itemsDB       = Item::whereIn('id', $request->items)->get();
-        $total         = $itemsDB->sum('precio');           // en euros (decimal)
+        $itemsDB = Item::whereIn('id', $request->items)->get();
+        $total   = collect($request->items)->sum(function($id) use ($itemsDB) {
+            return $itemsDB->firstWhere('id', $id)?->precio ?? 0;
+        });
         $nombresItems  = $itemsDB->pluck('nombre')->implode(', ');
 
         // Crear PaymentIntent en Stripe (importe en céntimos)

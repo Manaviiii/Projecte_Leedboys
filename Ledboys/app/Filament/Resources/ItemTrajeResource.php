@@ -23,26 +23,31 @@ class ItemTrajeResource extends Resource
     {
         return $form->schema([
             Section::make('Datos Generales')->schema([
-                Forms\Components\TextInput::make('nombre_item')
+                Forms\Components\TextInput::make('nombre')
                     ->label('Nombre del Traje')
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\TextInput::make('precio_item')
+                Forms\Components\TextInput::make('precio')
                     ->label('Precio (€)')
                     ->numeric()
                     ->prefix('€')
                     ->required(),
 
-                Forms\Components\Textarea::make('descripcion_item')
+                Forms\Components\Textarea::make('descripcion')
                     ->label('Descripción')
                     ->rows(3)
                     ->columnSpan(2),
 
-                Forms\Components\FileUpload::make('imagen_item')
+                Forms\Components\FileUpload::make('imagen')
                     ->label('Imagen')
                     ->image()
                     ->directory('items')
+                    ->columnSpan(2),
+
+                Forms\Components\Toggle::make('activo')
+                    ->label('Activo')
+                    ->default(true)
                     ->columnSpan(2),
             ])->columns(2),
 
@@ -56,6 +61,7 @@ class ItemTrajeResource extends Resource
                     ->required(),
 
                 Forms\Components\Select::make('genero')
+                    ->label('Género')
                     ->options([
                         'chico'  => 'Chico',
                         'chica'  => 'Chica',
@@ -77,7 +83,8 @@ class ItemTrajeResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('item.imagen')->label(''),
+                Tables\Columns\ImageColumn::make('item.imagen')
+                    ->label(''),
                 Tables\Columns\TextColumn::make('item.nombre')
                     ->label('Nombre')
                     ->searchable()
@@ -85,16 +92,20 @@ class ItemTrajeResource extends Resource
                 Tables\Columns\BadgeColumn::make('tipo_traje')
                     ->label('Tipo')
                     ->colors([
-                        'primary' => 'zancos',
+                        'primary'   => 'zancos',
                         'secondary' => 'sin_zancos',
-                    ]),
+                    ])
+                    ->formatStateUsing(fn ($state) => $state === 'zancos' ? 'Con Zancos' : 'Sin Zancos'),
                 Tables\Columns\BadgeColumn::make('genero')
+                    ->label('Género')
                     ->colors([
                         'primary' => 'unisex',
                         'danger'  => 'chica',
                         'success' => 'chico',
-                    ]),
-                Tables\Columns\TextColumn::make('stock_total')->label('Stock'),
+                    ])
+                    ->formatStateUsing(fn ($state) => ucfirst($state)),
+                Tables\Columns\TextColumn::make('stock_total')
+                    ->label('Stock'),
                 Tables\Columns\TextColumn::make('item.precio')
                     ->label('Precio')
                     ->money('eur'),
@@ -104,11 +115,13 @@ class ItemTrajeResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('tipo_traje')
+                    ->label('Tipo')
                     ->options([
                         'zancos'     => 'Con Zancos',
                         'sin_zancos' => 'Sin Zancos',
                     ]),
                 Tables\Filters\SelectFilter::make('genero')
+                    ->label('Género')
                     ->options([
                         'chico'  => 'Chico',
                         'chica'  => 'Chica',
