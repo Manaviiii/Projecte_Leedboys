@@ -20,6 +20,7 @@
 
     @media (max-width: 800px) {
         grid-template-columns: 1fr;
+        gap: 2rem;
     }
 }
 
@@ -39,6 +40,11 @@
 .checkout-left {
     position: sticky;
     top: 100px;
+
+    @media (max-width: 800px) {
+        position: static; // quitar sticky en móvil
+        order: 2;         // pago va debajo del resumen en móvil
+    }
 }
 
 .checkout-payment {
@@ -146,6 +152,10 @@
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.06);
     padding: 2rem;
+
+    @media (max-width: 800px) {
+        order: 1; // resumen va primero en móvil
+    }
 }
 
 .checkout-items {
@@ -180,6 +190,7 @@
         display: flex;
         flex-direction: column;
         gap: 0.3rem;
+        min-width: 0; // evita overflow en móvil
     }
 
     &-name {
@@ -187,6 +198,9 @@
         font-weight: 600;
         letter-spacing: 1px;
         color: @white;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     &-tipo {
@@ -197,9 +211,10 @@
     }
 
     &-qty {
-        font-size: 0.6rem;
+        font-size: 0.75rem !important;
         letter-spacing: 1px;
-        color: @gold;
+        color: @gold !important;
+        font-weight: 600;
     }
 
     &-price {
@@ -391,10 +406,65 @@
     }
 }
 
-// Cantidad más grande en resumen
-.checkout-item-qty {
-    font-size: 0.75rem !important;
+// MÉTODOS DE PAGO
+.checkout-payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.checkout-pm-label {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: @text-muted;
+}
+
+.checkout-pm-icons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.checkout-pm-icon {
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 0.6rem;
+    font-weight: 700;
     letter-spacing: 1px;
-    color: @gold !important;
-    font-weight: 600;
+}
+
+.checkout-pm-visa {
+    background: #1a1f71;
+    color: #fff;
+    font-style: italic;
+}
+
+.checkout-pm-mc {
+    background: #eb001b;
+    color: #fff;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        right: -4px; top: 50%;
+        transform: translateY(-50%);
+        width: 18px; height: 18px;
+        background: #f79e1b;
+        border-radius: 50%;
+        z-index: -1;
+    }
+}
+
+.checkout-pm-amex {
+    background: #2e77bc;
+    color: #fff;
+}
+
+.checkout-pm-stripe {
+    background: #635bff;
+    color: #fff;
 }

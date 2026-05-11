@@ -10,6 +10,8 @@ import Login from "./pages/Login";
 import Checkout from "./pages/Checkout";
 import Facturas from "./pages/Facturas";
 import Perfil from "./pages/Perfil";
+import Cookies from "./pages/Cookies";
+import Privacidad from "./pages/Privacidad";
 
 function getRoute() { return window.location.pathname; }
 
@@ -73,11 +75,13 @@ function App() {
     const isCheckout = path === "/checkout";
 
     const renderPage = () => {
-        if (path === "/" || path === "")   return <Home />;
-        if (path === "/login")             return <Login />;
-        if (path === "/checkout")          return <Checkout />;
-        if (path === "/facturas")          return <Facturas />;
-        if (path === "/perfil")            return <Perfil onLogout={handleLogout} />;
+        if (path === "/" || path === "")           return <Home />;
+        if (path === "/login")                     return <Login />;
+        if (path === "/checkout")                  return <Checkout />;
+        if (path === "/facturas")                  return <Facturas />;
+        if (path === "/perfil")                    return <Perfil onLogout={handleLogout} />;
+        if (path === "/politica-de-cookies")       return <Cookies />;
+        if (path === "/politica-de-privacidad")    return <Privacidad />;
         if (path === "/catalogo" || path.startsWith("/catalogo")) return <Catalogo />;
         if (path.startsWith("/tipo/")) {
             const tipo = path.replace("/tipo/", "").replace(/\/$/, "");

@@ -23,7 +23,7 @@ const CARD_STYLE = {
             fontFamily: "'Montserrat', sans-serif",
             fontSize: "15px",
             fontSmoothing: "antialiased",
-            "::placeholder": { color: "#888888" },
+            "::placeholder": { color: "transparent" },
         },
         invalid: { color: "#ff6b6b" },
     },
@@ -293,6 +293,15 @@ function CheckoutForm({ onSuccess }) {
                         {loading ? <span className="checkout-spinner" /> : `Pagar ${total.toFixed(2)}€`}
                     </button>
                     <div className="checkout-secure">🔒 Pago seguro procesado por Stripe</div>
+                    <div className="checkout-payment-methods">
+                        <span className="checkout-pm-label">Métodos aceptados</span>
+                        <div className="checkout-pm-icons">
+                            <span className="checkout-pm-icon checkout-pm-visa">VISA</span>
+                            <span className="checkout-pm-icon checkout-pm-mc">MC</span>
+                            <span className="checkout-pm-icon checkout-pm-amex">AMEX</span>
+                            <span className="checkout-pm-icon checkout-pm-stripe">Stripe</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -81,7 +81,7 @@ export default function Home() {
                     <div className="gold-divider" />
                     <h2>HAZ TU <span>EVENTO</span><br />ÚNICO</h2>
                     <p className="contact-subtitle">Cuéntanos qué necesitas y te preparamos una propuesta</p>
-                    <a className="contact-phone" href="tel:+34644784285">📞 644 78 42 85</a>
+                    <a className="contact-phone" href="tel:+34637645824">📞 637 64 58 24</a>
                     {submitted ? (
                         <div className="form-success">✓ Mensaje enviado correctamente. Nos pondremos en contacto contigo pronto.</div>
                     ) : (

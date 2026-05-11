@@ -16,6 +16,7 @@
 @media (max-width: 800px) {
   .checkout-layout {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 }
 .checkout-section-title {
@@ -30,6 +31,12 @@
 .checkout-left {
   position: sticky;
   top: 100px;
+}
+@media (max-width: 800px) {
+  .checkout-left {
+    position: static;
+    order: 2;
+  }
 }
 .checkout-payment {
   background: rgba(255, 255, 255, 0.02);
@@ -136,6 +143,11 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 2rem;
 }
+@media (max-width: 800px) {
+  .checkout-right {
+    order: 1;
+  }
+}
 .checkout-items {
   display: flex;
   flex-direction: column;
@@ -174,12 +186,16 @@
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
+  min-width: 0;
 }
 .checkout-item-name {
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 1px;
   color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .checkout-item-tipo {
   font-size: 0.58rem;
@@ -188,9 +204,10 @@
   color: #888888;
 }
 .checkout-item-qty {
-  font-size: 0.6rem;
+  font-size: 0.75rem !important;
   letter-spacing: 1px;
-  color: #c9a84c;
+  color: #c9a84c !important;
+  font-weight: 600;
 }
 .checkout-item-price {
   font-family: 'Bebas Neue', sans-serif;
@@ -359,9 +376,58 @@
 .checkout-field input:focus {
   border-color: #c9a84c;
 }
-.checkout-item-qty {
-  font-size: 0.75rem !important;
+.checkout-payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+.checkout-pm-label {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888888;
+}
+.checkout-pm-icons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.checkout-pm-icon {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 700;
   letter-spacing: 1px;
-  color: #c9a84c !important;
-  font-weight: 600;
+}
+.checkout-pm-visa {
+  background: #1a1f71;
+  color: #fff;
+  font-style: italic;
+}
+.checkout-pm-mc {
+  background: #eb001b;
+  color: #fff;
+  position: relative;
+}
+.checkout-pm-mc::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  background: #f79e1b;
+  border-radius: 50%;
+  z-index: -1;
+}
+.checkout-pm-amex {
+  background: #2e77bc;
+  color: #fff;
+}
+.checkout-pm-stripe {
+  background: #635bff;
+  color: #fff;
 }
