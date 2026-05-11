@@ -23,26 +23,31 @@ class ItemAccesorioResource extends Resource
     {
         return $form->schema([
             Section::make('Datos Generales')->schema([
-                Forms\Components\TextInput::make('nombre_item')
+                Forms\Components\TextInput::make('nombre')
                     ->label('Nombre del Accesorio')
                     ->required()
                     ->maxLength(255),
 
-                Forms\Components\TextInput::make('precio_item')
+                Forms\Components\TextInput::make('precio')
                     ->label('Precio (€)')
                     ->numeric()
                     ->prefix('€')
                     ->required(),
 
-                Forms\Components\Textarea::make('descripcion_item')
+                Forms\Components\Textarea::make('descripcion')
                     ->label('Descripción')
                     ->rows(3)
                     ->columnSpan(2),
 
-                Forms\Components\FileUpload::make('imagen_item')
+                Forms\Components\FileUpload::make('imagen')
                     ->label('Imagen')
                     ->image()
                     ->directory('items')
+                    ->columnSpan(2),
+
+                Forms\Components\Toggle::make('activo')
+                    ->label('Activo')
+                    ->default(true)
                     ->columnSpan(2),
             ])->columns(2),
 
@@ -60,12 +65,14 @@ class ItemAccesorioResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('item.imagen')->label(''),
+                Tables\Columns\ImageColumn::make('item.imagen')
+                    ->label(''),
                 Tables\Columns\TextColumn::make('item.nombre')
                     ->label('Nombre')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('stock_total')->label('Stock'),
+                Tables\Columns\TextColumn::make('stock_total')
+                    ->label('Stock'),
                 Tables\Columns\TextColumn::make('item.precio')
                     ->label('Precio')
                     ->money('eur'),

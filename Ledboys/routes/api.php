@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\ResidenciaController;
 use App\Http\Controllers\Api\PagoController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\ClienteResource;
+
 
 /*
 IMPORTANTE:
@@ -31,7 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me',      [AuthController::class, 'me']);
 
     // Clientes
-    Route::apiResource('clientes', ClienteController::class);
+    Route::apiResource('/clientes', ClienteController::class);
 
     // Eventos
     Route::apiResource('eventos', EventoController::class);
@@ -46,7 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // GET          /items/{item}   show            Ver un ítem específico
     // PUT/PATCH    /items/{item}   update          Actualizar un ítem
     // DELETE       /items/{item}   destroy,        Eliminar un ítem
-    Route::apiResource('items', ItemController::class)->except(['update']);
+    Route::apiResource('/items', ItemController::class)->except(['update']);
     Route::put('items/{item}',   [ItemController::class, 'update']);
     Route::patch('items/{item}', [ItemController::class, 'update']);
 
@@ -79,7 +81,6 @@ Route::get('/trajes/filtrar/{genero}', TrajeController::class . '@filtrarPorGene
 #endregion
 
 #region ACCESORIOS
-
 //Mostrar todos los accesorios (catalogo)
 Route::get('/accesorios', AccesorioController::class . '@index');
 

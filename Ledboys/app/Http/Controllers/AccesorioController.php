@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class AccesorioController extends Controller
 {
     /**
-     * Listado completo de accesorios
+     * @return JsonResponse Listado completo de accesorios
      */
     public function index()
     {
@@ -24,6 +24,8 @@ class AccesorioController extends Controller
 
     /**
      * Detalle de un accesorio específico
+     * @param int $id 
+     * @return JsonResponse  
      */
     public function mostrar($id)
     {
@@ -40,6 +42,8 @@ class AccesorioController extends Controller
 
     /**
      * Buscador de accesorios
+     * @param  Request $request
+     * @return JsonResponse 
      */
     public function buscar(Request $request)
     {

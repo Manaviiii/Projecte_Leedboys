@@ -26,6 +26,11 @@ class WebhookController extends Controller
     | Anota el "Signing secret" y ponlo en .env como STRIPE_WEBHOOK_SECRET
     |--------------------------------------------------------------------------
     */
+
+/**
+ * @param Req
+ */
+
     public function handle(Request $request)
     {
         $payload   = $request->getContent();
