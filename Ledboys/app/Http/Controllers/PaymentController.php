@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/PaymentController.php
 
 namespace App\Http\Controllers;
 
@@ -10,83 +9,138 @@ use Stripe\PaymentIntent;
 use Stripe\Refund;
 use App\Models\Item;
 use App\Models\Pago;
+use App\Models\Evento;
+use App\Models\EventoItem;
 
 class PaymentController extends Controller
 {
+    // IVA incluido en los precios
+    const IVA = 0.21;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Calcula el desglose de IVA dado un total con IVA incluido
+    |--------------------------------------------------------------------------
+    */
+    private function calcularDesglose(float $totalConIva): array
+    {
+        $baseImponible = round($totalConIva / (1 + self::IVA), 2);
+        $cuotaIva      = round($totalConIva - $baseImponible, 2);
+
+        return [
+            'base_imponible' => $baseImponible,
+            'iva_porcentaje' => self::IVA * 100, // 21
+            'cuota_iva'      => $cuotaIva,
+            'total'          => round($totalConIva, 2),
+        ];
+    }
+
     /*
     |--------------------------------------------------------------------------
     | POST /api/pagos/crear-intento
-    |
-    | Crea un PaymentIntent en Stripe y guarda el pago en estado "pendiente".
-    | El frontend usa el clientSecret para montar el formulario de Stripe.js.
-    |
-    | Body JSON:
-    |   items        array (requerido) — IDs de los items a comprar  [1, 3, 5]
-    |   evento_id    int   (opcional)
-    |   residencia_id int  (opcional)
     |--------------------------------------------------------------------------
     */
     public function crearIntento(Request $request)
     {
         $request->validate([
-            'items'         => 'required|array|min:1',
-            'items.*'       => 'integer|exists:items,id',
-            'evento_id'     => 'nullable|exists:eventos,id',
-            'residencia_id' => 'nullable|exists:residencias,id',
+            'fecha'                  => 'required|date|after_or_equal:today',
+            'items'                  => 'required|array|min:1',
+            'items.*'                => 'integer|exists:items,id',
+            'residencia_id'          => 'nullable|exists:residencias,id',
+            'nombre_facturacion'     => 'nullable|string|max:255',
+            'apellidos_facturacion'  => 'nullable|string|max:255',
+            'dni'                    => 'nullable|string|max:20',
+            'telefono_facturacion'   => 'nullable|string|max:20',
+            'direccion'              => 'nullable|string|max:255',
+            'codigo_postal'          => 'nullable|string|max:10',
         ]);
+
+        $cliente = auth()->user()->cliente;
+        if (!$cliente) {
+            return response()->json(['message' => 'El usuario no tiene perfil de cliente'], 422);
+        }
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
         // Sacar items de la DB y calcular total
         $itemsDB = Item::whereIn('id', $request->items)->get();
-        $total   = collect($request->items)->sum(function($id) use ($itemsDB) {
+        $total   = collect($request->items)->sum(function ($id) use ($itemsDB) {
             return $itemsDB->firstWhere('id', $id)?->precio ?? 0;
         });
-        $nombresItems  = $itemsDB->pluck('nombre')->implode(', ');
+        $nombresItems = $itemsDB->pluck('nombre')->implode(', ');
 
-        // Crear PaymentIntent en Stripe (importe en céntimos)
+        // Desglose IVA
+        $desglose = $this->calcularDesglose($total);
+
+        // Crear el evento
+        $evento = Evento::create([
+            'cliente_id'   => $cliente->id,
+            'fecha'        => $request->fecha,
+            'total_precio' => $total,
+            'estado'       => 'borrador',
+        ]);
+
+        // Crear los evento_items
+        foreach ($request->items as $itemId) {
+            $item = $itemsDB->firstWhere('id', $itemId);
+            EventoItem::create([
+                'evento_id'       => $evento->id,
+                'item_id'         => $itemId,
+                'cantidad'        => 1,
+                'precio_unitario' => $item->precio,
+            ]);
+        }
+
+        // Crear PaymentIntent en Stripe
         $intent = PaymentIntent::create([
             'amount'                    => (int) round($total * 100),
             'currency'                  => 'eur',
             'automatic_payment_methods' => ['enabled' => true],
             'metadata'                  => [
-                'user_id'    => auth()->id(),
-                'items'      => implode(',', $request->items),
+                'user_id'        => auth()->id(),
+                'cliente_id'     => $cliente->id,
+                'evento_id'      => $evento->id,
+                'items'          => implode(',', $request->items),
+                'base_imponible' => $desglose['base_imponible'],
+                'cuota_iva'      => $desglose['cuota_iva'],
             ],
         ]);
 
-        // Guardar pago en DB en estado pendiente
+        // Guardar pago en DB
         $pago = Pago::create([
             'user_id'                  => auth()->id(),
-            'evento_id'                => $request->evento_id,
+            'evento_id'                => $evento->id,
             'residencia_id'            => $request->residencia_id,
             'amount'                   => $total,
             'detalles_items'           => $nombresItems,
             'estado'                   => 'pendiente',
             'stripe_payment_intent_id' => $intent->id,
+            'nombre_facturacion'       => $request->nombre_facturacion,
+            'apellidos_facturacion'    => $request->apellidos_facturacion,
+            'dni'                      => $request->dni,
+            'telefono_facturacion'     => $request->telefono_facturacion,
+            'direccion'                => $request->direccion,
+            'codigo_postal'            => $request->codigo_postal,
         ]);
 
         return response()->json([
             'clientSecret' => $intent->client_secret,
             'pago_id'      => $pago->id,
-            'total'        => $total,
+            'evento_id'    => $evento->id,
             'items'        => $itemsDB->map(fn($i) => [
-                'id'     => $i->id,
-                'nombre' => $i->nombre,
-                'precio' => $i->precio,
+                'id'             => $i->id,
+                'nombre'         => $i->nombre,
+                'precio_con_iva' => $i->precio,
+                'base_imponible' => round($i->precio / (1 + self::IVA), 2),
+                'cuota_iva'      => round($i->precio - ($i->precio / (1 + self::IVA)), 2),
             ]),
+            'desglose'     => $desglose,
         ], 201);
     }
 
     /*
     |--------------------------------------------------------------------------
     | POST /api/pagos/{id}/confirmar
-    |
-    | El frontend llama a este endpoint tras recibir confirmación de Stripe.js.
-    | Doble seguridad: verificamos el estado real en Stripe antes de marcar pagado.
-    |
-    | Params:
-    |   id  — ID interno del pago (pago_id devuelto por crearIntento)
     |--------------------------------------------------------------------------
     */
     public function confirmarPago($id)
@@ -95,25 +149,34 @@ class PaymentController extends Controller
 
         $pago = Pago::findOrFail($id);
 
-        // Solo el dueño del pago puede confirmarlo
         if ($pago->user_id !== auth()->id()) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        // Verificar estado real en Stripe (no fiarse solo del frontend)
         $intent = PaymentIntent::retrieve($pago->stripe_payment_intent_id);
 
         if ($intent->status === 'succeeded') {
             $pago->update(['estado' => 'pagado']);
 
+            if ($pago->evento_id) {
+                Evento::where('id', $pago->evento_id)->update(['estado' => 'pagado']);
+            }
+
+            // Devolver también el desglose al confirmar
+            $desglose = $this->calcularDesglose((float) $pago->amount);
+
             return response()->json([
-                'message' => 'Pago confirmado correctamente',
-                'pago'    => $pago,
+                'message'  => 'Pago confirmado correctamente',
+                'pago'     => $pago,
+                'desglose' => $desglose,
             ]);
         }
 
-        // Si Stripe dice que no ha ido bien
         $pago->update(['estado' => 'fallido']);
+
+        if ($pago->evento_id) {
+            Evento::where('id', $pago->evento_id)->update(['estado' => 'cancelado']);
+        }
 
         return response()->json([
             'message'       => 'El pago no se ha completado en Stripe',
@@ -124,9 +187,6 @@ class PaymentController extends Controller
     /*
     |--------------------------------------------------------------------------
     | GET /api/pagos
-    |
-    | Devuelve el historial de pagos del usuario autenticado.
-    | Soporta paginación: ?per_page=10
     |--------------------------------------------------------------------------
     */
     public function historial(Request $request)
@@ -134,6 +194,7 @@ class PaymentController extends Controller
         $perPage = $request->query('per_page', 10);
 
         $pagos = Pago::where('user_id', auth()->id())
+                     ->with('evento')
                      ->latest()
                      ->paginate($perPage);
 
@@ -143,31 +204,27 @@ class PaymentController extends Controller
     /*
     |--------------------------------------------------------------------------
     | GET /api/pagos/{id}
-    |
-    | Detalle de un pago concreto.
-    | Solo accesible por el propio usuario.
     |--------------------------------------------------------------------------
     */
     public function detalle($id)
     {
-        $pago = Pago::findOrFail($id);
+        $pago = Pago::with('evento.items')->findOrFail($id);
 
         if ($pago->user_id !== auth()->id()) {
             return response()->json(['message' => 'No autorizado'], 403);
         }
 
-        return response()->json($pago);
+        $desglose = $this->calcularDesglose((float) $pago->amount);
+
+        return response()->json([
+            'pago'     => $pago,
+            'desglose' => $desglose,
+        ]);
     }
 
     /*
     |--------------------------------------------------------------------------
     | POST /api/pagos/{id}/reembolso
-    |
-    | Solicita un reembolso total a Stripe y actualiza el estado en DB.
-    | Solo se puede reembolsar un pago en estado "pagado".
-    |
-    | Body JSON (opcional):
-    |   motivo  string — Razón del reembolso (se guarda en metadata de Stripe)
     |--------------------------------------------------------------------------
     */
     public function reembolso(Request $request, $id)
@@ -182,12 +239,11 @@ class PaymentController extends Controller
 
         if ($pago->estado !== 'pagado') {
             return response()->json([
-                'message' => 'Solo se pueden reembolsar pagos en estado "pagado"',
+                'message'       => 'Solo se pueden reembolsar pagos en estado "pagado"',
                 'estado_actual' => $pago->estado,
             ], 422);
         }
 
-        // Crear reembolso en Stripe (reembolso total)
         $refund = Refund::create([
             'payment_intent' => $pago->stripe_payment_intent_id,
             'metadata'       => [
@@ -197,6 +253,10 @@ class PaymentController extends Controller
         ]);
 
         $pago->update(['estado' => 'reembolsado']);
+
+        if ($pago->evento_id) {
+            Evento::where('id', $pago->evento_id)->update(['estado' => 'cancelado']);
+        }
 
         return response()->json([
             'message'   => 'Reembolso procesado correctamente',

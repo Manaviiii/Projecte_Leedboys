@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Laravel\Sanctum\HasApiTokens; // <--- 1. Importa esto
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -26,10 +26,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    
-    // Un helper rápido para saber si es admin
+
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+
+    public function cliente()
+    {
+        return $this->hasOne(Cliente::class);
     }
 }
