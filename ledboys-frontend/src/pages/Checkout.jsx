@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useCart } from "../context/CartContext";
 import Footer from "../components/Footer";
 import jsPDF from "jspdf";
@@ -16,14 +16,14 @@ const EMPRESA = {
     telefono:  "+34 637 64 58 24",
 };
 
-const CARD_STYLE = {
+const FIELD_STYLE = {
     style: {
         base: {
             color: "#ffffff",
             fontFamily: "'Montserrat', sans-serif",
             fontSize: "15px",
             fontSmoothing: "antialiased",
-            "::placeholder": { color: "transparent" },
+            "::placeholder": { color: "#444" },
         },
         invalid: { color: "#ff6b6b" },
     },
@@ -35,7 +35,6 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
 
     doc.setFillColor(10, 10, 10);
     doc.rect(0, 0, W, 297, "F");
-
     doc.setFillColor(201, 168, 76);
     doc.rect(0, 0, W, 2, "F");
 
@@ -78,12 +77,10 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.setFontSize(7.5);
     doc.setTextColor(136, 136, 136);
     doc.text("FACTURADO A", 20, 65);
-
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(255, 255, 255);
     doc.text(`${facturacion.nombre} ${facturacion.apellidos}`, 20, 73);
-
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
     doc.setTextColor(136, 136, 136);
@@ -179,7 +176,6 @@ function CheckoutForm({ onSuccess }) {
         if (items.length === 0) return;
         const token = localStorage.getItem("token");
 
-        // Incluir trajes, accesorios y packs con sus cantidades
         const itemIds = items.flatMap(i => {
             let id = null;
             if (i.tipo === "Traje")     id = parseInt(i.id.replace("traje-", ""));
@@ -215,8 +211,10 @@ function CheckoutForm({ onSuccess }) {
         setLoading(true);
         setError(null);
 
+        const cardNumber = elements.getElement(CardNumberElement);
+
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-            payment_method: { card: elements.getElement(CardElement) },
+            payment_method: { card: cardNumber },
         });
 
         if (stripeError) { setError(stripeError.message); setLoading(false); return; }
@@ -272,18 +270,39 @@ function CheckoutForm({ onSuccess }) {
 
                 <div className="checkout-payment">
                     <h3 className="checkout-section-title">Datos de pago</h3>
-                    <div className="checkout-card-wrap">
-                        <div className="checkout-card-label">Número de tarjeta</div>
-                        <CardElement options={CARD_STYLE} />
+
+                    <div className="checkout-field checkout-field--full">
+                        <label>Número de tarjeta</label>
+                        <div className="checkout-card-wrap">
+                            <CardNumberElement options={FIELD_STYLE} />
+                        </div>
                     </div>
+
+                    <div className="checkout-billing-grid">
+                        <div className="checkout-field">
+                            <label>Fecha de caducidad</label>
+                            <div className="checkout-card-wrap">
+                                <CardExpiryElement options={FIELD_STYLE} />
+                            </div>
+                        </div>
+                        <div className="checkout-field">
+                            <label>CVV</label>
+                            <div className="checkout-card-wrap">
+                                <CardCvcElement options={FIELD_STYLE} />
+                            </div>
+                        </div>
+                    </div>
+
                     <p className="checkout-test-hint">
                         Modo test — usa <strong>4242 4242 4242 4242</strong>, fecha futura y cualquier CVC
                     </p>
+
                     {error && <div className="checkout-error">{error}</div>}
+
                     <button type="button" className="checkout-btn" disabled={!stripe || !clientSecret || loading} onClick={handleSubmit}>
                         {loading ? <span className="checkout-spinner" /> : `Pagar ${total.toFixed(2)}€`}
                     </button>
-                    <div className="checkout-secure">🔒 Pago seguro procesado por Stripe</div>
+
                     <div className="checkout-payment-methods">
                         <span className="checkout-pm-label">Métodos aceptados</span>
                         <div className="checkout-pm-icons">
