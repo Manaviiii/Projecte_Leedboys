@@ -18,7 +18,7 @@ class ItemTrajesSeeder extends Seeder
         DB::table('item_trajes')->insert([
             // Unisex
             ['item_id' => 1,  'tipo_traje' => 'zancos',     'genero' => 'chico', 'stock_total' => 4],
-            ['item_id' => 2,  'tipo_traje' => 'zancos',  'genero' => 'chico', 'stock_total' => 4],
+            ['item_id' => 2,  'tipo_traje' => 'zancos',  'genero' => 'chica', 'stock_total' => 4],
             ['item_id' => 3,  'tipo_traje' => 'sin_zancos',     'genero' => 'chico', 'stock_total' => 4],
             ['item_id' => 4,  'tipo_traje' => 'zancos',  'genero' => 'chico', 'stock_total' => 4],
             ['item_id' => 5,  'tipo_traje' => 'zancos',  'genero' => 'chico', 'stock_total' => 2],
