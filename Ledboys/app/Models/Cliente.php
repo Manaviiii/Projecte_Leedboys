@@ -9,7 +9,18 @@ class Cliente extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre', 'email', 'telefono', 'stripe_customer_id'];
+    protected $fillable = [
+        'user_id',
+        'nombre',
+        'email',
+        'telefono',
+        'stripe_customer_id',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function eventos()
     {
