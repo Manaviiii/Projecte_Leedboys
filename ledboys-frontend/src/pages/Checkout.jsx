@@ -13,7 +13,7 @@ const EMPRESA = {
     cif:       "B-87654321",
     direccion: "Institut Milà i Fontanals, Igualada",
     email:     "info@ledboyss.com",
-    telefono:  "+34 644 78 42 85",
+    telefono:  "+34 637 64 58 24",
 };
 
 const CARD_STYLE = {
@@ -33,15 +33,12 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const W   = 210;
 
-    // Fondo
     doc.setFillColor(10, 10, 10);
     doc.rect(0, 0, W, 297, "F");
 
-    // Línea dorada top
     doc.setFillColor(201, 168, 76);
     doc.rect(0, 0, W, 2, "F");
 
-    // Empresa — izquierda
     doc.setFont("helvetica", "bold");
     doc.setFontSize(26);
     doc.setTextColor(201, 168, 76);
@@ -55,7 +52,6 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.text(EMPRESA.email, 20, 43);
     doc.text(EMPRESA.telefono, 20, 48);
 
-    // FACTURA — derecha
     doc.setFontSize(30);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(255, 255, 255);
@@ -75,12 +71,10 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     addRight("Fecha:", new Date().toLocaleDateString("es-ES"), 36);
     addRight("Estado:", "PAGADO", 42, [80, 200, 120]);
 
-    // Separador
     doc.setDrawColor(201, 168, 76);
     doc.setLineWidth(0.3);
     doc.line(20, 56, W - 20, 56);
 
-    // FACTURADO A — izquierda
     doc.setFontSize(7.5);
     doc.setTextColor(136, 136, 136);
     doc.text("FACTURADO A", 20, 65);
@@ -98,7 +92,6 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.text(`${facturacion.direccion}`, 20, 89);
     doc.text(`CP: ${facturacion.cp}`, 20, 94);
 
-    // Tabla header
     const tableY = 108;
     doc.setFillColor(25, 25, 25);
     doc.rect(20, tableY - 6, W - 40, 10, "F");
@@ -110,7 +103,6 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.text("PRECIO UNIT.", 155, tableY, { align: "center" });
     doc.text("TOTAL", W - 25, tableY, { align: "right" });
 
-    // Items
     let y = tableY + 10;
     doc.setFont("helvetica", "normal");
 
@@ -130,7 +122,6 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
         y += 12;
     });
 
-    // Total
     doc.setDrawColor(201, 168, 76);
     doc.setLineWidth(0.3);
     doc.line(20, y + 2, W - 20, y + 2);
@@ -150,7 +141,6 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.setFontSize(18);
     doc.text(`${total.toFixed(2)}€`, W - 25, y, { align: "right" });
 
-    // Método pago
     y += 22;
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
@@ -162,7 +152,6 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.setTextColor(136, 136, 136);
     doc.text(`Ref. Stripe: ${stripeRef || "—"}`, 20, y + 12);
 
-    // Footer
     doc.setFillColor(201, 168, 76);
     doc.rect(0, 285, W, 2, "F");
     doc.setFontSize(7);
@@ -189,9 +178,16 @@ function CheckoutForm({ onSuccess }) {
     useEffect(() => {
         if (items.length === 0) return;
         const token = localStorage.getItem("token");
-        const itemIds = items
-            .filter(i => i.tipo === "Traje")
-            .flatMap(i => Array(i.cantidad).fill(parseInt(i.id.replace("traje-", ""))));
+
+        // Incluir trajes, accesorios y packs con sus cantidades
+        const itemIds = items.flatMap(i => {
+            let id = null;
+            if (i.tipo === "Traje")     id = parseInt(i.id.replace("traje-", ""));
+            if (i.tipo === "Accesorio") id = parseInt(i.id.replace("acc-", ""));
+            if (i.tipo === "Pack")      id = parseInt(i.id.replace("pack-", ""));
+            if (!id) return [];
+            return Array(i.cantidad).fill(id);
+        });
 
         fetch("/api/pagos/crear-intento", {
             method: "POST",
@@ -208,7 +204,6 @@ function CheckoutForm({ onSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validar datos de facturación
         const campos = ["nombre", "apellidos", "dni", "telefono", "direccion", "cp"];
         if (campos.some(c => !facturacion[c].trim())) {
             setFacturacionError("Por favor completa todos los datos de facturación.");
@@ -243,10 +238,7 @@ function CheckoutForm({ onSuccess }) {
     return (
         <div className="checkout-layout">
 
-            {/* IZQUIERDA */}
             <div className="checkout-left">
-
-                {/* Datos de facturación */}
                 <div className="checkout-billing">
                     <h3 className="checkout-section-title">Datos de facturación</h3>
                     <div className="checkout-billing-grid">
@@ -278,7 +270,6 @@ function CheckoutForm({ onSuccess }) {
                     {facturacionError && <div className="checkout-error">{facturacionError}</div>}
                 </div>
 
-                {/* Datos de pago */}
                 <div className="checkout-payment">
                     <h3 className="checkout-section-title">Datos de pago</h3>
                     <div className="checkout-card-wrap">
@@ -305,7 +296,6 @@ function CheckoutForm({ onSuccess }) {
                 </div>
             </div>
 
-            {/* DERECHA — Resumen */}
             <div className="checkout-right">
                 <h3 className="checkout-section-title">Resumen del pedido</h3>
                 <div className="checkout-items">
