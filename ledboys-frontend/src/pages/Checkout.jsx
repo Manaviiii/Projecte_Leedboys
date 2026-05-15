@@ -4,6 +4,7 @@ import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStri
 import { useCart } from "../context/CartContext";
 import Footer from "../components/Footer";
 import jsPDF from "jspdf";
+import emailjs from "@emailjs/browser";
 import "../styles/checkout.less";
 
 const stripePromise = loadStripe("pk_test_51SeyyJEWnLX7ncP0lzNrZqQuOjuHFarWUSnUkLbhFF8UMfxqUTLGZtmVBL0MuHzh5oPvl9YXZHAmxtSjT2ztjUQh00fZhU2BU8");
@@ -14,6 +15,12 @@ const EMPRESA = {
     direccion: "Institut Milà i Fontanals, Igualada",
     email:     "info@ledboyss.com",
     telefono:  "+34 637 64 58 24",
+};
+
+const EMAILJS = {
+    serviceId:  "service_zxnnhtn",
+    templateId: "template_jtumtr6",  
+    publicKey:  "Bx_dybjuI-eWS6agH",
 };
 
 const FIELD_STYLE = {
@@ -158,6 +165,24 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.save(`factura-ledboyss-${String(pagoId).padStart(6, "0")}.pdf`);
 }
 
+async function enviarEmailConfirmacion({ facturacion, pagoId, total, userEmail }) {
+    try {
+        await emailjs.send(
+            EMAILJS.serviceId,
+            EMAILJS.templateId,
+            {
+                to_email:   userEmail,
+                to_name:    `${facturacion.nombre} ${facturacion.apellidos}`,
+                factura_id: `#${String(pagoId).padStart(6, "0")}`,
+                total:      total.toFixed(2),
+            },
+            EMAILJS.publicKey
+        );
+    } catch (err) {
+        console.error("Error al enviar email:", err);
+    }
+}
+
 function CheckoutForm({ onSuccess }) {
     const stripe                      = useStripe();
     const elements                    = useElements();
@@ -225,8 +250,19 @@ function CheckoutForm({ onSuccess }) {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
             });
+
             const totalFinal = total;
             const itemsSnap  = [...items];
+            const user       = JSON.parse(localStorage.getItem("user") || "{}");
+
+            // Enviar email de confirmación
+            await enviarEmailConfirmacion({
+                facturacion,
+                pagoId,
+                total: totalFinal,
+                userEmail: user.email || "",
+            });
+
             clearCart();
             onSuccess(totalFinal, pagoId, itemsSnap, paymentIntent.id, facturacion);
         }
