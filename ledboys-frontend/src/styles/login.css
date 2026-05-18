@@ -112,17 +112,20 @@
   gap: 1.2rem;
   text-align: left;
 }
+.login-form .login-field,
 .login-form .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
+.login-form .login-field label,
 .login-form .form-group label {
   font-size: 0.65rem;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: #888888;
 }
+.login-form .login-field input,
 .login-form .form-group input {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -134,9 +137,11 @@
   transition: border-color 0.3s;
   width: 100%;
 }
+.login-form .login-field input::placeholder,
 .login-form .form-group input::placeholder {
   color: rgba(255, 255, 255, 0.2);
 }
+.login-form .login-field input:focus,
 .login-form .form-group input:focus {
   border-color: #c9a84c;
 }
@@ -181,7 +186,8 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
-.login-btn-spinner {
+.login-btn-spinner,
+.login-spinner {
   width: 18px;
   height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -190,8 +196,36 @@
   animation: spin 0.7s linear infinite;
   display: inline-block;
 }
+.login-register {
+  margin-top: 1.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: #888888;
+}
+.login-register a {
+  color: #c9a84c;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+.login-register a:hover {
+  opacity: 0.7;
+}
+.login-footer {
+  margin-top: 1.5rem;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  color: #888888;
+}
+.login-footer a {
+  color: #c9a84c;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+.login-footer a:hover {
+  opacity: 0.7;
+}
 .login-back {
-  margin-top: 2rem;
+  margin-top: 1rem;
   font-size: 0.7rem;
   letter-spacing: 2px;
 }

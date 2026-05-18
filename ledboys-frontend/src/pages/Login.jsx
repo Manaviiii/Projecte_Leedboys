@@ -28,7 +28,6 @@ export default function Login() {
                 return;
             }
 
-            // La API devuelve { success, message, data: { token, user } }
             const token = data.data?.token || data.token;
             const user  = data.data?.user  || data.user;
 
@@ -91,6 +90,10 @@ export default function Login() {
                         {loading ? <span className="login-btn-spinner" /> : "ENTRAR"}
                     </button>
                 </form>
+
+                <p className="login-register">
+                    ¿No tienes cuenta? <a href="/registro">Regístrate</a>
+                </p>
 
                 <p className="login-back">
                     <a href="/">← Volver al inicio</a>
