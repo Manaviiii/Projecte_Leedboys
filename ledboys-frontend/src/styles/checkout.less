@@ -11,7 +11,6 @@
     padding: 4rem 2rem 8rem;
 }
 
-// LAYOUT DOS COLUMNAS
 .checkout-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -34,17 +33,10 @@
     border-bottom: 1px solid rgba(201,168,76,0.2);
 }
 
-// ==============================
-// IZQUIERDA — PAGO
-// ==============================
 .checkout-left {
     position: sticky;
     top: 100px;
-
-    @media (max-width: 800px) {
-        position: static; // quitar sticky en móvil
-        order: 2;         // pago va debajo del resumen en móvil
-    }
+    @media (max-width: 800px) { position: static; order: 2; }
 }
 
 .checkout-payment {
@@ -137,32 +129,18 @@
     display: inline-block;
 }
 
-.checkout-secure {
-    font-size: 0.65rem;
-    letter-spacing: 2px;
-    color: @text-muted;
-    text-align: center;
-    text-transform: uppercase;
-}
-
-// ==============================
 // DERECHA — RESUMEN
-// ==============================
 .checkout-right {
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.06);
     padding: 2rem;
-
-    @media (max-width: 800px) {
-        order: 1; // resumen va primero en móvil
-    }
+    @media (max-width: 800px) { order: 1; }
 }
 
 .checkout-items {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .checkout-item {
@@ -171,16 +149,13 @@
     gap: 1rem;
     padding: 1rem 0;
     border-bottom: 1px solid rgba(255,255,255,0.04);
-
     &:last-child { border-bottom: none; }
 
     &-img {
-        width: 60px;
-        height: 80px;
+        width: 60px; height: 80px;
         flex-shrink: 0;
         overflow: hidden;
         border: 1px solid rgba(255,255,255,0.06);
-
         img { width: 100%; height: 100%; object-fit: cover; }
         &-placeholder { width: 100%; height: 100%; background: @gray-mid; }
     }
@@ -190,7 +165,7 @@
         display: flex;
         flex-direction: column;
         gap: 0.3rem;
-        min-width: 0; // evita overflow en móvil
+        min-width: 0;
     }
 
     &-name {
@@ -211,9 +186,9 @@
     }
 
     &-qty {
-        font-size: 0.75rem !important;
+        font-size: 0.75rem;
         letter-spacing: 1px;
-        color: @gold !important;
+        color: @gold;
         font-weight: 600;
     }
 
@@ -223,6 +198,79 @@
         letter-spacing: 1px;
         color: @white;
         flex-shrink: 0;
+        min-width: 80px;
+        text-align: right;
+    }
+}
+
+// EXTRAS tabulados
+.checkout-item--extra {
+    padding-left: 1rem;
+    background: rgba(255,255,255,0.01);
+
+    .checkout-item-img { display: none; }
+
+    .checkout-item-name {
+        font-size: 0.75rem !important;
+        color: @text-muted !important;
+        font-weight: 400 !important;
+    }
+
+    .checkout-item-price {
+        font-size: 0.95rem !important;
+        color: @text-muted !important;
+    }
+}
+
+.checkout-item-extra-indent {
+    color: @gold;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    opacity: 0.5;
+    width: 16px;
+}
+
+// Separador extras
+.checkout-extras-divider {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: @text-muted;
+    padding: 0.5rem 0;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    margin-top: 0.5rem;
+    opacity: 0.6;
+}
+
+// DESGLOSE IVA
+.checkout-iva {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    margin-bottom: 0;
+}
+
+.checkout-iva-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: @text-muted;
+
+    span:first-child {
+        flex: 1;
+        padding-right: 1rem;
+    }
+    span:last-child {
+        color: @white;
+        white-space: nowrap;
+        flex-shrink: 0;
+        min-width: 80px;
+        text-align: right;
     }
 }
 
@@ -248,9 +296,7 @@
     }
 }
 
-// ==============================
 // ÉXITO
-// ==============================
 .checkout-success {
     display: flex;
     flex-direction: column;
@@ -312,7 +358,6 @@
     }
 }
 
-// VACÍO
 .checkout-empty {
     display: flex;
     flex-direction: column;
@@ -330,7 +375,6 @@
     }
 }
 
-// ÉXITO - acciones
 .checkout-success-actions {
     display: flex;
     flex-direction: column;
@@ -352,16 +396,10 @@
     cursor: pointer;
     transition: all 0.3s;
 
-    &:hover {
-        background: @gold;
-        color: @black;
-        border-color: @gold;
-    }
+    &:hover { background: @gold; color: @black; border-color: @gold; }
 }
 
-// ==============================
 // FACTURACIÓN
-// ==============================
 .checkout-billing {
     background: rgba(255,255,255,0.02);
     border: 1px solid rgba(255,255,255,0.06);
@@ -373,7 +411,6 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
-
     @media (max-width: 500px) { grid-template-columns: 1fr; }
 }
 
@@ -436,135 +473,7 @@
     letter-spacing: 1px;
 }
 
-.checkout-pm-visa {
-    background: #1a1f71;
-    color: #fff;
-    font-style: italic;
-}
-
-.checkout-pm-mc {
-    background: #eb001b;
-    color: #fff;
-    position: relative;
-
-    &::after {
-        content: '';
-        position: absolute;
-        right: -4px; top: 50%;
-        transform: translateY(-50%);
-        width: 18px; height: 18px;
-        background: #f79e1b;
-        border-radius: 50%;
-        z-index: -1;
-    }
-}
-
-.checkout-pm-amex {
-    background: #2e77bc;
-    color: #fff;
-}
-
-.checkout-pm-stripe {
-    background: #635bff;
-    color: #fff;
-}
-
-// DESGLOSE IVA
-.checkout-iva {
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    margin-bottom: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    &-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.75rem;
-        letter-spacing: 1px;
-        color: @text-muted;
-
-        span:last-child { color: @white; }
-    }
-}
-
-// Fix IVA row spacing
-.checkout-iva-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-
-    span:first-child { flex: 1; }
-    span:last-child {
-        color: @white;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-}
-
-// EXTRAS tabulados bajo el traje
-.checkout-item--extra {
-    padding-left: 1rem;
-    background: rgba(255,255,255,0.01);
-
-    .checkout-item-img { display: none; }
-
-    .checkout-item-name {
-        font-size: 0.75rem !important;
-        color: @text-muted !important;
-    }
-
-    .checkout-item-price {
-        font-size: 1rem !important;
-        color: @text-muted !important;
-    }
-}
-
-.checkout-item-extra-indent {
-    color: @gold;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    opacity: 0.6;
-}
-
-// Fix IVA row spacing
-.checkout-iva-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-
-    span:first-child { flex: 1; }
-    span:last-child {
-        color: @white;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-}
-
-// EXTRAS tabulados bajo el traje
-.checkout-item--extra {
-    padding-left: 1rem;
-    background: rgba(255,255,255,0.01);
-
-    .checkout-item-img { display: none; }
-
-    .checkout-item-name {
-        font-size: 0.75rem !important;
-        color: @text-muted !important;
-    }
-
-    .checkout-item-price {
-        font-size: 1rem !important;
-        color: @text-muted !important;
-    }
-}
-
-.checkout-item-extra-indent {
-    color: @gold;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    opacity: 0.6;
-}
+.checkout-pm-visa   { background: #1a1f71; color: #fff; font-style: italic; }
+.checkout-pm-mc     { background: #eb001b; color: #fff; }
+.checkout-pm-amex   { background: #2e77bc; color: #fff; }
+.checkout-pm-stripe { background: #635bff; color: #fff; }
