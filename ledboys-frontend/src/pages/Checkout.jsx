@@ -359,7 +359,7 @@ function CheckoutForm({ onSuccess }) {
                     <div className="checkout-billing-grid">
                         <div className="checkout-field">
                             <label>Fecha del evento</label>
-                            <input name="fecha" type="date" value={evento.fecha} onChange={handleEvento} />
+                            <input name="fecha" type="date" value={evento.fecha} onChange={handleEvento} min={new Date().toISOString().split("T")[0]} />
                         </div>
                         <div className="checkout-field">
                             <label>Hora del evento</label>

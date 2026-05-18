@@ -7,6 +7,7 @@ import Catalogo from "./pages/Catalogo";
 import TipoPage from "./pages/TipoPage";
 import TrajeDetalle from "./pages/TrajeDetalle";
 import Login from "./pages/Login";
+import Registro from "./pages/Registro";
 import Checkout from "./pages/Checkout";
 import Facturas from "./pages/Facturas";
 import Perfil from "./pages/Perfil";
@@ -71,17 +72,18 @@ function App() {
         });
     };
 
-    const isLogin    = path === "/login";
+    const isLogin    = path === "/login" || path === "/registro";
     const isCheckout = path === "/checkout";
 
     const renderPage = () => {
-        if (path === "/" || path === "")           return <Home />;
-        if (path === "/login")                     return <Login />;
-        if (path === "/checkout")                  return <Checkout />;
-        if (path === "/facturas")                  return <Facturas />;
-        if (path === "/perfil")                    return <Perfil onLogout={handleLogout} />;
-        if (path === "/politica-de-cookies")       return <Cookies />;
-        if (path === "/politica-de-privacidad")    return <Privacidad />;
+        if (path === "/" || path === "")        return <Home />;
+        if (path === "/login")                  return <Login />;
+        if (path === "/registro")               return <Registro />;
+        if (path === "/checkout")               return <Checkout />;
+        if (path === "/facturas")               return <Facturas />;
+        if (path === "/perfil")                 return <Perfil onLogout={handleLogout} />;
+        if (path === "/politica-de-cookies")    return <Cookies />;
+        if (path === "/politica-de-privacidad") return <Privacidad />;
         if (path === "/catalogo" || path.startsWith("/catalogo")) return <Catalogo />;
         if (path.startsWith("/tipo/")) {
             const tipo = path.replace("/tipo/", "").replace(/\/$/, "");

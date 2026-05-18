@@ -26,11 +26,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me',      [AuthController::class, 'me']);
 
     // Perfil del usuario autenticado
-    Route::get('/perfil',             [ProfileController::class, 'ver']);
-    Route::put('/perfil',             [ProfileController::class, 'actualizar']);
-    Route::put('/perfil/email',       [ProfileController::class, 'cambiarEmail']);
-    Route::put('/perfil/password',    [ProfileController::class, 'cambiarPassword']);
-    Route::delete('/perfil',          [ProfileController::class, 'eliminar']);
+    Route::get('/perfil',             [PerfilController::class, 'ver']);
+    Route::put('/perfil',             [PerfilController::class, 'actualizar']);
+    Route::put('/perfil/email',       [PerfilController::class, 'cambiarEmail']);
+    Route::put('/perfil/password',    [PerfilController::class, 'cambiarPassword']);
+    Route::delete('/perfil',          [PerfilController::class, 'eliminar']);
 
     // Clientes
     Route::apiResource('/clientes', ClienteController::class);
