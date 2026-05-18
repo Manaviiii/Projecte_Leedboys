@@ -19,7 +19,7 @@ const EMPRESA = {
 
 const EMAILJS = {
     serviceId:  "service_zxnnhtn",
-    templateId: "template_jtumtr6",  
+    templateId: "template_jtumtr6",
     publicKey:  "Bx_dybjuI-eWS6agH",
 };
 
@@ -36,7 +36,7 @@ const FIELD_STYLE = {
     },
 };
 
-function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
+function generarPDFFactura({ pagoId, total, desglose, items, stripeRef, facturacion, evento }) {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const W   = 210;
 
@@ -81,6 +81,7 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.setLineWidth(0.3);
     doc.line(20, 56, W - 20, 56);
 
+    // FACTURADO A
     doc.setFontSize(7.5);
     doc.setTextColor(136, 136, 136);
     doc.text("FACTURADO A", 20, 65);
@@ -93,9 +94,23 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.setTextColor(136, 136, 136);
     doc.text(`DNI: ${facturacion.dni}`, 20, 79);
     doc.text(`Tel: ${facturacion.telefono}`, 20, 84);
-    doc.text(`${facturacion.direccion}`, 20, 89);
+    doc.text(facturacion.direccion, 20, 89);
     doc.text(`CP: ${facturacion.cp}`, 20, 94);
 
+    // DATOS DEL EVENTO
+    if (evento) {
+        doc.setFontSize(7.5);
+        doc.setTextColor(136, 136, 136);
+        doc.text("DATOS DEL EVENTO", W - 90, 65);
+        doc.setFontSize(8.5);
+        doc.setTextColor(255, 255, 255);
+        doc.text(`Fecha: ${evento.fecha}`, W - 90, 73);
+        doc.text(`Hora: ${evento.hora}`, W - 90, 79);
+        doc.setTextColor(136, 136, 136);
+        doc.text(`Lugar: ${evento.direccion_evento}`, W - 90, 85);
+    }
+
+    // Tabla
     const tableY = 108;
     doc.setFillColor(25, 25, 25);
     doc.rect(20, tableY - 6, W - 40, 10, "F");
@@ -130,22 +145,30 @@ function generarPDFFactura({ pagoId, total, items, stripeRef, facturacion }) {
     doc.setLineWidth(0.3);
     doc.line(20, y + 2, W - 20, y + 2);
 
+    // Desglose IVA
     y += 12;
-    doc.setFontSize(10);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
     doc.setTextColor(136, 136, 136);
-    doc.text("SUBTOTAL", W - 70, y);
+    doc.text("Base imponible:", W - 70, y);
     doc.setTextColor(255, 255, 255);
-    doc.text(`${total.toFixed(2)}€`, W - 25, y, { align: "right" });
+    doc.text(`${parseFloat(desglose?.base_imponible || total).toFixed(2)}€`, W - 25, y, { align: "right" });
 
-    y += 8;
-    doc.setFontSize(14);
+    y += 7;
+    doc.setTextColor(136, 136, 136);
+    doc.text(`IVA (${desglose?.iva_porcentaje || 21}%):`, W - 70, y);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`${parseFloat(desglose?.cuota_iva || 0).toFixed(2)}€`, W - 25, y, { align: "right" });
+
+    y += 7;
+    doc.setFontSize(13);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(201, 168, 76);
-    doc.text("TOTAL", W - 70, y);
-    doc.setFontSize(18);
-    doc.text(`${total.toFixed(2)}€`, W - 25, y, { align: "right" });
+    doc.text("TOTAL (IVA incl.):", W - 70, y);
+    doc.setFontSize(16);
+    doc.text(`${parseFloat(desglose?.total || total).toFixed(2)}€`, W - 25, y, { align: "right" });
 
-    y += 22;
+    y += 20;
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(136, 136, 136);
@@ -174,7 +197,7 @@ async function enviarEmailConfirmacion({ facturacion, pagoId, total, userEmail }
                 to_email:   userEmail,
                 to_name:    `${facturacion.nombre} ${facturacion.apellidos}`,
                 factura_id: `#${String(pagoId).padStart(6, "0")}`,
-                total:      total.toFixed(2),
+                total:      parseFloat(total).toFixed(2),
             },
             EMAILJS.publicKey
         );
@@ -191,14 +214,18 @@ function CheckoutForm({ onSuccess }) {
     const [error, setError]           = useState(null);
     const [clientSecret, setClientSecret] = useState(null);
     const [pagoId, setPagoId]         = useState(null);
+    const [desglose, setDesglose]     = useState(null);
 
     const [facturacion, setFacturacion] = useState({
         nombre: "", apellidos: "", dni: "", telefono: "", direccion: "", cp: "",
     });
+    const [evento, setEvento] = useState({
+        fecha: "", hora: "", direccion_evento: "",
+    });
     const [facturacionError, setFacturacionError] = useState("");
 
     useEffect(() => {
-        if (items.length === 0) return;
+        if (items.length === 0 || !evento.fecha) return;
         const token = localStorage.getItem("token");
 
         const itemIds = items.flatMap(i => {
@@ -213,21 +240,30 @@ function CheckoutForm({ onSuccess }) {
         fetch("/api/pagos/crear-intento", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
-            body: JSON.stringify({ items: itemIds }),
+            body: JSON.stringify({ items: itemIds, fecha: evento.fecha }),
         })
             .then(r => r.json())
-            .then(data => { setClientSecret(data.clientSecret); setPagoId(data.pago_id); })
+            .then(data => {
+                setClientSecret(data.clientSecret);
+                setPagoId(data.pago_id);
+                setDesglose(data.desglose);
+            })
             .catch(() => setError("Error al conectar con el servidor de pagos."));
-    }, []);
+    }, [evento.fecha]);
 
     const handleChange = (e) => setFacturacion({ ...facturacion, [e.target.name]: e.target.value });
+    const handleEvento = (e) => setEvento({ ...evento, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const campos = ["nombre", "apellidos", "dni", "telefono", "direccion", "cp"];
-        if (campos.some(c => !facturacion[c].trim())) {
+        const camposFact = ["nombre", "apellidos", "dni", "telefono", "direccion", "cp"];
+        if (camposFact.some(c => !facturacion[c].trim())) {
             setFacturacionError("Por favor completa todos los datos de facturación.");
+            return;
+        }
+        if (!evento.fecha || !evento.hora || !evento.direccion_evento.trim()) {
+            setFacturacionError("Por favor completa todos los datos del evento.");
             return;
         }
         setFacturacionError("");
@@ -251,11 +287,10 @@ function CheckoutForm({ onSuccess }) {
                 headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
             });
 
-            const totalFinal = total;
+            const totalFinal = desglose?.total || total;
             const itemsSnap  = [...items];
             const user       = JSON.parse(localStorage.getItem("user") || "{}");
 
-            // Enviar email de confirmación
             await enviarEmailConfirmacion({
                 facturacion,
                 pagoId,
@@ -264,15 +299,21 @@ function CheckoutForm({ onSuccess }) {
             });
 
             clearCart();
-            onSuccess(totalFinal, pagoId, itemsSnap, paymentIntent.id, facturacion);
+            onSuccess(totalFinal, pagoId, itemsSnap, paymentIntent.id, facturacion, desglose, evento);
         }
         setLoading(false);
     };
+
+    const totalConIva = desglose?.total || total;
+    const trajes      = items.filter(i => i.tipo === "Traje");
+    const extras      = items.filter(i => i.tipo !== "Traje");
 
     return (
         <div className="checkout-layout">
 
             <div className="checkout-left">
+
+                {/* DATOS DE FACTURACIÓN */}
                 <div className="checkout-billing">
                     <h3 className="checkout-section-title">Datos de facturación</h3>
                     <div className="checkout-billing-grid">
@@ -301,9 +342,29 @@ function CheckoutForm({ onSuccess }) {
                             <input name="cp" value={facturacion.cp} onChange={handleChange} placeholder="08001" />
                         </div>
                     </div>
+                </div>
+
+                {/* DATOS DEL EVENTO */}
+                <div className="checkout-billing">
+                    <h3 className="checkout-section-title">Datos del evento</h3>
+                    <div className="checkout-billing-grid">
+                        <div className="checkout-field">
+                            <label>Fecha del evento</label>
+                            <input name="fecha" type="date" value={evento.fecha} onChange={handleEvento} />
+                        </div>
+                        <div className="checkout-field">
+                            <label>Hora del evento</label>
+                            <input name="hora" type="time" value={evento.hora} onChange={handleEvento} />
+                        </div>
+                        <div className="checkout-field checkout-field--full">
+                            <label>Dirección del evento</label>
+                            <input name="direccion_evento" value={evento.direccion_evento} onChange={handleEvento} placeholder="Lugar donde se realizará el evento" />
+                        </div>
+                    </div>
                     {facturacionError && <div className="checkout-error">{facturacionError}</div>}
                 </div>
 
+                {/* DATOS DE PAGO */}
                 <div className="checkout-payment">
                     <h3 className="checkout-section-title">Datos de pago</h3>
 
@@ -336,7 +397,7 @@ function CheckoutForm({ onSuccess }) {
                     {error && <div className="checkout-error">{error}</div>}
 
                     <button type="button" className="checkout-btn" disabled={!stripe || !clientSecret || loading} onClick={handleSubmit}>
-                        {loading ? <span className="checkout-spinner" /> : `Pagar ${total.toFixed(2)}€`}
+                        {loading ? <span className="checkout-spinner" /> : `Pagar ${parseFloat(totalConIva).toFixed(2)}€`}
                     </button>
 
                     <div className="checkout-payment-methods">
@@ -351,28 +412,60 @@ function CheckoutForm({ onSuccess }) {
                 </div>
             </div>
 
+            {/* RESUMEN */}
             <div className="checkout-right">
                 <h3 className="checkout-section-title">Resumen del pedido</h3>
                 <div className="checkout-items">
-                    {items.map(item => (
-                        <div key={item.id} className="checkout-item">
-                            <div className="checkout-item-img">
-                                {item.img ? <img src={item.img} alt={item.name} /> : <div className="checkout-item-img-placeholder" />}
+                    {trajes.map(traje => (
+                        <div key={traje.id}>
+                            <div className="checkout-item">
+                                <div className="checkout-item-img">
+                                    {traje.img ? <img src={traje.img} alt={traje.name} /> : <div className="checkout-item-img-placeholder" />}
+                                </div>
+                                <div className="checkout-item-info">
+                                    <span className="checkout-item-name">{traje.name}</span>
+                                    <span className="checkout-item-tipo">{traje.tipo}</span>
+                                    <span className="checkout-item-qty">
+                                        {traje.cantidad} {traje.cantidad === 1 ? "unidad" : "unidades"} × {parseFloat(traje.precio).toFixed(2)}€
+                                    </span>
+                                </div>
+                                <div className="checkout-item-price">{(traje.precio * traje.cantidad).toFixed(2)}€</div>
                             </div>
+                        </div>
+                    ))}
+                    {/* Extras una sola vez al final */}
+                    {extras.map(extra => (
+                        <div key={extra.id} className="checkout-item checkout-item--extra">
+                            <div className="checkout-item-extra-indent">↳</div>
                             <div className="checkout-item-info">
-                                <span className="checkout-item-name">{item.name}</span>
-                                <span className="checkout-item-tipo">{item.tipo}</span>
+                                <span className="checkout-item-name">{extra.name}</span>
+                                <span className="checkout-item-tipo">{extra.tipo}</span>
                                 <span className="checkout-item-qty">
-                                    {item.cantidad} {item.cantidad === 1 ? "unidad" : "unidades"} × {parseFloat(item.precio).toFixed(2)}€
+                                    {extra.cantidad} {extra.cantidad === 1 ? "unidad" : "unidades"} × {parseFloat(extra.precio).toFixed(2)}€
                                 </span>
                             </div>
-                            <div className="checkout-item-price">{(item.precio * item.cantidad).toFixed(2)}€</div>
+                            <div className="checkout-item-price">{(extra.precio * extra.cantidad).toFixed(2)}€</div>
                         </div>
                     ))}
                 </div>
+
+                {/* DESGLOSE IVA */}
+                {desglose && (
+                    <div className="checkout-iva">
+                        <div className="checkout-iva-row">
+                            <span>Base imponible</span>
+                            <span>{parseFloat(desglose.base_imponible).toFixed(2)}€</span>
+                        </div>
+                        <div className="checkout-iva-row">
+                            <span>IVA ({desglose.iva_porcentaje}%)</span>
+                            <span>{parseFloat(desglose.cuota_iva).toFixed(2)}€</span>
+                        </div>
+                    </div>
+                )}
+
                 <div className="checkout-total">
-                    <span>Total</span>
-                    <span className="checkout-total-price">{total.toFixed(2)}€</span>
+                    <span>Total (IVA incl.)</span>
+                    <span className="checkout-total-price">{parseFloat(totalConIva).toFixed(2)}€</span>
                 </div>
             </div>
 
@@ -381,20 +474,24 @@ function CheckoutForm({ onSuccess }) {
 }
 
 export default function Checkout() {
-    const { items }                     = useCart();
-    const [success, setSuccess]         = useState(false);
-    const [totalPagado, setTotalPagado] = useState(0);
-    const [pagoIdFinal, setPagoIdFinal] = useState(null);
-    const [itemsFinal, setItemsFinal]   = useState([]);
-    const [stripeRef, setStripeRef]     = useState(null);
+    const { items }                               = useCart();
+    const [success, setSuccess]                   = useState(false);
+    const [totalPagado, setTotalPagado]           = useState(0);
+    const [pagoIdFinal, setPagoIdFinal]           = useState(null);
+    const [itemsFinal, setItemsFinal]             = useState([]);
+    const [stripeRef, setStripeRef]               = useState(null);
     const [facturacionFinal, setFacturacionFinal] = useState(null);
+    const [desgloseFinal, setDesgloseFinal]       = useState(null);
+    const [eventoFinal, setEventoFinal]           = useState(null);
 
-    const handleSuccess = (total, pagoId, items, stripeId, facturacion) => {
+    const handleSuccess = (total, pagoId, items, stripeId, facturacion, desglose, evento) => {
         setTotalPagado(total);
         setPagoIdFinal(pagoId);
         setItemsFinal(items);
         setStripeRef(stripeId);
         setFacturacionFinal(facturacion);
+        setDesgloseFinal(desglose);
+        setEventoFinal(evento);
         setSuccess(true);
     };
 
@@ -411,12 +508,20 @@ export default function Checkout() {
                         Nuestro equipo se pondrá en contacto contigo en breve para coordinar todos los detalles del evento.
                     </p>
                     <p className="checkout-success-total">
-                        Total pagado: <span>{totalPagado.toFixed(2)}€</span>
+                        Total pagado: <span>{parseFloat(totalPagado).toFixed(2)}€</span>
                     </p>
                     <div className="checkout-success-actions">
                         <button
                             className="checkout-pdf-btn"
-                            onClick={() => generarPDFFactura({ pagoId: pagoIdFinal, total: totalPagado, items: itemsFinal, stripeRef, facturacion: facturacionFinal })}
+                            onClick={() => generarPDFFactura({
+                                pagoId:      pagoIdFinal,
+                                total:       totalPagado,
+                                desglose:    desgloseFinal,
+                                items:       itemsFinal,
+                                stripeRef,
+                                facturacion: facturacionFinal,
+                                evento:      eventoFinal,
+                            })}
                         >
                             ↓ Descargar factura PDF
                         </button>

@@ -468,3 +468,103 @@
     background: #635bff;
     color: #fff;
 }
+
+// DESGLOSE IVA
+.checkout-iva {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    &-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        color: @text-muted;
+
+        span:last-child { color: @white; }
+    }
+}
+
+// Fix IVA row spacing
+.checkout-iva-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    span:first-child { flex: 1; }
+    span:last-child {
+        color: @white;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}
+
+// EXTRAS tabulados bajo el traje
+.checkout-item--extra {
+    padding-left: 1rem;
+    background: rgba(255,255,255,0.01);
+
+    .checkout-item-img { display: none; }
+
+    .checkout-item-name {
+        font-size: 0.75rem !important;
+        color: @text-muted !important;
+    }
+
+    .checkout-item-price {
+        font-size: 1rem !important;
+        color: @text-muted !important;
+    }
+}
+
+.checkout-item-extra-indent {
+    color: @gold;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+// Fix IVA row spacing
+.checkout-iva-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    span:first-child { flex: 1; }
+    span:last-child {
+        color: @white;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}
+
+// EXTRAS tabulados bajo el traje
+.checkout-item--extra {
+    padding-left: 1rem;
+    background: rgba(255,255,255,0.01);
+
+    .checkout-item-img { display: none; }
+
+    .checkout-item-name {
+        font-size: 0.75rem !important;
+        color: @text-muted !important;
+    }
+
+    .checkout-item-price {
+        font-size: 1rem !important;
+        color: @text-muted !important;
+    }
+}
+
+.checkout-item-extra-indent {
+    color: @gold;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    opacity: 0.6;
+}
