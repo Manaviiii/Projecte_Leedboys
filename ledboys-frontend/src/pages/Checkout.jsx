@@ -160,13 +160,13 @@ function generarPDFFactura({ pagoId, total, desglose, items, stripeRef, facturac
     doc.setTextColor(255, 255, 255);
     doc.text(`${parseFloat(desglose?.cuota_iva || 0).toFixed(2)}€`, W - 25, y, { align: "right" });
 
-    y += 7;
-    doc.setFontSize(13);
+    y += 9;
+    doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(201, 168, 76);
-    doc.text("TOTAL (IVA incl.):", W - 70, y);
-    doc.setFontSize(16);
-    doc.text(`${parseFloat(desglose?.total || total).toFixed(2)}€`, W - 25, y, { align: "right" });
+    doc.text("Total (IVA incl):", W - 68, y);
+    doc.setFontSize(13);
+    doc.text(`${parseFloat(desglose?.total || total).toFixed(2)}€`, W - 20, y, { align: "right" });
 
     y += 20;
     doc.setFontSize(8);
@@ -240,7 +240,16 @@ function CheckoutForm({ onSuccess }) {
         fetch("/api/pagos/crear-intento", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
-            body: JSON.stringify({ items: itemIds, fecha: evento.fecha }),
+            body: JSON.stringify({
+                items:                 itemIds,
+                fecha:                 evento.fecha,
+                nombre_facturacion:    facturacion.nombre,
+                apellidos_facturacion: facturacion.apellidos,
+                dni:                   facturacion.dni,
+                telefono_facturacion:  facturacion.telefono,
+                direccion:             facturacion.direccion,
+                cp:                    facturacion.cp,
+            }),
         })
             .then(r => r.json())
             .then(data => {
@@ -433,7 +442,10 @@ function CheckoutForm({ onSuccess }) {
                             </div>
                         </div>
                     ))}
-                    {/* Extras una sola vez al final */}
+                    {/* Extras al final con separador */}
+                    {extras.length > 0 && (
+                        <div className="checkout-extras-divider">Accesorios y packs</div>
+                    )}
                     {extras.map(extra => (
                         <div key={extra.id} className="checkout-item checkout-item--extra">
                             <div className="checkout-item-extra-indent">↳</div>
