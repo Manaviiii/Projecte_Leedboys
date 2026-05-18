@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             EventoItemsSeeder::class,
             ResidenciasSeeder::class,
             AdminSeeder::class,
+            FotosSeeder::class,
         ]);
     }
 }
