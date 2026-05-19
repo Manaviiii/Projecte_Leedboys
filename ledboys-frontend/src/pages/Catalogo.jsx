@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Footer from "../components/Footer";
 import "../styles/catalogo.less";
 
-const API_URL    = "/api/trajes";
 const SEARCH_URL = "/api/trajes/buscar";
 const FILTERS    = ["Todos", "Ledboys", "Ledgirls"];
 const PER_PAGE   = 12;
@@ -19,12 +18,24 @@ export default function Catalogo() {
     const debounceRef                     = useRef(null);
 
     useEffect(() => {
-        fetch(API_URL)
+        // Cargamos fotos principales desde /api/fotos que ya devuelve base64 + datos del traje
+        fetch("/api/fotos")
             .then(res => {
                 if (!res.ok) throw new Error("Error al cargar el catálogo");
                 return res.json();
             })
-            .then(data => { setAllItems(mapItems(data)); setLoading(false); })
+            .then(data => {
+                const items = data.map(foto => ({
+                    id:     foto.traje?.id || foto.idTraje,
+                    idTraje: foto.idTraje,
+                    name:   foto.nombre,
+                    img:    `data:image/jpeg;base64,${foto.imagen}`,
+                    genero: foto.traje?.genero ?? "unisex",
+                    precio: foto.traje?.precio ?? "—",
+                }));
+                setAllItems(items);
+                setLoading(false);
+            })
             .catch(err => { setError(err.message); setLoading(false); });
     }, []);
 
@@ -35,24 +46,18 @@ export default function Catalogo() {
             setSearching(true);
             fetch(`${SEARCH_URL}?q=${encodeURIComponent(query.trim())}`)
                 .then(res => res.json())
-                .then(data => { setSearchItems(mapItems(data)); setSearching(false); })
+                .then(data => {
+                    const ids = new Set(data.map(t => t.id));
+                    setSearchItems(allItems.filter(i => ids.has(i.id)));
+                    setSearching(false);
+                })
                 .catch(() => { setSearchItems([]); setSearching(false); });
         }, 350);
         return () => clearTimeout(debounceRef.current);
-    }, [query]);
-
-    function mapItems(data) {
-        return data.map(item => ({
-            id:     item.id,
-            name:   item.nombre,
-            img:    item.imagen ? `/${item.imagen}` : null,
-            genero: item.traje?.genero ?? "unisex",
-            precio: item.precio,
-        }));
-    }
+    }, [query, allItems]);
 
     const baseItems = searchItems !== null ? searchItems : allItems;
-    const filtered = activeFilter === "Todos" || searchItems !== null
+    const filtered  = activeFilter === "Todos" || searchItems !== null
         ? baseItems
         : baseItems.filter(item => {
             if (activeFilter === "Ledboys")  return item.genero === "chico"  || item.genero === "unisex";
@@ -131,7 +136,7 @@ export default function Catalogo() {
 
                         <div className="catalog-grid">
                             {paginated.map(item => (
-                                <a key={item.id} href={`/traje/${item.id}`} className="catalog-item">
+                                <a key={item.idTraje} href={`/traje/${item.id}`} className="catalog-item">
                                     {item.img
                                         ? <img src={item.img} alt={item.name} />
                                         : <div style={{ width:"100%", height:"100%", background:"#1a1a1a" }} />
