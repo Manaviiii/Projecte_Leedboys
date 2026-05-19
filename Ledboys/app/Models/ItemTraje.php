@@ -18,6 +18,6 @@ class ItemTraje extends Model
     
     public function fotos()
     {
-        return $this->hasMany(Foto::class, 'item_traje_id');
+        return $this->hasMany(Foto::class, 'idTraje');
     }
 }

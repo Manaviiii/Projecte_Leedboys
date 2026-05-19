@@ -16,10 +16,10 @@ class ItemAccesoriosSeeder extends Seeder
     public function run()
     {
         DB::table('item_packs')->insert([
-            ['item_id' => 62, 'numero_zancudos' => 2], // Pack Bronce
-            ['item_id' => 63, 'numero_zancudos' => 4], // Pack Silver
-            ['item_id' => 64, 'numero_zancudos' => 6], // Pack Gold
-            ['item_id' => 65, 'numero_zancudos' => 8], // Pack Platinum
+            ['item_id' => 63, 'numero_zancudos' => 2], // Pack Bronce
+            ['item_id' => 64, 'numero_zancudos' => 4], // Pack Silver
+            ['item_id' => 65, 'numero_zancudos' => 6], // Pack Gold
+            ['item_id' => 66, 'numero_zancudos' => 8], // Pack Platinum
         ]);
     }
 }
