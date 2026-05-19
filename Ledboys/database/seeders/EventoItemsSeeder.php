@@ -19,7 +19,7 @@ class EventoItemsSeeder extends Seeder
             // Evento 1 → traje solo
             [
                 'evento_id' => 1,
-                'item_id' => 1, // Marshmello
+                'item_id' => 2, // Marshmello
                 'cantidad' => 1,
                 'precio_unitario' => 150,
             ],
@@ -47,7 +47,7 @@ class EventoItemsSeeder extends Seeder
             ],
             [
                 'evento_id' => 3,
-                'item_id' => 1, // Marshmello
+                'item_id' => 2, // Marshmello
                 'cantidad' => 1,
                 'precio_unitario' => 0,
             ],

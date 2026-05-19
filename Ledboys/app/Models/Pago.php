@@ -14,10 +14,16 @@ class Pago extends Model
         'user_id',
         'evento_id',
         'residencia_id',
-        'amount',
         'detalles_items',
+        'amount',
         'estado',
         'stripe_payment_intent_id',
+        'nombre_facturacion',
+        'apellidos_facturacion',
+        'dni',
+        'telefono_facturacion',
+        'direccion',
+        'codigo_postal',
     ];
 
     protected $casts = [

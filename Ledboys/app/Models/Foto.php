@@ -9,19 +9,20 @@ class Foto extends Model
     protected $table = 'fotos';
  
     protected $fillable = [
-        'item_traje_id',
+        'idTraje',
         'principal',
         'nombre',
         'orden',
         'imagen',
     ];
+    
+    public function itemTraje()
+    {
+        return $this->belongsTo(ItemTraje::class, 'idTraje');
+    }
  
     protected $casts = [
         'principal' => 'boolean',
     ];
  
-    public function itemTraje()
-    {
-        return $this->belongsTo(ItemTraje::class, 'item_traje_id');
-    }
 }

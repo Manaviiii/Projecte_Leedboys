@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\ResidenciaController;
 use App\Http\Controllers\Api\PagoController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\FotoController;
 
 // Auth (sin middleware)
 Route::post('/login',    [AuthController::class, 'login']);
@@ -85,3 +86,6 @@ Route::middleware('auth:sanctum')->prefix('pagos')->group(function () {
 // Webhook de Stripe — SIN autenticación
 Route::post('/stripe/webhook', [WebhookController::class, 'handle']);
 #endregion
+
+Route::get('/fotos',             [FotoController::class, 'principales']);
+Route::get('/fotos/traje/{id}',  [FotoController::class, 'porTraje']);

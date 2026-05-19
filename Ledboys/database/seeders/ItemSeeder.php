@@ -76,15 +76,15 @@ class ItemSeeder extends Seeder
             ['id' => 59, 'nombre' => 'Ángeles',           'tipo' => 'traje', 'precio' => 150, 'imagen' => 'images/angeles.jpg',         'activo' => true],
             ['id' => 58, 'nombre' => 'Future Girls',      'tipo' => 'traje', 'precio' => 150, 'imagen' => 'images/future_girls.jpg',    'activo' => true],
 
-            ['id' => 59, 'nombre' => 'Barra Limbo',          'tipo' => 'accesorio', 'precio' => 50, 'imagen' => 'images/Barra_Limbo.jpg',    'activo' => true],
-            ['id' => 60, 'nombre' => 'Pistola de Burbujas',          'tipo' => 'accesorio', 'precio' => 50, 'imagen' => 'images/Pistola_Burbujas.jpg',    'activo' => true],
-            ['id' => 61, 'nombre' => 'Bengalas LED',          'tipo' => 'accesorio', 'precio' => 50, 'imagen' => 'images/Bengalas_LED.jpg',    'activo' => true],
+            ['id' => 60, 'nombre' => 'Barra Limbo',          'tipo' => 'accesorio', 'precio' => 50, 'imagen' => 'images/Barra_Limbo.jpg',    'activo' => true],
+            ['id' => 61, 'nombre' => 'Pistola de Burbujas',          'tipo' => 'accesorio', 'precio' => 50, 'imagen' => 'images/Pistola_Burbujas.jpg',    'activo' => true],
+            ['id' => 62, 'nombre' => 'Bengalas LED',          'tipo' => 'accesorio', 'precio' => 50, 'imagen' => 'images/Bengalas_LED.jpg',    'activo' => true],
 
             
-            ['id' => 62, 'nombre' => 'Pack Bronce',          'tipo' => 'pack', 'precio' => 300, 'imagen' => 'images/Pack_Bronce.jpg',    'activo' => true],
-            ['id' => 63, 'nombre' => 'Pack Silver',          'tipo' => 'pack', 'precio' => 450, 'imagen' => 'images/Pack_Silver.jpg',    'activo' => true],
-            ['id' => 64, 'nombre' => 'Pack Gold',          'tipo' => 'pack', 'precio' => 600, 'imagen' => 'images/Pack_Gold.jpg',    'activo' => true],
-            ['id' => 65, 'nombre' => 'Pack Platinum',          'tipo' => 'pack', 'precio' => 800, 'imagen' => 'images/Pack_Platinum.jpg',    'activo' => true],
+            ['id' => 63, 'nombre' => 'Pack Bronce',          'tipo' => 'pack', 'precio' => 300, 'imagen' => 'images/Pack_Bronce.jpg',    'activo' => true],
+            ['id' => 64, 'nombre' => 'Pack Silver',          'tipo' => 'pack', 'precio' => 450, 'imagen' => 'images/Pack_Silver.jpg',    'activo' => true],
+            ['id' => 65, 'nombre' => 'Pack Gold',          'tipo' => 'pack', 'precio' => 600, 'imagen' => 'images/Pack_Gold.jpg',    'activo' => true],
+            ['id' => 66, 'nombre' => 'Pack Platinum',          'tipo' => 'pack', 'precio' => 800, 'imagen' => 'images/Pack_Platinum.jpg',    'activo' => true],
         ]);
     }
 }
