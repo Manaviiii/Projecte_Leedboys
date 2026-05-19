@@ -9,14 +9,14 @@ class FotosSeeder extends Seeder
 {
     public function run()
     {
-        $carpeta = storage_path('app/fotos');
+        $carpeta  = storage_path('app/Fotos');
         $archivos = glob($carpeta . '/traje_*.jpg');
 
         // Agrupa los archivos por número de traje
         $trajes = [];
         foreach ($archivos as $archivo) {
             $nombre = basename($archivo);
-            preg_match('/traje_(\d+)_foto_\d+/', $nombre, $matches);
+            preg_match('/traje_(\d+)/', $nombre, $matches);
             if (!isset($matches[1])) continue;
 
             $numTraje = (int) $matches[1];
@@ -24,15 +24,20 @@ class FotosSeeder extends Seeder
         }
 
         foreach ($trajes as $numTraje => $fotos) {
-            // Busca el id de item_trajes a partir del item_id
-            $idTraje = DB::table('item_trajes')->where('item_id', $numTraje)->value('id');
-            if (!$idTraje) continue;
+            // Los archivos empiezan en 02 pero los item_id empiezan en 1
+            // por eso restamos 1
+            $itemId = $numTraje - 1;
 
-            // Busca el nombre del traje
-            $nombreTraje = DB::table('items')->where('id', $numTraje)->value('nombre');
+            $idTraje = DB::table('item_trajes')->where('item_id', $itemId)->value('id');
+            if (!$idTraje) {
+                echo "⚠️  No se encontró item_traje para item_id=$itemId (traje_$numTraje)\n";
+                continue;
+            }
+
+            $nombreTraje = DB::table('items')->where('id', $itemId)->value('nombre');
 
             // Ordena: primero el sin paréntesis (principal), luego los demás
-            usort($fotos, function($a, $b) {
+            usort($fotos, function ($a, $b) {
                 $aPrincipal = !str_contains(basename($a), '(');
                 $bPrincipal = !str_contains(basename($b), '(');
                 return $bPrincipal - $aPrincipal;
@@ -52,7 +57,7 @@ class FotosSeeder extends Seeder
                 ]);
             }
 
-            echo "✅ Traje $numTraje ($nombreTraje): " . count($fotos) . " fotos insertadas\n";
+            echo "✅ Traje $numTraje → item_id=$itemId ($nombreTraje): " . count($fotos) . " fotos insertadas\n";
         }
     }
 }

@@ -15,10 +15,11 @@ class ItemPacksSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('item_accesorios')->insert([
-            ['item_id' => 60, 'stock_total' => 10], // Barra Limbo
-            ['item_id' => 61, 'stock_total' => 10], // Pistola de Burbujas
-            ['item_id' => 62, 'stock_total' => 10], // Bengalas LED
+        DB::table('item_packs')->insert([
+            ['item_id' => 62, 'numero_zancudos' => 2], // Pack Bronce
+            ['item_id' => 63, 'numero_zancudos' => 4], // Pack Silver
+            ['item_id' => 64, 'numero_zancudos' => 6], // Pack Gold
+            ['item_id' => 65, 'numero_zancudos' => 8], // Pack Platinum
         ]);
     }
 }
