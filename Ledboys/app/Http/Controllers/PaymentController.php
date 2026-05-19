@@ -11,17 +11,13 @@ use App\Models\Item;
 use App\Models\Pago;
 use App\Models\Evento;
 use App\Models\EventoItem;
+use App\Mail\FacturaMail;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
-    // IVA incluido en los precios
     const IVA = 0.21;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Calcula el desglose de IVA dado un total con IVA incluido
-    |--------------------------------------------------------------------------
-    */
     private function calcularDesglose(float $totalConIva): array
     {
         $baseImponible = round($totalConIva / (1 + self::IVA), 2);
@@ -29,7 +25,7 @@ class PaymentController extends Controller
 
         return [
             'base_imponible' => $baseImponible,
-            'iva_porcentaje' => self::IVA * 100, // 21
+            'iva_porcentaje' => self::IVA * 100,
             'cuota_iva'      => $cuotaIva,
             'total'          => round($totalConIva, 2),
         ];
@@ -44,6 +40,8 @@ class PaymentController extends Controller
     {
         $request->validate([
             'fecha'                  => 'required|date|after_or_equal:today',
+            'hora'                   => 'nullable|date_format:H:i',
+            'ubicacion'              => 'nullable|string|max:255',
             'items'                  => 'required|array|min:1',
             'items.*'                => 'integer|exists:items,id',
             'residencia_id'          => 'nullable|exists:residencias,id',
@@ -62,25 +60,20 @@ class PaymentController extends Controller
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
-        // Sacar items de la DB y calcular total
-        $itemsDB = Item::whereIn('id', $request->items)->get();
-        $total   = collect($request->items)->sum(function ($id) use ($itemsDB) {
-            return $itemsDB->firstWhere('id', $id)?->precio ?? 0;
-        });
+        $itemsDB      = Item::whereIn('id', $request->items)->get();
+        $total        = collect($request->items)->sum(fn($id) => $itemsDB->firstWhere('id', $id)?->precio ?? 0);
         $nombresItems = $itemsDB->pluck('nombre')->implode(', ');
+        $desglose     = $this->calcularDesglose($total);
 
-        // Desglose IVA
-        $desglose = $this->calcularDesglose($total);
-
-        // Crear el evento
         $evento = Evento::create([
             'cliente_id'   => $cliente->id,
             'fecha'        => $request->fecha,
+            'hora'         => $request->hora,
+            'ubicacion'    => $request->ubicacion,
             'total_precio' => $total,
             'estado'       => 'borrador',
         ]);
 
-        // Crear los evento_items
         foreach ($request->items as $itemId) {
             $item = $itemsDB->firstWhere('id', $itemId);
             EventoItem::create([
@@ -91,7 +84,6 @@ class PaymentController extends Controller
             ]);
         }
 
-        // Crear PaymentIntent en Stripe
         $intent = PaymentIntent::create([
             'amount'                    => (int) round($total * 100),
             'currency'                  => 'eur',
@@ -106,7 +98,6 @@ class PaymentController extends Controller
             ],
         ]);
 
-        // Guardar pago en DB
         $pago = Pago::create([
             'user_id'                  => auth()->id(),
             'evento_id'                => $evento->id,
@@ -134,7 +125,7 @@ class PaymentController extends Controller
                 'base_imponible' => round($i->precio / (1 + self::IVA), 2),
                 'cuota_iva'      => round($i->precio - ($i->precio / (1 + self::IVA)), 2),
             ]),
-            'desglose'     => $desglose,
+            'desglose' => $desglose,
         ], 201);
     }
 
@@ -147,7 +138,7 @@ class PaymentController extends Controller
     {
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
-        $pago = Pago::findOrFail($id);
+        $pago = Pago::with('evento')->findOrFail($id);
 
         if ($pago->user_id !== auth()->id()) {
             return response()->json(['message' => 'No autorizado'], 403);
@@ -160,10 +151,16 @@ class PaymentController extends Controller
 
             if ($pago->evento_id) {
                 Evento::where('id', $pago->evento_id)->update(['estado' => 'pagado']);
+                $pago->refresh(); // refrescar para tener el evento actualizado
             }
 
-            // Devolver también el desglose al confirmar
             $desglose = $this->calcularDesglose((float) $pago->amount);
+
+            // Enviar email con la factura en PDF
+            $user = $pago->user;
+            if ($user && $user->email) {
+                Mail::to($user->email)->send(new FacturaMail($pago, $desglose));
+            }
 
             return response()->json([
                 'message'  => 'Pago confirmado correctamente',

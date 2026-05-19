@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\PagoController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\FotoController;
+use App\Http\Controllers\ReservaController;
+
 
 // Auth (sin middleware)
 Route::post('/login',    [AuthController::class, 'login']);
@@ -49,6 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Pagos (no tiene destroy)
     Route::apiResource('pagos', PagoController::class)->except(['destroy']);
+
+    Route::get('/reservas',      [ReservaController::class, 'index']);
+    Route::get('/reservas/{id}', [ReservaController::class, 'detalle']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -81,6 +86,8 @@ Route::middleware('auth:sanctum')->prefix('pagos')->group(function () {
     Route::get('/',                [PaymentController::class, 'historial']);
     Route::get('/{id}',            [PaymentController::class, 'detalle']);
     Route::post('/{id}/reembolso', [PaymentController::class, 'reembolso']);
+
+    
 });
 
 // Webhook de Stripe — SIN autenticación
