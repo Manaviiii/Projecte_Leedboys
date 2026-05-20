@@ -9,10 +9,15 @@ class ItemAccesorio extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'item_id'; // Importante
-    public $incrementing = false;      // Importante porque no es autoincrement ID normal
+    protected $primaryKey = 'item_id';
+    public $incrementing  = false;
+    public $timestamps    = false;
 
-    protected $fillable = ['item_id', 'stock_total'];
+    protected $fillable = [
+        'item_id',
+        'stock_total',
+        'imagen',
+    ];
 
     public function item()
     {
