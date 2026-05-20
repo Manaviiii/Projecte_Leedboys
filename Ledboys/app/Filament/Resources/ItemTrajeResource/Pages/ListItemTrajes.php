@@ -6,3 +6,4 @@ class ListItemTrajes extends ListRecords
 {
     protected static string $resource = ItemTrajeResource::class;
 }
+
