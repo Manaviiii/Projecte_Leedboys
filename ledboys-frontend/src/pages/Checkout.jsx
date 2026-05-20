@@ -81,7 +81,6 @@ function generarPDFFactura({ pagoId, total, desglose, items, stripeRef, facturac
     doc.setLineWidth(0.3);
     doc.line(20, 56, W - 20, 56);
 
-    // FACTURADO A
     doc.setFontSize(7.5);
     doc.setTextColor(136, 136, 136);
     doc.text("FACTURADO A", 20, 65);
@@ -97,7 +96,6 @@ function generarPDFFactura({ pagoId, total, desglose, items, stripeRef, facturac
     doc.text(facturacion.direccion, 20, 89);
     doc.text(`CP: ${facturacion.cp}`, 20, 94);
 
-    // DATOS DEL EVENTO
     if (evento) {
         doc.setFontSize(7.5);
         doc.setTextColor(136, 136, 136);
@@ -110,7 +108,6 @@ function generarPDFFactura({ pagoId, total, desglose, items, stripeRef, facturac
         doc.text(`Lugar: ${evento.direccion_evento}`, W - 90, 85);
     }
 
-    // Tabla
     const tableY = 108;
     doc.setFillColor(25, 25, 25);
     doc.rect(20, tableY - 6, W - 40, 10, "F");
@@ -145,7 +142,6 @@ function generarPDFFactura({ pagoId, total, desglose, items, stripeRef, facturac
     doc.setLineWidth(0.3);
     doc.line(20, y + 2, W - 20, y + 2);
 
-    // Desglose IVA
     y += 12;
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
@@ -271,6 +267,24 @@ function CheckoutForm({ onSuccess }) {
             setFacturacionError("Por favor completa todos los datos de facturación.");
             return;
         }
+
+        const dniRegex = /^[0-9]{8}[A-Za-z]$|^[XYZxyz][0-9]{7}[A-Za-z]$/;
+        if (!dniRegex.test(facturacion.dni.trim())) {
+            setFacturacionError("El DNI/NIE no es válido. Formato: 12345678A o X1234567A");
+            return;
+        }
+
+        const telRegex = /^\+[1-9]\d{6,14}$/;
+        if (!telRegex.test(facturacion.telefono.replace(/\s/g, ""))) {
+            setFacturacionError("El teléfono debe incluir el prefijo del país. Ej: +34 666 000 000");
+            return;
+        }
+
+        if (!/^\d{5}$/.test(facturacion.cp.trim())) {
+            setFacturacionError("El código postal debe tener 5 dígitos.");
+            return;
+        }
+
         if (!evento.fecha || !evento.hora || !evento.direccion_evento.trim()) {
             setFacturacionError("Por favor completa todos los datos del evento.");
             return;
@@ -319,7 +333,6 @@ function CheckoutForm({ onSuccess }) {
 
     return (
         <div className="checkout-layout">
-
             <div className="checkout-left">
 
                 {/* DATOS DE FACTURACIÓN */}
@@ -340,7 +353,7 @@ function CheckoutForm({ onSuccess }) {
                         </div>
                         <div className="checkout-field">
                             <label>Teléfono</label>
-                            <input name="telefono" value={facturacion.telefono} onChange={handleChange} placeholder="666 000 000" />
+                            <input name="telefono" value={facturacion.telefono} onChange={handleChange} placeholder="+34 666 000 000" />
                         </div>
                         <div className="checkout-field checkout-field--full">
                             <label>Dirección</label>
@@ -442,7 +455,6 @@ function CheckoutForm({ onSuccess }) {
                             </div>
                         </div>
                     ))}
-                    {/* Extras al final con separador */}
                     {extras.length > 0 && (
                         <div className="checkout-extras-divider">Accesorios y packs</div>
                     )}
@@ -461,7 +473,6 @@ function CheckoutForm({ onSuccess }) {
                     ))}
                 </div>
 
-                {/* DESGLOSE IVA */}
                 {desglose && (
                     <div className="checkout-iva">
                         <div className="checkout-iva-row">
@@ -480,7 +491,6 @@ function CheckoutForm({ onSuccess }) {
                     <span className="checkout-total-price">{parseFloat(totalConIva).toFixed(2)}€</span>
                 </div>
             </div>
-
         </div>
     );
 }
