@@ -434,9 +434,9 @@
 }
 .checkout-field input[type="date"]::-webkit-calendar-picker-indicator,
 .checkout-field input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(2);
+  filter: invert(1) sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2);
   cursor: pointer;
-  opacity: 0.9;
+  opacity: 1;
 }
 .checkout-payment-methods {
   display: flex;
@@ -479,4 +479,54 @@
 .checkout-pm-stripe {
   background: #635bff;
   color: #fff;
+}
+.checkout-phone-wrap .PhoneInput {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 0.3s;
+}
+.checkout-phone-wrap .PhoneInput:focus-within {
+  border-color: #c9a84c;
+}
+.checkout-phone-wrap .PhoneInputCountry {
+  padding: 0 0.75rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.checkout-phone-wrap .PhoneInputCountrySelect {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  outline: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.75rem 0;
+}
+.checkout-phone-wrap .PhoneInputCountrySelectArrow {
+  color: #888888;
+  opacity: 0.6;
+}
+.checkout-phone-wrap .PhoneInputInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  outline: none;
+}
+.checkout-phone-wrap .PhoneInputInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+.PhoneInputCountrySelect option {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+}
+.PhoneInputCountrySelect:focus {
+  background: #1a1a1a !important;
 }

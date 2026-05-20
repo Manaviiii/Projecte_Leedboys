@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useCart } from "../context/CartContext";
 import Footer from "../components/Footer";
 import jsPDF from "jspdf";
 import emailjs from "@emailjs/browser";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import "../styles/checkout.less";
 
 const stripePromise = loadStripe("pk_test_51SeyyJEWnLX7ncP0lzNrZqQuOjuHFarWUSnUkLbhFF8UMfxqUTLGZtmVBL0MuHzh5oPvl9YXZHAmxtSjT2ztjUQh00fZhU2BU8");
@@ -219,6 +221,26 @@ function CheckoutForm({ onSuccess }) {
         fecha: "", hora: "", direccion_evento: "",
     });
     const [facturacionError, setFacturacionError] = useState("");
+    const phoneRef = useRef(null);
+
+    // Controlar longitud del teléfono directamente en el DOM
+    useEffect(() => {
+        const wrap = phoneRef.current;
+        if (!wrap) return;
+        const input = wrap.querySelector("input");
+        if (!input) return;
+        const handler = (e) => {
+            const digits = (input.value || "").replace(/[^0-9]/g, "");
+            if (digits.length >= 11 && e.key !== "Backspace" && e.key !== "Delete" && e.key !== "ArrowLeft" && e.key !== "ArrowRight" && e.key !== "Tab") {
+                e.preventDefault();
+            }
+            if (!/[0-9]/.test(e.key) && e.key !== "Backspace" && e.key !== "Delete" && e.key !== "ArrowLeft" && e.key !== "ArrowRight" && e.key !== "Tab") {
+                e.preventDefault();
+            }
+        };
+        input.addEventListener("keydown", handler);
+        return () => input.removeEventListener("keydown", handler);
+    }, []);
 
     useEffect(() => {
         if (items.length === 0 || !evento.fecha) return;
@@ -274,9 +296,8 @@ function CheckoutForm({ onSuccess }) {
             return;
         }
 
-        const telRegex = /^\+[1-9]\d{6,14}$/;
-        if (!telRegex.test(facturacion.telefono.replace(/\s/g, ""))) {
-            setFacturacionError("El teléfono debe incluir el prefijo del país. Ej: +34 666 000 000");
+        if (!facturacion.telefono || !isValidPhoneNumber(facturacion.telefono)) {
+            setFacturacionError("El teléfono no es válido para el país seleccionado.");
             return;
         }
 
@@ -349,11 +370,34 @@ function CheckoutForm({ onSuccess }) {
                         </div>
                         <div className="checkout-field">
                             <label>DNI / NIF</label>
-                            <input name="dni" value={facturacion.dni} onChange={handleChange} placeholder="12345678A" />
+                            <input
+                                    name="dni"
+                                    value={facturacion.dni}
+                                    onChange={e => {
+                                        const val = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, "");
+                                        if (val.length <= 9) setFacturacion({ ...facturacion, dni: val });
+                                    }}
+                                    placeholder="12345678A"
+                                    maxLength={9}
+                                />
                         </div>
                         <div className="checkout-field">
                             <label>Teléfono</label>
-                            <input name="telefono" value={facturacion.telefono} onChange={handleChange} placeholder="+34 666 000 000" />
+                            <div className="checkout-phone-wrap" ref={phoneRef}>
+                                <PhoneInput
+                                    defaultCountry="ES"
+                                    international
+                                    withCountryCallingCode
+                                    value={facturacion.telefono}
+                                    onChange={val => {
+                                        if (!val) { setFacturacion({ ...facturacion, telefono: "" }); return; }
+                                        const digits = val.replace(/[^0-9]/g, "");
+                                        if (digits.length <= 12) setFacturacion({ ...facturacion, telefono: val });
+                                    }}
+                                    placeholder="666 000 000"
+
+                                />
+                            </div>
                         </div>
                         <div className="checkout-field checkout-field--full">
                             <label>Dirección</label>
