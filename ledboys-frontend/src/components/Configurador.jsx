@@ -10,8 +10,18 @@ export default function Configurador({ traje, stock, onClose }) {
     const [selAccesorios, setSelAccesorios] = useState([]);
     const [selPacks, setSelPacks]   = useState([]);
     const [added, setAdded]         = useState(false);
+    const [imgBase64, setImgBase64] = useState(null);
 
-    const img = traje.imagen ? `/${traje.imagen}` : null;
+    // Cargar foto principal desde API
+    useEffect(() => {
+        fetch(`/api/fotos/traje/${traje.id}`)
+            .then(r => r.json())
+            .then(data => {
+                const principal = data.fotos?.find(f => f.principal) || data.fotos?.[0];
+                if (principal) setImgBase64(`data:image/jpeg;base64,${principal.imagen}`);
+            })
+            .catch(() => {});
+    }, [traje.id]);
 
     // Cuántos de este traje ya hay en el carrito
     const enCarrito = items.find(i => i.id === `traje-${traje.id}`)?.cantidad ?? 0;
@@ -55,7 +65,7 @@ export default function Configurador({ traje, stock, onClose }) {
         addItem({
             id:       `traje-${traje.id}`,
             name:     traje.nombre,
-            img,
+            img:      imgBase64,
             precio:   traje.precio,
             cantidad,
             tipo:     "Traje",
@@ -105,8 +115,8 @@ export default function Configurador({ traje, stock, onClose }) {
 
                     <div className="config-traje">
                         <div className="config-traje-img">
-                            {img
-                                ? <img src={img} alt={traje.nombre} />
+                            {imgBase64
+                                ? <img src={imgBase64} alt={traje.nombre} />
                                 : <div className="config-traje-placeholder" />
                             }
                         </div>

@@ -261,6 +261,8 @@ function CheckoutForm({ onSuccess }) {
             body: JSON.stringify({
                 items:                 itemIds,
                 fecha:                 evento.fecha,
+                hora:                  evento.hora,
+                ubicacion:             evento.direccion_evento,
                 nombre_facturacion:    facturacion.nombre,
                 apellidos_facturacion: facturacion.apellidos,
                 dni:                   facturacion.dni,
@@ -613,7 +615,8 @@ export default function Checkout() {
 
     return (
         <div className="checkout-page">
-            <div className="page-hero">
+            <div className="page-hero checkout-page-hero">
+                <a href="/catalogo" className="checkout-back"><span>←</span> Volver</a>
                 <h1><span>CHECK</span>OUT</h1>
             </div>
             <div className="checkout-wrap">
