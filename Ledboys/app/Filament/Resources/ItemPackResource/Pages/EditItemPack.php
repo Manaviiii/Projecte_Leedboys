@@ -4,38 +4,61 @@ namespace App\Filament\Resources\ItemPackResource\Pages;
 
 use App\Filament\Resources\ItemPackResource;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Página de edición de un pack.
+ *
+ * Flujo:
+ * 1. mutateFormDataBeforeFill: precarga los datos del item padre.
+ * 2. mutateFormDataBeforeSave: limpia campos extra antes de guardar en item_packs.
+ * 3. afterSave: actualiza el item padre con los datos generales.
+ */
 class EditItemPack extends EditRecord
 {
     protected static string $resource = ItemPackResource::class;
 
+    /**
+     * Precarga los datos del item padre al abrir el formulario de edición.
+     * Sin esto los campos nombre, precio, etc. aparecerían vacíos.
+     */
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $item = $this->record->item;
 
-        $data['nombre_item']      = $item?->nombre;
-        $data['precio_item']      = $item?->precio;
-        $data['descripcion_item'] = $item?->descripcion;
-        $data['imagen_item']      = $item?->imagen;
+        if ($item) {
+            $data['nombre']      = $item->nombre;
+            $data['precio']      = $item->precio;
+            $data['descripcion'] = $item->descripcion;
+            $data['imagen']      = $item->imagen;
+            $data['activo']      = $item->activo;
+        }
 
         return $data;
     }
 
-    protected function handleRecordUpdate(Model $record, array $data): Model
+    /**
+     * Limpia los campos del item padre antes de guardar en item_packs.
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        $record->item->update([
-            'nombre'      => $data['nombre_item'],
-            'precio'      => $data['precio_item'],
-            'descripcion' => $data['descripcion_item'] ?? null,
-            'imagen'      => $data['imagen_item'] ?? null,
-        ]);
+        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['imagen'], $data['activo']);
+        return $data;
+    }
 
-        $record->update([
-            'numero_zancudos' => $data['numero_zancudos'],
-        ]);
+    /**
+     * Tras guardar, actualiza el item padre con los datos generales del formulario.
+     */
+    protected function afterSave(): void
+    {
+        $data = $this->form->getState();
 
-        return $record;
+        $this->record->item->update([
+            'nombre'      => $data['nombre'],
+            'precio'      => $data['precio'],
+            'descripcion' => $data['descripcion'] ?? null,
+            'imagen'      => $data['imagen'] ?? null,
+            'activo'      => $data['activo'] ?? true,
+        ]);
     }
 
     protected function getRedirectUrl(): string

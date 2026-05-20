@@ -4,29 +4,36 @@ namespace App\Filament\Resources\ItemAccesorioResource\Pages;
 
 use App\Filament\Resources\ItemAccesorioResource;
 use App\Models\Item;
-use App\Models\ItemAccesorio;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class CreateItemAccesorio extends CreateRecord
 {
     protected static string $resource = ItemAccesorioResource::class;
 
-    protected function handleRecordCreation(array $data): Model
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
         $item = Item::create([
-            'nombre'      => $data['nombre_item'],
+            'nombre'      => $data['nombre'],
             'tipo'        => 'accesorio',
-            'precio'      => $data['precio_item'],
-            'descripcion' => $data['descripcion_item'] ?? null,
-            'imagen'      => $data['imagen_item'] ?? null,
-            'activo'      => true,
+            'precio'      => $data['precio'],
+            'descripcion' => $data['descripcion'] ?? null,
+            'activo'      => $data['activo'] ?? true,
         ]);
 
-        return ItemAccesorio::create([
-            'item_id'     => $item->id,
-            'stock_total' => $data['stock_total'],
-        ]);
+        $data['item_id'] = $item->id;
+
+        if (!empty($data['foto_archivo'])) {
+            $rutaArchivo = Storage::disk('public')->path($data['foto_archivo']);
+            if (file_exists($rutaArchivo)) {
+                $data['imagen'] = file_get_contents($rutaArchivo);
+                Storage::disk('public')->delete($data['foto_archivo']);
+            }
+        }
+
+        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['activo'], $data['foto_archivo']);
+
+        return $data;
     }
 
     protected function getRedirectUrl(): string

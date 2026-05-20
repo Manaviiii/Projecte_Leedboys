@@ -4,7 +4,8 @@ namespace App\Filament\Resources\ItemAccesorioResource\Pages;
 
 use App\Filament\Resources\ItemAccesorioResource;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class EditItemAccesorio extends EditRecord
 {
@@ -14,28 +15,45 @@ class EditItemAccesorio extends EditRecord
     {
         $item = $this->record->item;
 
-        $data['nombre_item']      = $item?->nombre;
-        $data['precio_item']      = $item?->precio;
-        $data['descripcion_item'] = $item?->descripcion;
-        $data['imagen_item']      = $item?->imagen;
+        if ($item) {
+            $data['nombre']      = $item->nombre;
+            $data['precio']      = $item->precio;
+            $data['descripcion'] = $item->descripcion;
+            $data['activo']      = $item->activo;
+        }
 
         return $data;
     }
 
-    protected function handleRecordUpdate(Model $record, array $data): Model
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        $record->item->update([
-            'nombre'      => $data['nombre_item'],
-            'precio'      => $data['precio_item'],
-            'descripcion' => $data['descripcion_item'] ?? null,
-            'imagen'      => $data['imagen_item'] ?? null,
+        return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        $data = $this->form->getState();
+
+        $this->record->item->update([
+            'nombre'      => $data['nombre'],
+            'precio'      => $data['precio'],
+            'descripcion' => $data['descripcion'] ?? null,
+            'activo'      => $data['activo'] ?? true,
         ]);
 
-        $record->update([
-            'stock_total' => $data['stock_total'],
-        ]);
+        if (!empty($data['foto_archivo'])) {
+            $rutaArchivo = Storage::disk('public')->path($data['foto_archivo']);
 
-        return $record;
+            if (file_exists($rutaArchivo)) {
+                $blob = file_get_contents($rutaArchivo);
+
+                DB::table('item_accesorios')
+                    ->where('item_id', $this->record->item_id)
+                    ->update(['imagen' => $blob]);
+
+                Storage::disk('public')->delete($data['foto_archivo']);
+            }
+        }
     }
 
     protected function getRedirectUrl(): string

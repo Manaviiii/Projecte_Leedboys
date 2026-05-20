@@ -19,7 +19,7 @@ use Filament\Forms\Components\Section;
  * - 'item_accesorios': stock y una única foto en formato BLOB
  *
  * Al crear: las Pages crean primero el Item y luego el ItemAccesorio con la foto.
- * Al editar: se precargan los datos del item padre para no tener el formulario vacío.
+ * Al editar: se precargan los datos del item padre y se muestra la foto actual en base64.
  */
 class ItemAccesorioResource extends Resource
 {
@@ -62,7 +62,6 @@ class ItemAccesorioResource extends Resource
             ])->columns(2),
 
             // ── Sección 2: Stock y foto del accesorio (tabla item_accesorios) ──
-            // La foto se sube como archivo temporal, se lee como BLOB y se guarda en la BD.
             Section::make('Stock y Foto')->schema([
                 Forms\Components\TextInput::make('stock_total')
                     ->label('Stock Total')
@@ -70,9 +69,28 @@ class ItemAccesorioResource extends Resource
                     ->minValue(0)
                     ->required(),
 
-                // El archivo se sube temporalmente — en la Page se convierte a BLOB
+                // Previsualización de la foto actual guardada como BLOB en item_accesorios.
+                // Solo visible en edición — al crear no hay foto todavía.
+                // Se renderiza como img con src base64 ya que el BLOB no tiene ruta en disco.
+                Forms\Components\Placeholder::make('preview_foto')
+                    ->label('Foto actual')
+                    ->content(function ($record) {
+                        if (!$record || !$record->imagen) {
+                            return new \Illuminate\Support\HtmlString(
+                                '<span style="color:#aaa;">Sin foto guardada</span>'
+                            );
+                        }
+                        $base64 = base64_encode($record->imagen);
+                        return new \Illuminate\Support\HtmlString(
+                            "<img src=\"data:image/jpeg;base64,{$base64}\" style=\"max-height:150px;border-radius:6px;\">"
+                        );
+                    })
+                    ->visibleOn('edit'), // solo visible al editar, no al crear
+
+                // Si se sube un archivo nuevo reemplaza el BLOB guardado.
+                // En edición es opcional — si se deja vacío se mantiene la foto existente.
                 Forms\Components\FileUpload::make('foto_archivo')
-                    ->label('Foto del accesorio')
+                    ->label('Subir foto nueva (opcional en edición)')
                     ->image()
                     ->directory('fotos_tmp'),
             ])->columns(2),

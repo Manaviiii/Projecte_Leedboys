@@ -3,50 +3,117 @@
 namespace App\Filament\Resources\ItemTrajeResource\Pages;
 
 use App\Filament\Resources\ItemTrajeResource;
+use App\Models\Item;
+use App\Models\Foto;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class EditItemTraje extends EditRecord
 {
     protected static string $resource = ItemTrajeResource::class;
 
-    /**
-     * Al cargar el formulario, combinamos los campos de `items` y de `item_trajes`
-     * en un único array de estado para que el formulario los muestre correctamente.
-     */
+    protected array $fotosNuevas    = [];
+    protected ?int  $ordenPrincipal = null;
+
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $item = $this->record->item;
 
-        $data['nombre_item']      = $item?->nombre;
-        $data['precio_item']      = $item?->precio;
-        $data['descripcion_item'] = $item?->descripcion;
-        $data['imagen_item']      = $item?->imagen;
+        if ($item) {
+            $data['nombre']      = $item->nombre;
+            $data['precio']      = $item->precio;
+            $data['descripcion'] = $item->descripcion;
+            $data['imagen']      = $item->imagen;
+            $data['activo']      = $item->activo;
+        }
+
+        $data['fotos_input'] = $this->record->fotos->map(fn($foto) => [
+            'archivo'   => null,
+            'foto_id'   => $foto->id,
+            'nombre'    => $foto->nombre,
+            'orden'     => $foto->orden,
+        ])->toArray();
+
+        $fotoPrincipal = $this->record->fotos->firstWhere('principal', true);
+        $data['foto_principal_orden'] = $fotoPrincipal?->orden;
 
         return $data;
     }
 
-    /**
-     * Al guardar, actualizamos el Item base y el ItemTraje por separado.
-     */
-    protected function handleRecordUpdate(Model $record, array $data): Model
+    protected function mutateFormDataBeforeSave(array $data): array
     {
-        // Actualizar el Item base
-        $record->item->update([
-            'nombre'      => $data['nombre_item'],
-            'precio'      => $data['precio_item'],
-            'descripcion' => $data['descripcion_item'] ?? null,
-            'imagen'      => $data['imagen_item'] ?? null,
+        $this->fotosNuevas    = $data['fotos_input'] ?? [];
+        $this->ordenPrincipal = isset($data['foto_principal_orden']) ? (int) $data['foto_principal_orden'] : null;
+
+        unset($data['fotos_input'], $data['foto_principal_orden']);
+        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['imagen'], $data['activo']);
+
+        return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        $data = $this->form->getState();
+
+        $this->record->item->update([
+            'nombre'      => $data['nombre'],
+            'precio'      => $data['precio'],
+            'descripcion' => $data['descripcion'] ?? null,
+            'imagen'      => $data['imagen'] ?? null,
+            'activo'      => $data['activo'] ?? true,
         ]);
 
-        // Actualizar el ItemTraje
-        $record->update([
-            'tipo_traje'  => $data['tipo_traje'],
-            'genero'      => $data['genero'],
-            'stock_total' => $data['stock_total'],
-        ]);
+        $idsMantenidos = [];
 
-        return $record;
+        foreach ($this->fotosNuevas as $fotoData) {
+            $orden       = (int) ($fotoData['orden'] ?? 1);
+            $esPrincipal = ($this->ordenPrincipal !== null && $orden === $this->ordenPrincipal);
+
+            if (!empty($fotoData['foto_id'])) {
+                $foto = Foto::find($fotoData['foto_id']);
+                if ($foto) {
+                    $updateData = [
+                        'nombre'    => $fotoData['nombre'],
+                        'orden'     => $orden,
+                        'principal' => $esPrincipal,
+                    ];
+
+                    if (!empty($fotoData['archivo'])) {
+                        // Usar disk public — Filament guarda los archivos en storage/app/public
+                        $rutaArchivo = Storage::disk('public')->path($fotoData['archivo']);
+                        if (file_exists($rutaArchivo)) {
+                            $updateData['imagen'] = file_get_contents($rutaArchivo);
+                            Storage::disk('public')->delete($fotoData['archivo']);
+                        }
+                    }
+
+                    $foto->update($updateData);
+                    $idsMantenidos[] = $foto->id;
+                }
+            } else {
+                if (!empty($fotoData['archivo'])) {
+                    $rutaArchivo = Storage::disk('public')->path($fotoData['archivo']);
+                    if (file_exists($rutaArchivo)) {
+                        $blob = file_get_contents($rutaArchivo);
+
+                        $foto = Foto::create([
+                            'idTraje'   => $this->record->id,
+                            'principal' => $esPrincipal,
+                            'nombre'    => $fotoData['nombre'],
+                            'orden'     => $orden,
+                            'imagen'    => $blob,
+                        ]);
+
+                        Storage::disk('public')->delete($fotoData['archivo']);
+                        $idsMantenidos[] = $foto->id;
+                    }
+                }
+            }
+        }
+
+        Foto::where('idTraje', $this->record->id)
+            ->whereNotIn('id', $idsMantenidos)
+            ->delete();
     }
 
     protected function getRedirectUrl(): string
