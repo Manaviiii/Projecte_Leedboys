@@ -101,19 +101,69 @@ class ItemTrajeResource extends Resource
             ])->columns(3),
 
             // ── Sección 3: Fotos (tabla fotos, guardadas como BLOB) ────────────
-            // El Repeater permite añadir múltiples fotos.
-            // El archivo se sube temporalmente a disco y en la Page se lee
-            // con file_get_contents() y se guarda como BLOB en la BD.
-            // Solo debe haber una foto marcada como principal — se controla en la Page.
+            // El Repeater permite añadir, editar y eliminar fotos.
+            // Las fotos existentes se muestran como previsualización base64.
+            // Las fotos nuevas se suben temporalmente y se convierten a BLOB en la Page.
+            // Solo debe haber una foto marcada como principal.
             Section::make('Fotos del Traje')->schema([
+                // Select para elegir cuál de las fotos añadidas es la principal.
+                // Se basa en el orden — elige el número de orden de la foto principal.
+                // Al guardar, la Page marca como principal la foto cuyo orden coincida.
+                Forms\Components\Select::make('foto_principal_orden')
+                    ->label('Foto principal')
+                    ->placeholder('Selecciona el orden de la foto principal')
+                    ->options(function ($get) {
+                        $fotos = $get('fotos_input') ?? [];
+                        $opciones = [];
+                        foreach ($fotos as $foto) {
+                            $orden = $foto['orden'] ?? null;
+                            $nombre = $foto['nombre'] ?? 'Sin nombre';
+                            if ($orden) {
+                                $opciones[$orden] = "{$orden} — {$nombre}";
+                            }
+                        }
+                        return $opciones;
+                    })
+                    ->reactive(),
+
                 Repeater::make('fotos_input')
                     ->label('Fotos')
                     ->schema([
+
+                        // Previsualización de la foto ya guardada en BD (solo en edición).
+                        // Se renderiza como img con src base64 ya que el BLOB no tiene ruta en disco.
+                        Forms\Components\Placeholder::make('preview')
+                            ->label('Foto actual')
+                            ->content(function ($get) {
+                                $fotoId = $get('foto_id');
+                                if (!$fotoId) {
+                                    return new \Illuminate\Support\HtmlString(
+                                        '<span style="color:#aaa;">Sin foto guardada — sube una nueva abajo</span>'
+                                    );
+                                }
+                                $foto = \App\Models\Foto::find($fotoId);
+                                if (!$foto || !$foto->imagen) {
+                                    return new \Illuminate\Support\HtmlString(
+                                        '<span style="color:#aaa;">Sin foto guardada</span>'
+                                    );
+                                }
+                                $base64 = base64_encode($foto->imagen);
+                                return new \Illuminate\Support\HtmlString(
+                                    "<img src=\"data:image/jpeg;base64,{$base64}\" style=\"max-height:150px;border-radius:6px;\">"
+                                );
+                            })
+                            ->columnSpan(2),
+
+                        // Campo oculto con el ID de la foto existente.
+                        // Si tiene valor, la Page actualiza esa fila. Si está vacío, crea una nueva.
+                        Forms\Components\Hidden::make('foto_id'),
+
+                        // Si se sube un archivo nuevo reemplaza el BLOB guardado.
+                        // En edición es opcional — si se deja vacío se mantiene la foto existente.
                         Forms\Components\FileUpload::make('archivo')
-                            ->label('Foto')
+                            ->label('Subir foto nueva (opcional en edición)')
                             ->image()
-                            ->required()
-                            ->directory('fotos_tmp'), // directorio temporal antes de convertir a BLOB
+                            ->directory('fotos_tmp'),
 
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre de la foto')
@@ -126,15 +176,12 @@ class ItemTrajeResource extends Resource
                             ->default(1)
                             ->minValue(1),
 
-                        // Toggle para marcar cuál es la foto principal del traje en el catálogo
-                        Forms\Components\Toggle::make('principal')
-                            ->label('Foto principal')
-                            ->default(false),
                     ])
                     ->columns(2)
                     ->createItemButtonLabel('+ Añadir foto')
-                    ->defaultItems(0), // sin fotos por defecto al abrir el formulario
-            ])->collapsible(), // colapsable para no ocupar espacio innecesario
+                    ->defaultItems(0),
+
+            ])->collapsible(),
         ]);
     }
 

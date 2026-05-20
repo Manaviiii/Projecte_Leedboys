@@ -4,37 +4,63 @@ namespace App\Filament\Resources\ItemTrajeResource\Pages;
 
 use App\Filament\Resources\ItemTrajeResource;
 use App\Models\Item;
-use App\Models\ItemTraje;
+use App\Models\Foto;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class CreateItemTraje extends CreateRecord
 {
     protected static string $resource = ItemTrajeResource::class;
 
-    /**
-     * Interceptamos la creación para guardar primero en `items`
-     * y luego crear el `item_traje` apuntando al item recién creado.
-     */
-    protected function handleRecordCreation(array $data): Model
+    protected array $fotosPendientes = [];
+    protected ?int  $ordenPrincipal  = null;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // 1. Crear el Item base
+        $this->fotosPendientes = $data['fotos_input'] ?? [];
+        $this->ordenPrincipal  = isset($data['foto_principal_orden']) ? (int) $data['foto_principal_orden'] : null;
+        unset($data['fotos_input'], $data['foto_principal_orden']);
+
         $item = Item::create([
-            'nombre'      => $data['nombre_item'],
+            'nombre'      => $data['nombre'],
             'tipo'        => 'traje',
-            'precio'      => $data['precio_item'],
-            'descripcion' => $data['descripcion_item'] ?? null,
-            'imagen'      => $data['imagen_item'] ?? null,
-            'activo'      => true,
+            'precio'      => $data['precio'],
+            'descripcion' => $data['descripcion'] ?? null,
+            'imagen'      => $data['imagen'] ?? null,
+            'activo'      => $data['activo'] ?? true,
         ]);
 
-        // 2. Crear el ItemTraje vinculado
-        return ItemTraje::create([
-            'item_id'     => $item->id,
-            'tipo_traje'  => $data['tipo_traje'],
-            'genero'      => $data['genero'],
-            'stock_total' => $data['stock_total'],
-        ]);
+        $data['item_id'] = $item->id;
+        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['imagen'], $data['activo']);
+
+        return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        foreach ($this->fotosPendientes as $fotoData) {
+            if (empty($fotoData['archivo'])) continue;
+
+            $orden       = (int) ($fotoData['orden'] ?? 1);
+            $esPrincipal = ($this->ordenPrincipal !== null && $orden === $this->ordenPrincipal);
+
+            // Usar disk public — Filament guarda los archivos en storage/app/public
+            $rutaArchivo = Storage::disk('public')->path($fotoData['archivo']);
+
+            if (!file_exists($rutaArchivo)) continue;
+
+            $blob = file_get_contents($rutaArchivo);
+
+            Foto::create([
+                'idTraje'   => $this->record->id,
+                'principal' => $esPrincipal,
+                'nombre'    => $fotoData['nombre'],
+                'orden'     => $orden,
+                'imagen'    => $blob,
+            ]);
+
+            Storage::disk('public')->delete($fotoData['archivo']);
+        }
     }
 
     protected function getRedirectUrl(): string

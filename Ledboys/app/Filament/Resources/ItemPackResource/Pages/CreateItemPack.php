@@ -4,29 +4,40 @@ namespace App\Filament\Resources\ItemPackResource\Pages;
 
 use App\Filament\Resources\ItemPackResource;
 use App\Models\Item;
-use App\Models\ItemPack;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Página de creación de un pack.
+ *
+ * Flujo:
+ * 1. mutateFormDataBeforeCreate: crea el Item padre y añade su ID a los datos
+ *    antes de crear el ItemPack.
+ */
 class CreateItemPack extends CreateRecord
 {
     protected static string $resource = ItemPackResource::class;
 
-    protected function handleRecordCreation(array $data): Model
+    /**
+     * Crea el Item padre antes de crear el ItemPack.
+     * Extrae los campos generales, crea el Item y deja solo los campos de item_packs.
+     */
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
         $item = Item::create([
-            'nombre'      => $data['nombre_item'],
+            'nombre'      => $data['nombre'],
             'tipo'        => 'pack',
-            'precio'      => $data['precio_item'],
-            'descripcion' => $data['descripcion_item'] ?? null,
-            'imagen'      => $data['imagen_item'] ?? null,
-            'activo'      => true,
+            'precio'      => $data['precio'],
+            'descripcion' => $data['descripcion'] ?? null,
+            'imagen'      => $data['imagen'] ?? null,
+            'activo'      => $data['activo'] ?? true,
         ]);
 
-        return ItemPack::create([
-            'item_id'          => $item->id,
-            'numero_zancudos'  => $data['numero_zancudos'],
-        ]);
+        $data['item_id'] = $item->id;
+
+        // Limpiar campos que no pertenecen a item_packs
+        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['imagen'], $data['activo']);
+
+        return $data;
     }
 
     protected function getRedirectUrl(): string
