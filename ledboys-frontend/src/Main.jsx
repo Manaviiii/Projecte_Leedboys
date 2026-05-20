@@ -11,6 +11,7 @@ import Registro from "./pages/Registro";
 import Checkout from "./pages/Checkout";
 import Facturas from "./pages/Facturas";
 import Perfil from "./pages/Perfil";
+import Reservas from "./pages/Reservas";
 import Cookies from "./pages/Cookies";
 import Privacidad from "./pages/Privacidad";
 
@@ -82,6 +83,7 @@ function App() {
         if (path === "/checkout")               return <Checkout />;
         if (path === "/facturas")               return <Facturas />;
         if (path === "/perfil")                 return <Perfil onLogout={handleLogout} />;
+        if (path === "/reservas")               return <Reservas />;
         if (path === "/politica-de-cookies")    return <Cookies />;
         if (path === "/politica-de-privacidad") return <Privacidad />;
         if (path === "/catalogo" || path.startsWith("/catalogo")) return <Catalogo />;

@@ -442,9 +442,14 @@
         &::placeholder { color: rgba(255,255,255,0.2); }
         &:focus { border-color: @gold; }
 
+        &[type="date"],
+        &[type="time"] {
+            accent-color: @gold;
+        }
+
         &[type="date"]::-webkit-calendar-picker-indicator,
         &[type="time"]::-webkit-calendar-picker-indicator {
-            filter: invert(1) sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2);
+            filter: invert(1) sepia(1) saturate(3) hue-rotate(10deg);
             cursor: pointer;
             opacity: 1;
         }
@@ -544,3 +549,59 @@
 .PhoneInputCountrySelect:focus {
     background: #1a1a1a !important;
 }
+
+
+// BOTÓN VOLVER AL CATÁLOGO
+.checkout-page-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .checkout-back {
+        position: absolute;
+        top: 50%;
+        left: 2rem;
+        transform: translateY(-50%);
+    }
+}
+
+.checkout-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: @white;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(201,168,76,0.15), transparent);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s;
+    }
+
+    &:hover {
+        border-color: @gold;
+        color: @gold;
+        &::before { transform: scaleX(1); }
+    }
+
+    span { transition: transform 0.3s; }
+    &:hover span { transform: translateX(-4px); }
+}
+
+
+
