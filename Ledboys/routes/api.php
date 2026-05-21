@@ -86,8 +86,6 @@ Route::middleware('auth:sanctum')->prefix('pagos')->group(function () {
     Route::get('/',                [PaymentController::class, 'historial']);
     Route::get('/{id}',            [PaymentController::class, 'detalle']);
     Route::post('/{id}/reembolso', [PaymentController::class, 'reembolso']);
-
-    
 });
 
 // Webhook de Stripe — SIN autenticación
