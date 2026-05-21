@@ -13,14 +13,6 @@ use Filament\Forms\Components\Section;
 
 /**
  * Resource de Filament para gestionar los packs del catálogo.
- *
- * Los datos se distribuyen en dos tablas:
- * - 'items': datos generales (nombre, precio, descripción, imagen, activo)
- * - 'item_packs': número de zancudos incluidos en el pack
- *
- * Los packs no tienen fotos — usan solo la imagen de referencia del item padre.
- * Al crear: las Pages crean primero el Item y luego el ItemPack.
- * Al editar: se precargan los datos del item padre para no tener el formulario vacío.
  */
 class ItemPackResource extends Resource
 {
@@ -30,10 +22,6 @@ class ItemPackResource extends Resource
     protected static ?string $navigationGroup = 'Catálogo';
     protected static ?int $navigationSort = 3;
 
-    /**
-     * Formulario de creación y edición.
-     * Dividido en dos secciones: datos generales y detalles del pack.
-     */
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -43,23 +31,30 @@ class ItemPackResource extends Resource
                 Forms\Components\TextInput::make('nombre')
                     ->label('Nombre del Pack')
                     ->required()
-                    ->maxLength(255),
+                    ->minLength(2)
+                    ->maxLength(255)
+                    ->placeholder('Ej: Pack Bronce')
+                    ->rules(['regex:/\S/']),
 
                 Forms\Components\TextInput::make('precio')
                     ->label('Precio (€)')
                     ->numeric()
                     ->prefix('€')
-                    ->required(),
+                    ->required()
+                    ->minValue(0.01)
+                    ->maxValue(9999.99)
+                    ->placeholder('300.00'),
 
                 Forms\Components\Textarea::make('descripcion')
                     ->label('Descripción')
                     ->rows(3)
+                    ->maxLength(1000)
                     ->columnSpan(2),
 
-                // Imagen de referencia del pack (no es BLOB, se guarda como ruta en disco)
                 Forms\Components\FileUpload::make('imagen')
                     ->label('Imagen')
                     ->image()
+                    ->maxSize(5120)
                     ->directory('items')
                     ->columnSpan(2),
 
@@ -69,51 +64,32 @@ class ItemPackResource extends Resource
                     ->columnSpan(2),
             ])->columns(2),
 
-            // ── Sección 2: Detalles del pack (tabla item_packs) ────────────────
+            // ── Sección 2: Detalles del pack ───────────────────────────────────
             Section::make('Detalles del Pack')->schema([
-                // Número de zancudos que incluye el pack contratado
                 Forms\Components\TextInput::make('numero_zancudos')
                     ->label('Nº de Zancudos incluidos')
                     ->numeric()
-                    ->minValue(1)
-                    ->required(),
+                    ->integer()
+                    ->minValue(1)  // al menos 1 zancudo
+                    ->maxValue(99)
+                    ->required()
+                    ->placeholder('2'),
             ]),
         ]);
     }
 
-    /**
-     * Tabla de listado de packs con columnas y acciones.
-     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('item.imagen')
-                    ->label(''),
-
-                Tables\Columns\TextColumn::make('item.nombre')
-                    ->label('Nombre')
-                    ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('numero_zancudos')
-                    ->label('Zancudos'),
-
-                Tables\Columns\TextColumn::make('item.precio')
-                    ->label('Precio')
-                    ->money('eur'),
-
-                Tables\Columns\IconColumn::make('item.activo')
-                    ->label('Activo')
-                    ->boolean(),
+                Tables\Columns\ImageColumn::make('item.imagen')->label(''),
+                Tables\Columns\TextColumn::make('item.nombre')->label('Nombre')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('numero_zancudos')->label('Zancudos'),
+                Tables\Columns\TextColumn::make('item.precio')->label('Precio')->money('eur'),
+                Tables\Columns\IconColumn::make('item.activo')->label('Activo')->boolean(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
+            ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }
 
     public static function getPages(): array

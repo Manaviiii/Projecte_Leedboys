@@ -13,13 +13,6 @@ use Filament\Forms\Components\Section;
 
 /**
  * Resource de Filament para gestionar los accesorios del catálogo.
- *
- * Los datos se distribuyen en dos tablas:
- * - 'items': datos generales (nombre, precio, descripción, activo)
- * - 'item_accesorios': stock y una única foto en formato BLOB
- *
- * Al crear: las Pages crean primero el Item y luego el ItemAccesorio con la foto.
- * Al editar: se precargan los datos del item padre y se muestra la foto actual en base64.
  */
 class ItemAccesorioResource extends Resource
 {
@@ -29,10 +22,6 @@ class ItemAccesorioResource extends Resource
     protected static ?string $navigationGroup = 'Catálogo';
     protected static ?int $navigationSort = 2;
 
-    /**
-     * Formulario de creación y edición.
-     * Dividido en dos secciones: datos generales y stock + foto.
-     */
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -42,17 +31,24 @@ class ItemAccesorioResource extends Resource
                 Forms\Components\TextInput::make('nombre')
                     ->label('Nombre del Accesorio')
                     ->required()
-                    ->maxLength(255),
+                    ->minLength(2)
+                    ->maxLength(255)
+                    ->placeholder('Ej: Barra Limbo')
+                    ->rules(['regex:/\S/']),
 
                 Forms\Components\TextInput::make('precio')
                     ->label('Precio (€)')
                     ->numeric()
                     ->prefix('€')
-                    ->required(),
+                    ->required()
+                    ->minValue(0.01)
+                    ->maxValue(9999.99)
+                    ->placeholder('50.00'),
 
                 Forms\Components\Textarea::make('descripcion')
                     ->label('Descripción')
                     ->rows(3)
+                    ->maxLength(1000)
                     ->columnSpan(2),
 
                 Forms\Components\Toggle::make('activo')
@@ -61,17 +57,17 @@ class ItemAccesorioResource extends Resource
                     ->columnSpan(2),
             ])->columns(2),
 
-            // ── Sección 2: Stock y foto del accesorio (tabla item_accesorios) ──
+            // ── Sección 2: Stock y foto ────────────────────────────────────────
             Section::make('Stock y Foto')->schema([
                 Forms\Components\TextInput::make('stock_total')
                     ->label('Stock Total')
                     ->numeric()
+                    ->integer()
                     ->minValue(0)
-                    ->required(),
+                    ->maxValue(999)
+                    ->required()
+                    ->placeholder('10'),
 
-                // Previsualización de la foto actual guardada como BLOB en item_accesorios.
-                // Solo visible en edición — al crear no hay foto todavía.
-                // Se renderiza como img con src base64 ya que el BLOB no tiene ruta en disco.
                 Forms\Components\Placeholder::make('preview_foto')
                     ->label('Foto actual')
                     ->content(function ($record) {
@@ -85,10 +81,8 @@ class ItemAccesorioResource extends Resource
                             "<img src=\"data:image/jpeg;base64,{$base64}\" style=\"max-height:150px;border-radius:6px;\">"
                         );
                     })
-                    ->visibleOn('edit'), // solo visible al editar, no al crear
+                    ->visibleOn('edit'),
 
-                // Si se sube un archivo nuevo reemplaza el BLOB guardado.
-                // En edición es opcional — si se deja vacío se mantiene la foto existente.
                 Forms\Components\FileUpload::make('foto_archivo')
                     ->label('Subir foto nueva (opcional en edición)')
                     ->image()
@@ -97,39 +91,18 @@ class ItemAccesorioResource extends Resource
         ]);
     }
 
-    /**
-     * Tabla de listado de accesorios con columnas y acciones.
-     */
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('item.imagen')
-                    ->label(''),
-
-                Tables\Columns\TextColumn::make('item.nombre')
-                    ->label('Nombre')
-                    ->searchable()
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('stock_total')
-                    ->label('Stock'),
-
-                Tables\Columns\TextColumn::make('item.precio')
-                    ->label('Precio')
-                    ->money('eur'),
-
-                Tables\Columns\IconColumn::make('item.activo')
-                    ->label('Activo')
-                    ->boolean(),
+                Tables\Columns\ImageColumn::make('item.imagen')->label(''),
+                Tables\Columns\TextColumn::make('item.nombre')->label('Nombre')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('stock_total')->label('Stock'),
+                Tables\Columns\TextColumn::make('item.precio')->label('Precio')->money('eur'),
+                Tables\Columns\IconColumn::make('item.activo')->label('Activo')->boolean(),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
+            ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }
 
     public static function getPages(): array
