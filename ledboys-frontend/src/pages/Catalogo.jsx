@@ -18,21 +18,28 @@ export default function Catalogo() {
     const debounceRef                     = useRef(null);
 
     useEffect(() => {
-        // Cargamos fotos principales desde /api/fotos que ya devuelve base64 + datos del traje
         fetch("/api/fotos")
             .then(res => {
                 if (!res.ok) throw new Error("Error al cargar el catálogo");
                 return res.json();
             })
             .then(data => {
-                const items = data.map(foto => ({
-                    id:     foto.traje?.id || foto.idTraje,
-                    idTraje: foto.idTraje,
-                    name:   foto.nombre,
-                    img:    `data:image/jpeg;base64,${foto.imagen}`,
-                    genero: foto.traje?.genero ?? "unisex",
-                    precio: foto.traje?.precio ?? "—",
-                }));
+                // Una sola foto por traje
+                const seen = new Set();
+                const items = data
+                    .filter(foto => {
+                        const id = foto.traje?.id || foto.idTraje;
+                        if (seen.has(id)) return false;
+                        seen.add(id);
+                        return true;
+                    })
+                    .map(foto => ({
+                        id:     foto.traje?.id || foto.idTraje,
+                        name:   foto.traje?.nombre || foto.nombre,
+                        img:    `data:image/jpeg;base64,${foto.imagen}`,
+                        genero: foto.traje?.genero ?? "unisex",
+                        precio: foto.traje?.precio ?? "—",
+                    }));
                 setAllItems(items);
                 setLoading(false);
             })
@@ -54,10 +61,12 @@ export default function Catalogo() {
                 .catch(() => { setSearchItems([]); setSearching(false); });
         }, 350);
         return () => clearTimeout(debounceRef.current);
-    }, [query, allItems]);
+    }, [query]);
+
+
 
     const baseItems = searchItems !== null ? searchItems : allItems;
-    const filtered  = activeFilter === "Todos" || searchItems !== null
+    const filtered = activeFilter === "Todos" || searchItems !== null
         ? baseItems
         : baseItems.filter(item => {
             if (activeFilter === "Ledboys")  return item.genero === "chico"  || item.genero === "unisex";
@@ -136,7 +145,7 @@ export default function Catalogo() {
 
                         <div className="catalog-grid">
                             {paginated.map(item => (
-                                <a key={item.idTraje} href={`/traje/${item.id}`} className="catalog-item">
+                                <a key={item.id} href={`/traje/${item.id}`} className="catalog-item">
                                     {item.img
                                         ? <img src={item.img} alt={item.name} />
                                         : <div style={{ width:"100%", height:"100%", background:"#1a1a1a" }} />
@@ -144,9 +153,6 @@ export default function Catalogo() {
                                     <div className="catalog-item-overlay" />
                                     <div className="catalog-item-info">
                                         <h3>{item.name}</h3>
-                                        <div className="tags">
-                                            <span className="tag">{item.genero}</span>
-                                        </div>
                                     </div>
                                 </a>
                             ))}

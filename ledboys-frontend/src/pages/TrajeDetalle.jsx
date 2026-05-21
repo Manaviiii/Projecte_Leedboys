@@ -146,7 +146,6 @@ export default function TrajeDetalle({ id }) {
                         <div className="gold-divider" style={{ margin: "1rem 0 1.5rem" }} />
 
                         <div className="detalle-badges">
-                            <span className="detalle-badge">{genero}</span>
                             <span className="detalle-badge">{tipo === "zancos" ? "Con zancos" : "Sin zancos"}</span>
                         </div>
 
@@ -158,10 +157,6 @@ export default function TrajeDetalle({ id }) {
                             <div className="detalle-stat">
                                 <span className="detalle-stat-label">Stock</span>
                                 <span className="detalle-stat-value">{stock} uds.</span>
-                            </div>
-                            <div className="detalle-stat">
-                                <span className="detalle-stat-label">Género</span>
-                                <span className="detalle-stat-value" style={{ textTransform: "capitalize" }}>{genero}</span>
                             </div>
                         </div>
 

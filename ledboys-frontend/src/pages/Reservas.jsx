@@ -3,11 +3,11 @@ import Footer from "../components/Footer";
 import "../styles/reservas.less";
 
 export default function Reservas() {
-    const [reservas, setReservas]     = useState([]);
-    const [historial, setHistorial]   = useState([]);
-    const [loading, setLoading]       = useState(true);
-    const [tab, setTab]               = useState("futuras");
-    const [expanded, setExpanded]     = useState(null);
+    const [reservas, setReservas]   = useState([]);
+    const [historial, setHistorial] = useState([]);
+    const [loading, setLoading]     = useState(true);
+    const [tab, setTab]             = useState("futuras");
+    const [expanded, setExpanded]   = useState(null);
 
     useEffect(() => {
         const token   = localStorage.getItem("token");
@@ -23,9 +23,20 @@ export default function Reservas() {
         }).catch(() => setLoading(false));
     }, []);
 
-    const lista = tab === "futuras" ? reservas : historial;
+    const lista     = tab === "futuras" ? reservas : historial;
+    const user      = JSON.parse(localStorage.getItem("user") || "{}");
+    const nombre    = user.name || "";
+    const proximaId = reservas.length > 0 ? reservas[0].id : null;
 
     const toggleExpand = (id) => setExpanded(prev => prev === id ? null : id);
+
+    // Calcular días que faltan para una reserva
+    const diasRestantes = (fecha) => {
+        if (!fecha) return null;
+        const [dia, mes, anyo] = fecha.split("/");
+        const diff = new Date(`${anyo}-${mes}-${dia}`) - new Date();
+        return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    };
 
     if (loading) return <div className="loading"><div className="loading-spinner" /></div>;
 
@@ -61,71 +72,121 @@ export default function Reservas() {
                     </div>
                 ) : (
                     <div className="reservas-list">
-                        {lista.map(reserva => (
-                            <div key={reserva.id} className={`reserva-card${expanded === reserva.id ? " expanded" : ""}`}>
+                        {lista.map((reserva, index) => {
+                            const isProxima = tab === "futuras" && reserva.id === proximaId;
+                            const dias      = tab === "futuras" ? diasRestantes(reserva.fecha) : null;
 
-                                {/* CABECERA */}
-                                <div className="reserva-header" onClick={() => toggleExpand(reserva.id)}>
-                                    <div className="reserva-header-left">
-                                        <span className={`reserva-estado reserva-estado--${reserva.estado}`}>
-                                            {reserva.estado}
-                                        </span>
-                                        <div className="reserva-fecha-wrap">
-                                            <span className="reserva-fecha">{reserva.fecha || "—"}</span>
-                                            {reserva.hora && <span className="reserva-hora">{reserva.hora}</span>}
-                                        </div>
-                                    </div>
-                                    <div className="reserva-header-right">
-                                        <span className="reserva-total">{parseFloat(reserva.total_precio).toFixed(2)}€</span>
-                                        <span className="reserva-toggle">{expanded === reserva.id ? "▲" : "▼"}</span>
-                                    </div>
-                                </div>
-
-                                {/* DETALLE */}
-                                {expanded === reserva.id && (
-                                    <div className="reserva-detalle">
-
-                                        {reserva.ubicacion && (
-                                            <div className="reserva-info-row">
-                                                <span className="reserva-info-label">📍 Lugar</span>
-                                                <span className="reserva-info-value">{reserva.ubicacion}</span>
+                            return (
+                                <div
+                                    key={reserva.id}
+                                    className={`reserva-card${expanded === reserva.id ? " expanded" : ""}${isProxima ? " proxima" : ""}`}
+                                >
+                                    {/* BANNER PRÓXIMO EVENTO */}
+                                    {isProxima && (
+                                        <div className="reserva-proxima-bar">
+                                            <div className="reserva-proxima-bar-left">
+                                                <span className="reserva-proxima-label">Próximo evento</span>
+                                                {dias !== null && (
+                                                    <span className="reserva-proxima-dias">
+                                                        {dias === 0 ? "¡Hoy!" : dias === 1 ? "Mañana" : `En ${dias} días`}
+                                                    </span>
+                                                )}
                                             </div>
-                                        )}
-
-                                        <div className="reserva-items">
-                                            <h4>Items contratados</h4>
-                                            {/* Agrupar por nombre y tipo */}
-                                            {Object.values(
-                                                reserva.items.reduce((acc, item) => {
-                                                    const key = `${item.id}-${item.tipo}`;
-                                                    if (!acc[key]) acc[key] = { ...item, cantidad: 0 };
-                                                    acc[key].cantidad += item.cantidad;
-                                                    return acc;
-                                                }, {})
-                                            ).map((item, i) => (
-                                                <div key={i} className="reserva-item">
-                                                    <div className="reserva-item-info">
-                                                        <span className="reserva-item-nombre">{item.nombre}</span>
-                                                        <span className="reserva-item-tipo">{item.tipo}</span>
-                                                    </div>
-                                                    <div className="reserva-item-right">
-                                                        <span className="reserva-item-qty">× {item.cantidad}</span>
-                                                        <span className="reserva-item-precio">
-                                                            {(parseFloat(item.precio_unitario) * item.cantidad).toFixed(2)}€
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            ))}
+                                            <div className="reserva-proxima-countdown">
+                                                {dias !== null && dias > 0 && (
+                                                    <>
+                                                        <div className="reserva-countdown-block">
+                                                            <span>{Math.floor(dias / 30)}</span>
+                                                            <small>meses</small>
+                                                        </div>
+                                                        <div className="reserva-countdown-sep">·</div>
+                                                        <div className="reserva-countdown-block">
+                                                            <span>{dias % 30}</span>
+                                                            <small>días</small>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
                                         </div>
+                                    )}
 
-                                        <div className="reserva-footer-total">
-                                            <span>Total</span>
-                                            <span>{parseFloat(reserva.total_precio).toFixed(2)}€</span>
+                                    {/* CABECERA */}
+                                    <div className="reserva-header" onClick={() => toggleExpand(reserva.id)}>
+                                        <div className="reserva-header-left">
+                                            <span className={`reserva-estado reserva-estado--${reserva.estado}`}>
+                                                {reserva.estado}
+                                            </span>
+                                            <div className="reserva-fecha-wrap">
+                                                <span className="reserva-fecha">{reserva.fecha || "—"}</span>
+                                                {reserva.hora && <span className="reserva-hora">{reserva.hora}</span>}
+                                                {reserva.ubicacion && <span className="reserva-ubicacion-inline">📍 {reserva.ubicacion}</span>}
+                                            </div>
+                                        </div>
+                                        <div className="reserva-header-right">
+                                            <span className="reserva-total">{parseFloat(reserva.total_precio).toFixed(2)}€</span>
+                                            <span className="reserva-toggle">{expanded === reserva.id ? "▲" : "▼"}</span>
                                         </div>
                                     </div>
-                                )}
-                            </div>
-                        ))}
+
+                                    {/* DETALLE */}
+                                    {expanded === reserva.id && (
+                                        <div className="reserva-detalle">
+
+                                            <div className="reserva-info-grid">
+                                                {nombre && (
+                                                    <div className="reserva-info-row">
+                                                        <span className="reserva-info-label">A nombre de</span>
+                                                        <span className="reserva-info-value">{nombre}</span>
+                                                    </div>
+                                                )}
+                                                {reserva.hora && (
+                                                    <div className="reserva-info-row">
+                                                        <span className="reserva-info-label">Hora</span>
+                                                        <span className="reserva-info-value">{reserva.hora}</span>
+                                                    </div>
+                                                )}
+                                                {reserva.ubicacion && (
+                                                    <div className="reserva-info-row">
+                                                        <span className="reserva-info-label">Lugar</span>
+                                                        <span className="reserva-info-value">{reserva.ubicacion}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="reserva-items">
+                                                <h4>Items contratados</h4>
+                                                {Object.values(
+                                                    reserva.items.reduce((acc, item) => {
+                                                        const key = `${item.id}-${item.tipo}`;
+                                                        if (!acc[key]) acc[key] = { ...item, cantidad: 0 };
+                                                        acc[key].cantidad += item.cantidad;
+                                                        return acc;
+                                                    }, {})
+                                                ).map((item, i) => (
+                                                    <div key={i} className="reserva-item">
+                                                        <div className="reserva-item-info">
+                                                            <span className="reserva-item-nombre">{item.nombre}</span>
+                                                            <span className="reserva-item-tipo">{item.tipo}</span>
+                                                        </div>
+                                                        <div className="reserva-item-right">
+                                                            <span className="reserva-item-qty">× {item.cantidad}</span>
+                                                            <span className="reserva-item-precio">
+                                                                {(parseFloat(item.precio_unitario) * item.cantidad).toFixed(2)}€
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="reserva-footer-total">
+                                                <span>Total</span>
+                                                <span>{parseFloat(reserva.total_precio).toFixed(2)}€</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>
