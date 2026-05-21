@@ -77,6 +77,11 @@ export default function Catalogo() {
     const totalPages = Math.ceil(filtered.length / PER_PAGE);
     const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
+    // Scroll al top al cambiar de página
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [page]);
+
     const handleFilter = (f) => { setActiveFilter(f); setPage(1); };
     const handleSearch = (e) => { setQuery(e.target.value); setPage(1); };
     const clearSearch  = () => { setQuery(""); setSearchItems(null); setPage(1); };

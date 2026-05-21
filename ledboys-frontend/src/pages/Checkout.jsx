@@ -217,10 +217,21 @@ function CheckoutForm({ onSuccess }) {
     const [evento, setEvento] = useState({
         fecha: "", hora: "", direccion_evento: "",
     });
-    const [facturacionError, setFacturacionError] = useState("");
-    const phoneRef = useRef(null);
+    const [fieldErrors, setFieldErrors] = useState({});
 
-    // Controlar longitud del teléfono directamente en el DOM
+    const phoneRef  = useRef(null);
+    const fieldRefs = {
+        nombre:           useRef(null),
+        apellidos:        useRef(null),
+        dni:              useRef(null),
+        telefono:         useRef(null),
+        direccion:        useRef(null),
+        cp:               useRef(null),
+        fecha:            useRef(null),
+        hora:             useRef(null),
+        direccion_evento: useRef(null),
+    };
+
     useEffect(() => {
         const wrap = phoneRef.current;
         if (!wrap) return;
@@ -239,40 +250,78 @@ function CheckoutForm({ onSuccess }) {
         return () => input.removeEventListener("keydown", handler);
     }, []);
 
-    const handleChange = (e) => setFacturacion({ ...facturacion, [e.target.name]: e.target.value });
-    const handleEvento = (e) => setEvento({ ...evento, [e.target.name]: e.target.value });
+    const handleChange = (e) => {
+        setFacturacion({ ...facturacion, [e.target.name]: e.target.value });
+        if (fieldErrors[e.target.name]) setFieldErrors(prev => ({ ...prev, [e.target.name]: null }));
+    };
+    const handleEvento = (e) => {
+        setEvento({ ...evento, [e.target.name]: e.target.value });
+        if (fieldErrors[e.target.name]) setFieldErrors(prev => ({ ...prev, [e.target.name]: null }));
+    };
+
+    const validateDniLetra = (dni) => {
+        const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
+        const d = dni.toUpperCase();
+        let num = parseInt(d);
+        if (d[0].match(/[XYZ]/)) {
+            num = parseInt(d.replace("X","0").replace("Y","1").replace("Z","2"));
+        }
+        return d[d.length - 1] === letras[num % 23];
+    };
+
+    const validateAndScroll = () => {
+        const errors = {};
+        const dniRegex = /^[0-9]{8}[A-Za-z]$|^[XYZxyz][0-9]{7}[A-Za-z]$/;
+
+        if (!facturacion.nombre.trim())    errors.nombre    = "Campo obligatorio";
+        if (!facturacion.apellidos.trim()) errors.apellidos = "Campo obligatorio";
+
+        if (!facturacion.dni.trim()) {
+            errors.dni = "Campo obligatorio";
+        } else if (!dniRegex.test(facturacion.dni.trim())) {
+            errors.dni = "Formato no válido. Ej: 12345678A";
+        } else if (!validateDniLetra(facturacion.dni.trim())) {
+            const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
+            const d = facturacion.dni.toUpperCase();
+            let num = parseInt(d);
+            if (d[0].match(/[XYZ]/)) num = parseInt(d.replace("X","0").replace("Y","1").replace("Z","2"));
+            errors.dni = "DNI incorrecto";
+        }
+
+        if (!facturacion.telefono)         errors.telefono  = "Campo obligatorio";
+        else if (!isValidPhoneNumber(facturacion.telefono)) errors.telefono = "Teléfono no válido";
+
+        if (!facturacion.direccion.trim()) errors.direccion = "Campo obligatorio";
+
+        if (!facturacion.cp.trim())        errors.cp = "Campo obligatorio";
+        else if (!/^\d{5}$/.test(facturacion.cp.trim())) errors.cp = "Debe tener 5 dígitos";
+
+        if (!evento.fecha) {
+            errors.fecha = "Campo obligatorio";
+        } else {
+            const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+            const fechaEvento = new Date(evento.fecha);
+            const maxFecha = new Date(); maxFecha.setFullYear(maxFecha.getFullYear() + 1);
+            if (fechaEvento < hoy) errors.fecha = "La fecha no puede ser pasada";
+            else if (fechaEvento > maxFecha) errors.fecha = "No se puede reservar con más de un año de antelación";
+        }
+
+        if (!evento.hora)                   errors.hora             = "Campo obligatorio";
+        if (!evento.direccion_evento.trim()) errors.direccion_evento = "Campo obligatorio";
+
+        setFieldErrors(errors);
+
+        const firstError = Object.keys(errors)[0];
+        if (firstError && fieldRefs[firstError]?.current) {
+            fieldRefs[firstError].current.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        return Object.keys(errors).length === 0;
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Validaciones
-        const camposFact = ["nombre", "apellidos", "dni", "telefono", "direccion", "cp"];
-        if (camposFact.some(c => !facturacion[c].trim())) {
-            setFacturacionError("Por favor completa todos los datos de facturación.");
-            return;
-        }
-
-        const dniRegex = /^[0-9]{8}[A-Za-z]$|^[XYZxyz][0-9]{7}[A-Za-z]$/;
-        if (!dniRegex.test(facturacion.dni.trim())) {
-            setFacturacionError("El DNI/NIE no es válido. Formato: 12345678A o X1234567A");
-            return;
-        }
-
-        if (!facturacion.telefono || !isValidPhoneNumber(facturacion.telefono)) {
-            setFacturacionError("El teléfono no es válido para el país seleccionado.");
-            return;
-        }
-
-        if (!/^\d{5}$/.test(facturacion.cp.trim())) {
-            setFacturacionError("El código postal debe tener 5 dígitos.");
-            return;
-        }
-
-        if (!evento.fecha || !evento.hora || !evento.direccion_evento.trim()) {
-            setFacturacionError("Por favor completa todos los datos del evento.");
-            return;
-        }
-        setFacturacionError("");
+        if (!validateAndScroll()) return;
 
         if (!stripe || !elements) return;
         setLoading(true);
@@ -289,7 +338,6 @@ function CheckoutForm({ onSuccess }) {
             return Array(i.cantidad).fill(id);
         });
 
-        // Crear intento con todos los datos ya rellenos
         let clientSecret, pagoId, desglose;
         try {
             const res = await fetch("/api/pagos/crear-intento", {
@@ -354,6 +402,7 @@ function CheckoutForm({ onSuccess }) {
         setLoading(false);
     };
 
+    const fe          = fieldErrors;
     const totalConIva = total;
     const trajes      = items.filter(i => i.tipo === "Traje");
     const extras      = items.filter(i => i.tipo !== "Traje");
@@ -366,15 +415,20 @@ function CheckoutForm({ onSuccess }) {
                 <div className="checkout-billing">
                     <h3 className="checkout-section-title">Datos de facturación</h3>
                     <div className="checkout-billing-grid">
-                        <div className="checkout-field">
+
+                        <div className={`checkout-field${fe.nombre ? " field-error" : ""}`} ref={fieldRefs.nombre}>
                             <label>Nombre</label>
                             <input name="nombre" value={facturacion.nombre} onChange={handleChange} placeholder="Tu nombre" />
+                            {fe.nombre && <span className="checkout-field-error">{fe.nombre}</span>}
                         </div>
-                        <div className="checkout-field">
+
+                        <div className={`checkout-field${fe.apellidos ? " field-error" : ""}`} ref={fieldRefs.apellidos}>
                             <label>Apellidos</label>
                             <input name="apellidos" value={facturacion.apellidos} onChange={handleChange} placeholder="Tus apellidos" />
+                            {fe.apellidos && <span className="checkout-field-error">{fe.apellidos}</span>}
                         </div>
-                        <div className="checkout-field">
+
+                        <div className={`checkout-field${fe.dni ? " field-error" : ""}`} ref={fieldRefs.dni}>
                             <label>DNI / NIF</label>
                             <input
                                 name="dni"
@@ -382,12 +436,15 @@ function CheckoutForm({ onSuccess }) {
                                 onChange={e => {
                                     const val = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, "");
                                     if (val.length <= 9) setFacturacion({ ...facturacion, dni: val });
+                                    if (fieldErrors.dni) setFieldErrors(prev => ({ ...prev, dni: null }));
                                 }}
                                 placeholder="12345678A"
                                 maxLength={9}
                             />
+                            {fe.dni && <span className="checkout-field-error">{fe.dni}</span>}
                         </div>
-                        <div className="checkout-field">
+
+                        <div className={`checkout-field${fe.telefono ? " field-error" : ""}`} ref={fieldRefs.telefono}>
                             <label>Teléfono</label>
                             <div className="checkout-phone-wrap" ref={phoneRef}>
                                 <PhoneInput
@@ -399,19 +456,36 @@ function CheckoutForm({ onSuccess }) {
                                         if (!val) { setFacturacion({ ...facturacion, telefono: "" }); return; }
                                         const digits = val.replace(/[^0-9]/g, "");
                                         if (digits.length <= 12) setFacturacion({ ...facturacion, telefono: val });
+                                        if (fieldErrors.telefono) setFieldErrors(prev => ({ ...prev, telefono: null }));
                                     }}
                                     placeholder="666 000 000"
                                 />
                             </div>
+                            {fe.telefono && <span className="checkout-field-error">{fe.telefono}</span>}
                         </div>
-                        <div className="checkout-field checkout-field--full">
+
+                        <div className={`checkout-field checkout-field--full${fe.direccion ? " field-error" : ""}`} ref={fieldRefs.direccion}>
                             <label>Dirección</label>
                             <input name="direccion" value={facturacion.direccion} onChange={handleChange} placeholder="Calle, número, piso..." />
+                            {fe.direccion && <span className="checkout-field-error">{fe.direccion}</span>}
                         </div>
-                        <div className="checkout-field">
+
+                        <div className={`checkout-field${fe.cp ? " field-error" : ""}`} ref={fieldRefs.cp}>
                             <label>Código postal</label>
-                            <input name="cp" value={facturacion.cp} onChange={handleChange} placeholder="08001" />
+                            <input
+                                name="cp"
+                                value={facturacion.cp}
+                                onChange={e => {
+                                    const val = e.target.value.replace(/[^0-9]/g, "");
+                                    if (val.length <= 5) setFacturacion({ ...facturacion, cp: val });
+                                    if (fieldErrors.cp) setFieldErrors(prev => ({ ...prev, cp: null }));
+                                }}
+                                placeholder="08001"
+                                maxLength={5}
+                            />
+                            {fe.cp && <span className="checkout-field-error">{fe.cp}</span>}
                         </div>
+
                     </div>
                 </div>
 
@@ -419,20 +493,26 @@ function CheckoutForm({ onSuccess }) {
                 <div className="checkout-billing">
                     <h3 className="checkout-section-title">Datos del evento</h3>
                     <div className="checkout-billing-grid">
-                        <div className="checkout-field">
+
+                        <div className={`checkout-field${fe.fecha ? " field-error" : ""}`} ref={fieldRefs.fecha}>
                             <label>Fecha del evento</label>
                             <input name="fecha" type="date" value={evento.fecha} onChange={handleEvento} min={new Date().toISOString().split("T")[0]} />
+                            {fe.fecha && <span className="checkout-field-error">{fe.fecha}</span>}
                         </div>
-                        <div className="checkout-field">
+
+                        <div className={`checkout-field${fe.hora ? " field-error" : ""}`} ref={fieldRefs.hora}>
                             <label>Hora del evento</label>
                             <input name="hora" type="time" value={evento.hora} onChange={handleEvento} />
+                            {fe.hora && <span className="checkout-field-error">{fe.hora}</span>}
                         </div>
-                        <div className="checkout-field checkout-field--full">
+
+                        <div className={`checkout-field checkout-field--full${fe.direccion_evento ? " field-error" : ""}`} ref={fieldRefs.direccion_evento}>
                             <label>Dirección del evento</label>
                             <input name="direccion_evento" value={evento.direccion_evento} onChange={handleEvento} placeholder="Lugar donde se realizará el evento" />
+                            {fe.direccion_evento && <span className="checkout-field-error">{fe.direccion_evento}</span>}
                         </div>
+
                     </div>
-                    {facturacionError && <div className="checkout-error">{facturacionError}</div>}
                 </div>
 
                 {/* DATOS DE PAGO */}
