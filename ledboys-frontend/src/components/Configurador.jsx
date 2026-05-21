@@ -3,16 +3,15 @@ import { useCart } from "../context/CartContext";
 import "../styles/configurador.less";
 
 export default function Configurador({ traje, stock, onClose }) {
-    const { addItem, items }        = useCart();
-    const [cantidad, setCantidad]   = useState(1);
+    const { addItem, items }          = useCart();
+    const [cantidad, setCantidad]     = useState(1);
     const [accesorios, setAccesorios] = useState([]);
-    const [packs, setPacks]         = useState([]);
+    const [packs, setPacks]           = useState([]);
     const [selAccesorios, setSelAccesorios] = useState([]);
-    const [selPacks, setSelPacks]   = useState([]);
-    const [added, setAdded]         = useState(false);
-    const [imgBase64, setImgBase64] = useState(null);
+    const [selPack, setSelPack]       = useState(null);
+    const [added, setAdded]           = useState(false);
+    const [imgBase64, setImgBase64]   = useState(null);
 
-    // Cargar foto principal desde API
     useEffect(() => {
         fetch(`/api/fotos/traje/${traje.id}`)
             .then(r => r.json())
@@ -23,21 +22,12 @@ export default function Configurador({ traje, stock, onClose }) {
             .catch(() => {});
     }, [traje.id]);
 
-    // Cuántos de este traje ya hay en el carrito
-    const enCarrito = items.find(i => i.id === `traje-${traje.id}`)?.cantidad ?? 0;
+    const enCarrito      = items.find(i => i.id === `traje-${traje.id}`)?.cantidad ?? 0;
     const stockDisponible = stock - enCarrito;
 
-    // Cargar accesorios y packs
     useEffect(() => {
-        fetch("/api/accesorios")
-            .then(r => r.json())
-            .then(d => setAccesorios(d))
-            .catch(() => {});
-
-        fetch("/api/packs")
-            .then(r => r.json())
-            .then(d => setPacks(d))
-            .catch(() => {});
+        fetch("/api/accesorios").then(r => r.json()).then(d => setAccesorios(d)).catch(() => {});
+        fetch("/api/packs").then(r => r.json()).then(d => setPacks(d)).catch(() => {});
     }, []);
 
     const toggleAccesorio = (id) => {
@@ -46,19 +36,15 @@ export default function Configurador({ traje, stock, onClose }) {
         );
     };
 
-    const togglePack = (id) => {
-        setSelPacks(prev =>
-            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-        );
-    };
+    const selectPack = (id) => setSelPack(prev => prev === id ? null : id);
 
-    const totalTraje = traje.precio * cantidad;
+    const totalTraje      = traje.precio * cantidad;
     const totalAccesorios = accesorios
         .filter(a => selAccesorios.includes(a.id))
         .reduce((s, a) => s + parseFloat(a.precio), 0);
-    const totalPacks = packs
-        .filter(p => selPacks.includes(p.id))
-        .reduce((s, p) => s + parseFloat(p.precio), 0);
+    const totalPacks      = selPack
+        ? parseFloat(packs.find(p => p.id === selPack)?.precio || 0)
+        : 0;
     const total = totalTraje + totalAccesorios + totalPacks;
 
     const handleAddToCart = () => {
@@ -85,7 +71,7 @@ export default function Configurador({ traje, stock, onClose }) {
             }));
 
         packs
-            .filter(p => selPacks.includes(p.id))
+            .filter(p => p.id === selPack)
             .forEach(p => addItem({
                 id:       `pack-${p.id}`,
                 name:     p.nombre,
@@ -133,15 +119,9 @@ export default function Configurador({ traje, stock, onClose }) {
                     <div className="config-section">
                         <h4>CANTIDAD</h4>
                         <div className="config-cantidad">
-                            <button
-                                onClick={() => setCantidad(c => Math.max(1, c - 1))}
-                                disabled={cantidad <= 1}
-                            >−</button>
+                            <button onClick={() => setCantidad(c => Math.max(1, c - 1))} disabled={cantidad <= 1}>−</button>
                             <span>{cantidad}</span>
-                            <button
-                                onClick={() => setCantidad(c => Math.min(stockDisponible, c + 1))}
-                                disabled={cantidad >= stockDisponible}
-                            >+</button>
+                            <button onClick={() => setCantidad(c => Math.min(stockDisponible, c + 1))} disabled={cantidad >= stockDisponible}>+</button>
                         </div>
                         {cantidad >= stockDisponible && stockDisponible > 0 && (
                             <p style={{ color: "#ff6b6b", fontSize: "0.75rem", letterSpacing: "2px", marginTop: "0.5rem" }}>
@@ -155,6 +135,7 @@ export default function Configurador({ traje, stock, onClose }) {
                         )}
                     </div>
 
+                    {/* ACCESORIOS — checkbox (múltiple selección) */}
                     {accesorios.length > 0 && (
                         <div className="config-section">
                             <h4>ACCESORIOS EXTRA</h4>
@@ -178,6 +159,7 @@ export default function Configurador({ traje, stock, onClose }) {
                         </div>
                     )}
 
+                    {/* PACKS — radio button (selección única) */}
                     {packs.length > 0 && (
                         <div className="config-section">
                             <h4>PACKS</h4>
@@ -185,11 +167,11 @@ export default function Configurador({ traje, stock, onClose }) {
                                 {packs.map(p => (
                                     <div
                                         key={p.id}
-                                        className={`config-extra-item${selPacks.includes(p.id) ? " selected" : ""}`}
-                                        onClick={() => togglePack(p.id)}
+                                        className={`config-extra-item${selPack === p.id ? " selected" : ""}`}
+                                        onClick={() => selectPack(p.id)}
                                     >
-                                        <div className="config-extra-check">
-                                            {selPacks.includes(p.id) && "✓"}
+                                        <div className="config-extra-radio">
+                                            <div className={`config-radio-dot${selPack === p.id ? " active" : ""}`} />
                                         </div>
                                         <div className="config-extra-info">
                                             <span>{p.nombre}</span>

@@ -210,9 +210,6 @@ function CheckoutForm({ onSuccess }) {
     const { items, total, clearCart } = useCart();
     const [loading, setLoading]       = useState(false);
     const [error, setError]           = useState(null);
-    const [clientSecret, setClientSecret] = useState(null);
-    const [pagoId, setPagoId]         = useState(null);
-    const [desglose, setDesglose]     = useState(null);
 
     const [facturacion, setFacturacion] = useState({
         nombre: "", apellidos: "", dni: "", telefono: "", direccion: "", cp: "",
@@ -242,50 +239,13 @@ function CheckoutForm({ onSuccess }) {
         return () => input.removeEventListener("keydown", handler);
     }, []);
 
-    useEffect(() => {
-        if (items.length === 0 || !evento.fecha) return;
-        const token = localStorage.getItem("token");
-
-        const itemIds = items.flatMap(i => {
-            let id = null;
-            if (i.tipo === "Traje")     id = parseInt(i.id.replace("traje-", ""));
-            if (i.tipo === "Accesorio") id = parseInt(i.id.replace("acc-", ""));
-            if (i.tipo === "Pack")      id = parseInt(i.id.replace("pack-", ""));
-            if (!id) return [];
-            return Array(i.cantidad).fill(id);
-        });
-
-        fetch("/api/pagos/crear-intento", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
-            body: JSON.stringify({
-                items:                 itemIds,
-                fecha:                 evento.fecha,
-                hora:                  evento.hora,
-                ubicacion:             evento.direccion_evento,
-                nombre_facturacion:    facturacion.nombre,
-                apellidos_facturacion: facturacion.apellidos,
-                dni:                   facturacion.dni,
-                telefono_facturacion:  facturacion.telefono,
-                direccion:             facturacion.direccion,
-                cp:                    facturacion.cp,
-            }),
-        })
-            .then(r => r.json())
-            .then(data => {
-                setClientSecret(data.clientSecret);
-                setPagoId(data.pago_id);
-                setDesglose(data.desglose);
-            })
-            .catch(() => setError("Error al conectar con el servidor de pagos."));
-    }, [evento.fecha]);
-
     const handleChange = (e) => setFacturacion({ ...facturacion, [e.target.name]: e.target.value });
     const handleEvento = (e) => setEvento({ ...evento, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Validaciones
         const camposFact = ["nombre", "apellidos", "dni", "telefono", "direccion", "cp"];
         if (camposFact.some(c => !facturacion[c].trim())) {
             setFacturacionError("Por favor completa todos los datos de facturación.");
@@ -314,9 +274,54 @@ function CheckoutForm({ onSuccess }) {
         }
         setFacturacionError("");
 
-        if (!stripe || !elements || !clientSecret) return;
+        if (!stripe || !elements) return;
         setLoading(true);
         setError(null);
+
+        const token = localStorage.getItem("token");
+
+        const itemIds = items.flatMap(i => {
+            let id = null;
+            if (i.tipo === "Traje")     id = parseInt(i.id.replace("traje-", ""));
+            if (i.tipo === "Accesorio") id = parseInt(i.id.replace("acc-", ""));
+            if (i.tipo === "Pack")      id = parseInt(i.id.replace("pack-", ""));
+            if (!id) return [];
+            return Array(i.cantidad).fill(id);
+        });
+
+        // Crear intento con todos los datos ya rellenos
+        let clientSecret, pagoId, desglose;
+        try {
+            const res = await fetch("/api/pagos/crear-intento", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
+                body: JSON.stringify({
+                    items:                 itemIds,
+                    fecha:                 evento.fecha,
+                    hora:                  evento.hora,
+                    ubicacion:             evento.direccion_evento,
+                    nombre_facturacion:    facturacion.nombre,
+                    apellidos_facturacion: facturacion.apellidos,
+                    dni:                   facturacion.dni,
+                    telefono_facturacion:  facturacion.telefono,
+                    direccion:             facturacion.direccion,
+                    cp:                    facturacion.cp,
+                }),
+            });
+            const data = await res.json();
+            if (!data.clientSecret) {
+                setError("Error al crear el intento de pago.");
+                setLoading(false);
+                return;
+            }
+            clientSecret = data.clientSecret;
+            pagoId       = data.pago_id;
+            desglose     = data.desglose;
+        } catch {
+            setError("Error al conectar con el servidor de pagos.");
+            setLoading(false);
+            return;
+        }
 
         const cardNumber = elements.getElement(CardNumberElement);
 
@@ -327,7 +332,6 @@ function CheckoutForm({ onSuccess }) {
         if (stripeError) { setError(stripeError.message); setLoading(false); return; }
 
         if (paymentIntent.status === "succeeded") {
-            const token = localStorage.getItem("token");
             await fetch(`/api/pagos/${pagoId}/confirmar`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
@@ -350,7 +354,7 @@ function CheckoutForm({ onSuccess }) {
         setLoading(false);
     };
 
-    const totalConIva = desglose?.total || total;
+    const totalConIva = total;
     const trajes      = items.filter(i => i.tipo === "Traje");
     const extras      = items.filter(i => i.tipo !== "Traje");
 
@@ -373,15 +377,15 @@ function CheckoutForm({ onSuccess }) {
                         <div className="checkout-field">
                             <label>DNI / NIF</label>
                             <input
-                                    name="dni"
-                                    value={facturacion.dni}
-                                    onChange={e => {
-                                        const val = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, "");
-                                        if (val.length <= 9) setFacturacion({ ...facturacion, dni: val });
-                                    }}
-                                    placeholder="12345678A"
-                                    maxLength={9}
-                                />
+                                name="dni"
+                                value={facturacion.dni}
+                                onChange={e => {
+                                    const val = e.target.value.toUpperCase().replace(/[^0-9A-Z]/g, "");
+                                    if (val.length <= 9) setFacturacion({ ...facturacion, dni: val });
+                                }}
+                                placeholder="12345678A"
+                                maxLength={9}
+                            />
                         </div>
                         <div className="checkout-field">
                             <label>Teléfono</label>
@@ -397,7 +401,6 @@ function CheckoutForm({ onSuccess }) {
                                         if (digits.length <= 12) setFacturacion({ ...facturacion, telefono: val });
                                     }}
                                     placeholder="666 000 000"
-
                                 />
                             </div>
                         </div>
@@ -464,7 +467,7 @@ function CheckoutForm({ onSuccess }) {
 
                     {error && <div className="checkout-error">{error}</div>}
 
-                    <button type="button" className="checkout-btn" disabled={!stripe || !clientSecret || loading} onClick={handleSubmit}>
+                    <button type="button" className="checkout-btn" disabled={!stripe || loading} onClick={handleSubmit}>
                         {loading ? <span className="checkout-spinner" /> : `Pagar ${parseFloat(totalConIva).toFixed(2)}€`}
                     </button>
 
@@ -518,19 +521,6 @@ function CheckoutForm({ onSuccess }) {
                         </div>
                     ))}
                 </div>
-
-                {desglose && (
-                    <div className="checkout-iva">
-                        <div className="checkout-iva-row">
-                            <span>Base imponible</span>
-                            <span>{parseFloat(desglose.base_imponible).toFixed(2)}€</span>
-                        </div>
-                        <div className="checkout-iva-row">
-                            <span>IVA ({desglose.iva_porcentaje}%)</span>
-                            <span>{parseFloat(desglose.cuota_iva).toFixed(2)}€</span>
-                        </div>
-                    </div>
-                )}
 
                 <div className="checkout-total">
                     <span>Total (IVA incl.)</span>
