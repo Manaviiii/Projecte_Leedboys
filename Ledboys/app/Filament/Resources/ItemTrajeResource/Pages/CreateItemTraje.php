@@ -7,6 +7,7 @@ use App\Models\Item;
 use App\Models\Foto;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class CreateItemTraje extends CreateRecord
 {
@@ -51,12 +52,14 @@ class CreateItemTraje extends CreateRecord
 
             $blob = file_get_contents($rutaArchivo);
 
-            Foto::create([
-                'idTraje'   => $this->record->id,
-                'principal' => $esPrincipal,
-                'nombre'    => $fotoData['nombre'],
-                'orden'     => $orden,
-                'imagen'    => $blob,
+            $foto = \Illuminate\Support\Facades\DB::table('fotos')->insertGetId([
+                'idTraje'    => $this->record->id,
+                'principal'  => $esPrincipal ? 1 : 0,
+                'nombre'     => $fotoData['nombre'],
+                'orden'      => $orden,
+                'imagen'     => $blob,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             Storage::disk('public')->delete($fotoData['archivo']);
