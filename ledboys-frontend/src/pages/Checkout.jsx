@@ -4,7 +4,6 @@ import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStri
 import { useCart } from "../context/CartContext";
 import Footer from "../components/Footer";
 import jsPDF from "jspdf";
-import emailjs from "@emailjs/browser";
 import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import "../styles/checkout.less";
@@ -17,12 +16,6 @@ const EMPRESA = {
     direccion: "Institut Milà i Fontanals, Igualada",
     email:     "info@ledboyss.com",
     telefono:  "+34 637 64 58 24",
-};
-
-const EMAILJS = {
-    serviceId:  "service_zxnnhtn",
-    templateId: "template_jtumtr6",
-    publicKey:  "Bx_dybjuI-eWS6agH",
 };
 
 const FIELD_STYLE = {
@@ -186,24 +179,6 @@ function generarPDFFactura({ pagoId, total, desglose, items, stripeRef, facturac
     doc.save(`factura-ledboyss-${String(pagoId).padStart(6, "0")}.pdf`);
 }
 
-async function enviarEmailConfirmacion({ facturacion, pagoId, total, userEmail }) {
-    try {
-        await emailjs.send(
-            EMAILJS.serviceId,
-            EMAILJS.templateId,
-            {
-                to_email:   userEmail,
-                to_name:    `${facturacion.nombre} ${facturacion.apellidos}`,
-                factura_id: `#${String(pagoId).padStart(6, "0")}`,
-                total:      parseFloat(total).toFixed(2),
-            },
-            EMAILJS.publicKey
-        );
-    } catch (err) {
-        console.error("Error al enviar email:", err);
-    }
-}
-
 function CheckoutForm({ onSuccess }) {
     const stripe                      = useStripe();
     const elements                    = useElements();
@@ -281,10 +256,6 @@ function CheckoutForm({ onSuccess }) {
         } else if (!dniRegex.test(facturacion.dni.trim())) {
             errors.dni = "Formato no válido. Ej: 12345678A";
         } else if (!validateDniLetra(facturacion.dni.trim())) {
-            const letras = "TRWAGMYFPDXBNJZSQVHLCKE";
-            const d = facturacion.dni.toUpperCase();
-            let num = parseInt(d);
-            if (d[0].match(/[XYZ]/)) num = parseInt(d.replace("X","0").replace("Y","1").replace("Z","2"));
             errors.dni = "DNI incorrecto";
         }
 
@@ -387,14 +358,6 @@ function CheckoutForm({ onSuccess }) {
 
             const totalFinal = desglose?.total || total;
             const itemsSnap  = [...items];
-            const user       = JSON.parse(localStorage.getItem("user") || "{}");
-
-            await enviarEmailConfirmacion({
-                facturacion,
-                pagoId,
-                total: totalFinal,
-                userEmail: user.email || "",
-            });
 
             clearCart();
             onSuccess(totalFinal, pagoId, itemsSnap, paymentIntent.id, facturacion, desglose, evento);

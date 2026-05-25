@@ -203,9 +203,15 @@ class PaymentController extends Controller
             $desglose = $this->calcularDesglose((float) $pago->amount);
 
             // Enviar la factura en PDF al email del usuario
+            // Enviar la factura en PDF al email del usuario
             $user = $pago->user;
             if ($user && $user->email) {
-                Mail::to($user->email)->send(new FacturaMail($pago, $desglose));
+                try {
+                    Mail::to($user->email)->send(new FacturaMail($pago, $desglose));
+                    \Log::info('Email factura enviado a: ' . $user->email);
+                } catch (\Exception $e) {
+                    \Log::error('Error enviando email factura: ' . $e->getMessage());
+                }
             }
 
             return response()->json([
