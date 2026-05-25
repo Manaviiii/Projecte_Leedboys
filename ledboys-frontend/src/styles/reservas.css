@@ -89,14 +89,18 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, rgba(201, 168, 76, 0.12), rgba(201, 168, 76, 0.04));
   border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+  overflow: hidden;
+  gap: 1rem;
 }
 .reserva-proxima-bar-left {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  min-width: 0;
 }
 .reserva-proxima-label {
   font-size: 0.6rem;
@@ -124,7 +128,7 @@
 }
 .reserva-countdown-block span {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 3vw, 1.4rem);
   letter-spacing: 2px;
   color: #c9a84c;
   line-height: 1;
@@ -144,19 +148,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 2rem;
+  padding: 1.25rem 1.5rem;
   cursor: pointer;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 .reserva-header-left {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
+  min-width: 0;
+  flex: 1;
 }
 .reserva-header-right {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-shrink: 0;
 }
 .reserva-estado {
@@ -206,9 +212,11 @@
 }
 .reserva-total {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 3vw, 1.5rem);
   letter-spacing: 2px;
   color: #c9a84c;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .reserva-toggle {
   font-size: 0.6rem;

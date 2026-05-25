@@ -16,6 +16,7 @@ export default function Catalogo() {
     const [page, setPage]                 = useState(1);
     const [query, setQuery]               = useState("");
     const debounceRef                     = useRef(null);
+    const catalogRef                      = useRef(null);
 
     useEffect(() => {
         fetch("/api/fotos")
@@ -24,7 +25,6 @@ export default function Catalogo() {
                 return res.json();
             })
             .then(data => {
-                // Una sola foto por traje
                 const seen = new Set();
                 const items = data
                     .filter(foto => {
@@ -61,12 +61,17 @@ export default function Catalogo() {
                 .catch(() => { setSearchItems([]); setSearching(false); });
         }, 350);
         return () => clearTimeout(debounceRef.current);
-    }, [query]);
+    }, [query, allItems]);
 
-
+    // Scroll al inicio del catálogo al cambiar de página
+    useEffect(() => {
+        if (catalogRef.current) {
+            catalogRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }, [page]);
 
     const baseItems = searchItems !== null ? searchItems : allItems;
-    const filtered = activeFilter === "Todos" || searchItems !== null
+    const filtered  = activeFilter === "Todos" || searchItems !== null
         ? baseItems
         : baseItems.filter(item => {
             if (activeFilter === "Ledboys")  return item.genero === "chico"  || item.genero === "unisex";
@@ -76,11 +81,6 @@ export default function Catalogo() {
 
     const totalPages = Math.ceil(filtered.length / PER_PAGE);
     const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-    // Scroll al top al cambiar de página
-    useEffect(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }, [page]);
 
     const handleFilter = (f) => { setActiveFilter(f); setPage(1); };
     const handleSearch = (e) => { setQuery(e.target.value); setPage(1); };
@@ -136,7 +136,7 @@ export default function Catalogo() {
                 </div>
             )}
 
-            <section className="catalog-section">
+            <section className="catalog-section" ref={catalogRef}>
                 {(loading || searching) && <div className="loading"><div className="loading-spinner" /></div>}
                 {error && <p style={{ textAlign: "center", color: "#888", padding: "4rem" }}>{error}</p>}
 

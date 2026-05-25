@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/registro.less";
+import PasswordStrength from "../components/PasswordStrength";
 
 export default function Registro() {
     const [form, setForm]       = useState({ name: "", email: "", password: "", password_confirmation: "" });
@@ -73,6 +74,7 @@ export default function Registro() {
                     <div className="registro-field">
                         <label>Contraseña</label>
                         <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Mínimo 8 caracteres" required />
+                        <PasswordStrength password={form.password} />
                     </div>
                     <div className="registro-field">
                         <label>Confirmar contraseña</label>

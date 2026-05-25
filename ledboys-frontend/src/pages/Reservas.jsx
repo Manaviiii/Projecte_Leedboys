@@ -135,7 +135,7 @@ export default function Reservas() {
                                             <div className="reserva-info-grid">
                                                 {nombre && (
                                                     <div className="reserva-info-row">
-                                                        <span className="reserva-info-label">A nombre de</span>
+                                                        <span className="reserva-info-label">Contacto</span>
                                                         <span className="reserva-info-value">{nombre}</span>
                                                     </div>
                                                 )}
