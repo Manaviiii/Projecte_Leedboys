@@ -34,7 +34,7 @@ class ItemTrajesSeeder extends Seeder
             ['item_id' => 21, 'tipo_traje' => 'zancos',     'genero' => 'chico', 'stock_total' => 4],
             ['item_id' => 22, 'tipo_traje' => 'zancos',     'genero' => 'chica', 'stock_total' => 4],
             ['item_id' => 23, 'tipo_traje' => 'zancos',     'genero' => 'chico', 'stock_total' => 2],
-            ['item_id' => 24, 'tipo_traje' => 'zancos',     'genero' => 'chico', 'stock_total' => 3],
+            ['item_id' => 24, 'tipo_traje' => 'zancos',     'genero' => 'chica', 'stock_total' => 3],
             ['item_id' => 25, 'tipo_traje' => 'zancos',     'genero' => 'chico', 'stock_total' => 3],
             ['item_id' => 26, 'tipo_traje' => 'zancos',     'genero' => 'chico', 'stock_total' => 4],
             ['item_id' => 27, 'tipo_traje' => 'zancos',     'genero' => 'chico', 'stock_total' => 4],

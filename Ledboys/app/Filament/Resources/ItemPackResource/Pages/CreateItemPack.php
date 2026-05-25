@@ -8,19 +8,12 @@ use Filament\Resources\Pages\CreateRecord;
 
 /**
  * Página de creación de un pack.
- *
- * Flujo:
- * 1. mutateFormDataBeforeCreate: crea el Item padre y añade su ID a los datos
- *    antes de crear el ItemPack.
+ * El numero_zancudos se fija siempre a 2 — no se muestra en el formulario.
  */
 class CreateItemPack extends CreateRecord
 {
     protected static string $resource = ItemPackResource::class;
 
-    /**
-     * Crea el Item padre antes de crear el ItemPack.
-     * Extrae los campos generales, crea el Item y deja solo los campos de item_packs.
-     */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $item = Item::create([
@@ -32,9 +25,9 @@ class CreateItemPack extends CreateRecord
             'activo'      => $data['activo'] ?? true,
         ]);
 
-        $data['item_id'] = $item->id;
+        $data['item_id']          = $item->id;
+        $data['numero_zancudos']  = 2; // fijo siempre a 2
 
-        // Limpiar campos que no pertenecen a item_packs
         unset($data['nombre'], $data['precio'], $data['descripcion'], $data['imagen'], $data['activo']);
 
         return $data;

@@ -24,6 +24,10 @@ class ProximosEventosWidget extends BaseWidget
     // Solo mostrar los 10 más próximos
     protected function getTableQuery(): Builder
     {
+        \Log::info('proximos: ' . Evento::where('estado', 'pagado')->where('fecha', '>=', Carbon::today())->count());
+\Log::info('todos eventos: ' . Evento::count());
+\Log::info(Evento::select('id', 'fecha', 'estado')->get()->toJson());
+
         return Evento::query()
             ->where('estado', 'pagado')
             ->where('fecha', '>=', Carbon::today())

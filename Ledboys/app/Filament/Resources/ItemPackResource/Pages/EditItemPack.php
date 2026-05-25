@@ -7,20 +7,12 @@ use Filament\Resources\Pages\EditRecord;
 
 /**
  * Página de edición de un pack.
- *
- * Flujo:
- * 1. mutateFormDataBeforeFill: precarga los datos del item padre.
- * 2. mutateFormDataBeforeSave: limpia campos extra antes de guardar en item_packs.
- * 3. afterSave: actualiza el item padre con los datos generales.
+ * El numero_zancudos no se toca al editar.
  */
 class EditItemPack extends EditRecord
 {
     protected static string $resource = ItemPackResource::class;
 
-    /**
-     * Precarga los datos del item padre al abrir el formulario de edición.
-     * Sin esto los campos nombre, precio, etc. aparecerían vacíos.
-     */
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $item = $this->record->item;
@@ -36,18 +28,12 @@ class EditItemPack extends EditRecord
         return $data;
     }
 
-    /**
-     * Limpia los campos del item padre antes de guardar en item_packs.
-     */
     protected function mutateFormDataBeforeSave(array $data): array
     {
         unset($data['nombre'], $data['precio'], $data['descripcion'], $data['imagen'], $data['activo']);
         return $data;
     }
 
-    /**
-     * Tras guardar, actualiza el item padre con los datos generales del formulario.
-     */
     protected function afterSave(): void
     {
         $data = $this->form->getState();
