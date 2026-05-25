@@ -4,10 +4,9 @@ namespace App\Filament\Resources\ItemTrajeResource\Pages;
 
 use App\Filament\Resources\ItemTrajeResource;
 use App\Models\Item;
-use App\Models\Foto;
-use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateItemTraje extends CreateRecord
 {
@@ -18,7 +17,16 @@ class CreateItemTraje extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $this->fotosPendientes = $data['fotos_input'] ?? [];
+        $fotos = $data['fotos_input'] ?? [];
+
+        // Asignar nombre automático (Foto1, Foto2...) y orden según posición
+        foreach ($fotos as $index => &$foto) {
+            $foto['nombre'] = 'Foto' . ($index + 1);
+            $foto['orden']  = $index + 1;
+        }
+        unset($foto);
+
+        $this->fotosPendientes = $fotos;
         $this->ordenPrincipal  = isset($data['foto_principal_orden']) ? (int) $data['foto_principal_orden'] : null;
         unset($data['fotos_input'], $data['foto_principal_orden']);
 
@@ -27,12 +35,11 @@ class CreateItemTraje extends CreateRecord
             'tipo'        => 'traje',
             'precio'      => $data['precio'],
             'descripcion' => $data['descripcion'] ?? null,
-            'imagen'      => $data['imagen'] ?? null,
             'activo'      => $data['activo'] ?? true,
         ]);
 
         $data['item_id'] = $item->id;
-        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['imagen'], $data['activo']);
+        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['activo']);
 
         return $data;
     }
@@ -42,17 +49,15 @@ class CreateItemTraje extends CreateRecord
         foreach ($this->fotosPendientes as $fotoData) {
             if (empty($fotoData['archivo'])) continue;
 
-            $orden       = (int) ($fotoData['orden'] ?? 1);
+            $orden       = (int) $fotoData['orden'];
             $esPrincipal = ($this->ordenPrincipal !== null && $orden === $this->ordenPrincipal);
 
-            // Usar disk public — Filament guarda los archivos en storage/app/public
             $rutaArchivo = Storage::disk('public')->path($fotoData['archivo']);
-
             if (!file_exists($rutaArchivo)) continue;
 
             $blob = file_get_contents($rutaArchivo);
 
-            $foto = \Illuminate\Support\Facades\DB::table('fotos')->insertGetId([
+            DB::table('fotos')->insert([
                 'idTraje'    => $this->record->id,
                 'principal'  => $esPrincipal ? 1 : 0,
                 'nombre'     => $fotoData['nombre'],

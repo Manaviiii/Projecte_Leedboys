@@ -51,12 +51,6 @@ class ItemPackResource extends Resource
                     ->maxLength(1000)
                     ->columnSpan(2),
 
-                Forms\Components\FileUpload::make('imagen')
-                    ->label('Imagen')
-                    ->image()
-                    ->maxSize(5120)
-                    ->directory('items')
-                    ->columnSpan(2),
 
                 Forms\Components\Toggle::make('activo')
                     ->label('Activo')
@@ -64,17 +58,7 @@ class ItemPackResource extends Resource
                     ->columnSpan(2),
             ])->columns(2),
 
-            // ── Sección 2: Detalles del pack ───────────────────────────────────
-            Section::make('Detalles del Pack')->schema([
-                Forms\Components\TextInput::make('numero_zancudos')
-                    ->label('Nº de Zancudos incluidos')
-                    ->numeric()
-                    ->integer()
-                    ->minValue(1)  // al menos 1 zancudo
-                    ->maxValue(99)
-                    ->required()
-                    ->placeholder('2'),
-            ]),
+            // numero_zancudos se fija a 2 automáticamente — no se muestra en el formulario
         ]);
     }
 
@@ -82,7 +66,6 @@ class ItemPackResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('item.imagen')->label(''),
                 Tables\Columns\TextColumn::make('item.nombre')->label('Nombre')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('numero_zancudos')->label('Zancudos'),
                 Tables\Columns\TextColumn::make('item.precio')->label('Precio')->money('eur'),

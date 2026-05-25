@@ -4,14 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ClienteResource\Pages;
 use App\Models\Cliente;
-use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Tabs;
 
+/**
+ * Resource de Filament para visualizar clientes.
+ * Los clientes se crean automáticamente al registrarse desde la web.
+ * Desde el panel solo se pueden ver.
+ */
 class ClienteResource extends Resource
 {
     protected static ?string $model = Cliente::class;
@@ -19,34 +21,10 @@ class ClienteResource extends Resource
     protected static ?string $navigationLabel = 'Clientes';
     protected static ?int $navigationSort = 1;
 
+    // Sin formulario — no se crean ni editan desde Filament
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Card::make()->schema([
-                    Forms\Components\TextInput::make('nombre')
-                        ->label('Nombre completo')
-                        ->required()
-                        ->maxLength(255),
-
-                    Forms\Components\TextInput::make('email')
-                        ->label('Email')
-                        ->email()
-                        ->maxLength(255),
-
-                    Forms\Components\TextInput::make('telefono')
-                        ->label('Teléfono')
-                        ->tel()
-                        ->maxLength(20),
-
-                    Forms\Components\TextInput::make('stripe_customer_id')
-                        ->label('Stripe Customer ID')
-                        ->maxLength(255)
-                        ->disabled()
-                        ->dehydrated(false)
-                        ->visibleOn('edit'),
-                ])->columns(2),
-            ]);
+        return $form->schema([]);
     }
 
     public static function table(Table $table): Table
@@ -61,44 +39,35 @@ class ClienteResource extends Resource
                     ->label('Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('telefono')
-                    ->label('Teléfono'),
+                    ->label('Teléfono')
+                    ->formatStateUsing(fn ($state) => $state ?? '—'),
                 Tables\Columns\TextColumn::make('eventos_count')
                     ->label('Eventos')
                     ->counts('eventos'),
-                Tables\Columns\TextColumn::make('residencias_count')
-                    ->label('Residencias')
-                    ->counts('residencias'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Alta')
                     ->date('d/m/Y')
                     ->sortable(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // Solo lectura — sin editar ni eliminar
             ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelationManagers(): array
     {
         return [
             ClienteResource\RelationManagers\EventosRelationManager::class,
-            ClienteResource\RelationManagers\ResidenciasRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListClientes::route('/'),
-            'create' => Pages\CreateCliente::route('/create'),
-            'edit'   => Pages\EditCliente::route('/{record}/edit'),
+            'index' => Pages\ListClientes::route('/'),
+            'view'  => Pages\ListClientes::route('/{record}'),
         ];
     }
 }

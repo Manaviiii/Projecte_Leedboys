@@ -12,7 +12,8 @@ class CreateItemAccesorio extends CreateRecord
     protected static string $resource = ItemAccesorioResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
-    {
+{
+    try {
         $item = Item::create([
             'nombre'      => $data['nombre'],
             'tipo'        => 'accesorio',
@@ -20,21 +21,26 @@ class CreateItemAccesorio extends CreateRecord
             'descripcion' => $data['descripcion'] ?? null,
             'activo'      => $data['activo'] ?? true,
         ]);
-
-        $data['item_id'] = $item->id;
-
-        if (!empty($data['foto_archivo'])) {
-            $rutaArchivo = Storage::disk('public')->path($data['foto_archivo']);
-            if (file_exists($rutaArchivo)) {
-                $data['imagen'] = file_get_contents($rutaArchivo);
-                Storage::disk('public')->delete($data['foto_archivo']);
-            }
-        }
-
-        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['activo'], $data['foto_archivo']);
-
-        return $data;
+    } catch (\Exception $e) {
+        \Log::error('Error crear item accesorio: ' . $e->getMessage());
+        throw $e;
     }
+
+    $data['item_id'] = $item->id;
+
+    if (!empty($data['foto_archivo'])) {
+        $rutaArchivo = Storage::disk('public')->path($data['foto_archivo']);
+        if (file_exists($rutaArchivo)) {
+            $data['imagen'] = file_get_contents($rutaArchivo);
+            Storage::disk('public')->delete($data['foto_archivo']);
+        }
+    }
+
+    unset($data['nombre'], $data['precio'], $data['descripcion'], $data['activo'], $data['foto_archivo']);
+
+    return $data;
+}
+    
 
     protected function getRedirectUrl(): string
     {

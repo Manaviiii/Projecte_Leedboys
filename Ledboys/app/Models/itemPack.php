@@ -10,9 +10,13 @@ class ItemPack extends Model
     use HasFactory;
 
     protected $primaryKey = 'item_id';
-    public $incrementing = false;
+    public $incrementing  = false;
+    public $timestamps    = false; // item_packs no tiene created_at ni updated_at
 
-    protected $fillable = ['item_id', 'numero_zancudos'];
+    protected $fillable = [
+        'item_id',
+        'numero_zancudos',
+    ];
 
     public function item()
     {

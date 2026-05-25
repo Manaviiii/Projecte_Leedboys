@@ -16,6 +16,7 @@ use Filament\Forms\Components\TextInput;
 
 class ResidenciaResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $model = Residencia::class;
     protected static ?string $navigationIcon = 'heroicon-o-home';
     protected static ?string $navigationLabel = 'Residencias';
@@ -142,4 +143,4 @@ class ResidenciaResource extends Resource
             'edit'   => Pages\EditResidencia::route('/{record}/edit'),
         ];
     }
-}
+} 

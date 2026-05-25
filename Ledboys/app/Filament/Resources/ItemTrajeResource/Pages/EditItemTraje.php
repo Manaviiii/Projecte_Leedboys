@@ -3,11 +3,20 @@
 namespace App\Filament\Resources\ItemTrajeResource\Pages;
 
 use App\Filament\Resources\ItemTrajeResource;
-use App\Models\Item;
 use App\Models\Foto;
-use Filament\Resources\Pages\EditRecord;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Filament\Resources\Pages\EditRecord;
 
+/**
+ * Página de edición de un traje.
+ *
+ * Flujo:
+ * 1. mutateFormDataBeforeFill: precarga datos del item padre y fotos existentes.
+ *    El orden se precarga según la posición actual de cada foto.
+ * 2. mutateFormDataBeforeSave: reasigna nombre y orden según posición en el Repeater.
+ * 3. afterSave: actualiza item padre, procesa fotos nuevas/existentes/eliminadas.
+ */
 class EditItemTraje extends EditRecord
 {
     protected static string $resource = ItemTrajeResource::class;
@@ -23,16 +32,19 @@ class EditItemTraje extends EditRecord
             $data['nombre']      = $item->nombre;
             $data['precio']      = $item->precio;
             $data['descripcion'] = $item->descripcion;
-            $data['imagen']      = $item->imagen;
             $data['activo']      = $item->activo;
         }
 
-        $data['fotos_input'] = $this->record->fotos->map(fn($foto) => [
-            'archivo'   => null,
-            'foto_id'   => $foto->id,
-            'nombre'    => $foto->nombre,
-            'orden'     => $foto->orden,
-        ])->toArray();
+        // Cargar fotos existentes ordenadas por 'orden'
+        $data['fotos_input'] = $this->record->fotos
+            ->sortBy('orden')
+            ->values()
+            ->map(fn($foto) => [
+                'archivo'   => null,
+                'foto_id'   => $foto->id,
+                'nombre'    => $foto->nombre,
+                'orden'     => $foto->orden,
+            ])->toArray();
 
         $fotoPrincipal = $this->record->fotos->firstWhere('principal', true);
         $data['foto_principal_orden'] = $fotoPrincipal?->orden;
@@ -42,11 +54,25 @@ class EditItemTraje extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $this->fotosNuevas    = $data['fotos_input'] ?? [];
+        $fotos = $data['fotos_input'] ?? [];
+
+        // Reasignar nombre default y orden según posición actual en el Repeater
+        foreach ($fotos as $index => &$foto) {
+            $posicion = $index + 1;
+
+            if (empty($foto['nombre']) || $foto['nombre'] === 'Foto') {
+                $foto['nombre'] = 'Foto' . $posicion;
+            }
+
+            $foto['orden'] = $posicion;
+        }
+        unset($foto);
+
+        $this->fotosNuevas    = $fotos;
         $this->ordenPrincipal = isset($data['foto_principal_orden']) ? (int) $data['foto_principal_orden'] : null;
 
         unset($data['fotos_input'], $data['foto_principal_orden']);
-        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['imagen'], $data['activo']);
+        unset($data['nombre'], $data['precio'], $data['descripcion'], $data['activo']);
 
         return $data;
     }
@@ -59,27 +85,26 @@ class EditItemTraje extends EditRecord
             'nombre'      => $data['nombre'],
             'precio'      => $data['precio'],
             'descripcion' => $data['descripcion'] ?? null,
-            'imagen'      => $data['imagen'] ?? null,
             'activo'      => $data['activo'] ?? true,
         ]);
 
         $idsMantenidos = [];
 
         foreach ($this->fotosNuevas as $fotoData) {
-            $orden       = (int) ($fotoData['orden'] ?? 1);
+            $orden       = (int) $fotoData['orden'];
             $esPrincipal = ($this->ordenPrincipal !== null && $orden === $this->ordenPrincipal);
 
             if (!empty($fotoData['foto_id'])) {
+                // Foto existente — actualizar
                 $foto = Foto::find($fotoData['foto_id']);
                 if ($foto) {
                     $updateData = [
                         'nombre'    => $fotoData['nombre'],
                         'orden'     => $orden,
-                        'principal' => $esPrincipal,
+                        'principal' => $esPrincipal ? 1 : 0,
                     ];
 
                     if (!empty($fotoData['archivo'])) {
-                        // Usar disk public — Filament guarda los archivos en storage/app/public
                         $rutaArchivo = Storage::disk('public')->path($fotoData['archivo']);
                         if (file_exists($rutaArchivo)) {
                             $updateData['imagen'] = file_get_contents($rutaArchivo);
@@ -91,26 +116,30 @@ class EditItemTraje extends EditRecord
                     $idsMantenidos[] = $foto->id;
                 }
             } else {
+                // Foto nueva — insertar como BLOB
                 if (!empty($fotoData['archivo'])) {
                     $rutaArchivo = Storage::disk('public')->path($fotoData['archivo']);
                     if (file_exists($rutaArchivo)) {
                         $blob = file_get_contents($rutaArchivo);
 
-                        $foto = Foto::create([
-                            'idTraje'   => $this->record->id,
-                            'principal' => $esPrincipal,
-                            'nombre'    => $fotoData['nombre'],
-                            'orden'     => $orden,
-                            'imagen'    => $blob,
+                        $id = DB::table('fotos')->insertGetId([
+                            'idTraje'    => $this->record->id,
+                            'principal'  => $esPrincipal ? 1 : 0,
+                            'nombre'     => $fotoData['nombre'],
+                            'orden'      => $orden,
+                            'imagen'     => $blob,
+                            'created_at' => now(),
+                            'updated_at' => now(),
                         ]);
 
                         Storage::disk('public')->delete($fotoData['archivo']);
-                        $idsMantenidos[] = $foto->id;
+                        $idsMantenidos[] = $id;
                     }
                 }
             }
         }
 
+        // Eliminar fotos que el usuario quitó del Repeater
         Foto::where('idTraje', $this->record->id)
             ->whereNotIn('id', $idsMantenidos)
             ->delete();
