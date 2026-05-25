@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/perfil.less";
+import PasswordStrength from "../components/PasswordStrength";
 
 export default function Perfil({ onLogout }) {
     const [user, setUser]       = useState(null);
@@ -96,8 +97,8 @@ export default function Perfil({ onLogout }) {
                 method: "PUT",
                 headers: getHeaders(),
                 body: JSON.stringify({
-                    password_actual:      passwords.actual,
-                    password:             passwords.nueva,
+                    password_actual:       passwords.actual,
+                    password:              passwords.nueva,
                     password_confirmation: passwords.confirm,
                 }),
             });
@@ -112,9 +113,9 @@ export default function Perfil({ onLogout }) {
     if (loading) return <div className="loading"><div className="loading-spinner" /></div>;
     if (!user)   return null;
 
-    const iniciales    = user.name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
-    const totalPedidos = pagos.length;
-    const totalGastado = pagos.filter(p => p.estado === "pagado").reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
+    const iniciales     = user.name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
+    const totalPedidos  = pagos.length;
+    const totalGastado  = pagos.filter(p => p.estado === "pagado").reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
     const fechaRegistro = user.created_at
         ? new Date(user.created_at).toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" })
         : "—";
@@ -195,7 +196,8 @@ export default function Perfil({ onLogout }) {
                                 required
                             />
                             <input
-                                type="password" onPaste={e => e.preventDefault()}
+                                type="password"
+                                onPaste={e => e.preventDefault()}
                                 value={emailPass}
                                 onChange={e => setEmailPass(e.target.value)}
                                 placeholder="Contraseña actual para confirmar"
@@ -213,21 +215,25 @@ export default function Perfil({ onLogout }) {
                         <h4 className="perfil-edit-label">Contraseña</h4>
                         <form className="perfil-edit-form perfil-edit-form--pass" onSubmit={handlePassword}>
                             <input
-                                type="password" onPaste={e => e.preventDefault()}
+                                type="password"
+                                onPaste={e => e.preventDefault()}
                                 value={passwords.actual}
                                 onChange={e => setPasswords({ ...passwords, actual: e.target.value })}
                                 placeholder="Contraseña actual"
                                 required
                             />
                             <input
-                                type="password" onPaste={e => e.preventDefault()}
+                                type="password"
+                                onPaste={e => e.preventDefault()}
                                 value={passwords.nueva}
                                 onChange={e => setPasswords({ ...passwords, nueva: e.target.value })}
                                 placeholder="Nueva contraseña"
                                 required
                             />
+                            <PasswordStrength password={passwords.nueva} />
                             <input
-                                type="password" onPaste={e => e.preventDefault()}
+                                type="password"
+                                onPaste={e => e.preventDefault()}
                                 value={passwords.confirm}
                                 onChange={e => setPasswords({ ...passwords, confirm: e.target.value })}
                                 placeholder="Confirmar nueva contraseña"
@@ -245,6 +251,16 @@ export default function Perfil({ onLogout }) {
                 <div className="perfil-accesos">
                     <h3 className="perfil-section-title">Accesos rápidos</h3>
                     <div className="perfil-accesos-grid">
+                        {user.role === "admin" && (
+                            <a href="http://localhost:8000/admin/login" target="_blank" rel="noreferrer" className="perfil-acceso perfil-acceso--admin">
+                                <span className="perfil-acceso-icon">⚙️</span>
+                                <div>
+                                    <span className="perfil-acceso-title">Administración</span>
+                                    <span className="perfil-acceso-desc">Panel de control Filament</span>
+                                </div>
+                                <span className="perfil-acceso-arrow">→</span>
+                            </a>
+                        )}
                         <a href="/facturas" className="perfil-acceso">
                             <span className="perfil-acceso-icon">🧾</span>
                             <div>

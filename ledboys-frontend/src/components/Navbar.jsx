@@ -43,6 +43,8 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
         { label: "Facturas", href: "/facturas" },
     ];
 
+    const isAdmin = user?.role === "admin";
+
     return (
         <>
             <nav className={`navbar${scrolled ? " scrolled" : ""}`}>
@@ -71,6 +73,18 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                             </a>
                         </li>
                     ))}
+                    {isAdmin && (
+                        <li>
+                            <a
+                                href="http://localhost:8000/admin/login"
+                                target="_blank"
+                                rel="noreferrer"
+                                className="navbar-admin-link"
+                            >
+                                Admin
+                            </a>
+                        </li>
+                    )}
                 </ul>
 
                 <a className="navbar-logo-right" href="/tipo/ledgirlss">
@@ -102,7 +116,6 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                     <button onClick={() => setMenuOpen(false)}>✕</button>
                 </div>
 
-                {/* Navegación — siempre visible */}
                 <div className="navbar-mobile-links">
                     {links.map((link) => (
                         <a
@@ -116,7 +129,6 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                     ))}
                 </div>
 
-                {/* Usuario o login */}
                 {user ? (
                     <>
                         <div className="navbar-mobile-user">
@@ -127,6 +139,17 @@ export default function Navbar({ currentPath = "/", user = null, onLogout }) {
                                         {link.label}
                                     </a>
                                 ))}
+                                {isAdmin && (
+                                    <a
+                                        href="http://localhost:8000/admin/login"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="navbar-mobile-admin"
+                                        onClick={() => setMenuOpen(false)}
+                                    >
+                                        Administración
+                                    </a>
+                                )}
                             </div>
                         </div>
                         <div className="navbar-mobile-footer">
