@@ -19,6 +19,39 @@ function ImageLightbox({ src, alt, onClose }) {
     );
 }
 
+// Colores por nivel de pack
+const PACK_COLORS = {
+    "Hora Loca Bronce":   "#cd7f32",
+    "Hora Loca Plata":    "#c0c0c0",
+    "Hora Loca Gold":     "#c9a84c",
+    "Hora Loca Platinum": "#00e5ff",
+};
+
+function PackInfo({ pack, onClose }) {
+    useEffect(() => {
+        const handler = (e) => { if (e.key === "Escape") onClose(); };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, []);
+
+    const color = PACK_COLORS[pack.nombre] || "#c9a84c";
+
+    return (
+        <div className="pack-info-overlay" onClick={onClose}>
+            <div className="pack-info-box" onClick={e => e.stopPropagation()}>
+                <div className="pack-info-header" style={{ borderColor: color }}>
+                    <span className="pack-info-nombre" style={{ color }}>{pack.nombre}</span>
+                    <button className="pack-info-close" onClick={onClose}>✕</button>
+                </div>
+                <p className="pack-info-desc">{pack.descripcion}</p>
+                <div className="pack-info-footer">
+                    <span className="pack-info-tipo">Pack · {pack.precio}€</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function Configurador({ traje, stock, onClose }) {
     const { addItem, items }          = useCart();
     const [cantidad, setCantidad]     = useState(1);
@@ -29,6 +62,7 @@ export default function Configurador({ traje, stock, onClose }) {
     const [added, setAdded]           = useState(false);
     const [imgBase64, setImgBase64]   = useState(null);
     const [lightbox, setLightbox]     = useState(null);
+    const [packInfo, setPackInfo]     = useState(null);
 
     useEffect(() => {
         fetch(`/api/fotos/traje/${traje.id}`)
@@ -101,6 +135,7 @@ export default function Configurador({ traje, stock, onClose }) {
             }));
 
         setLightbox(null);
+        setPackInfo(null);
         setAdded(true);
         setTimeout(() => onClose(), 800);
     };
@@ -196,21 +231,34 @@ export default function Configurador({ traje, stock, onClose }) {
                         <div className="config-section">
                             <h4>PACKS</h4>
                             <div className="config-extras">
-                                {packs.map(p => (
-                                    <div
-                                        key={p.id}
-                                        className={`config-extra-item${selPack === p.id ? " selected" : ""}`}
-                                        onClick={() => selectPack(p.id)}
-                                    >
-                                        <div className="config-extra-radio">
-                                            <div className={`config-radio-dot${selPack === p.id ? " active" : ""}`} />
+                                {packs.map(p => {
+                                    const color = PACK_COLORS[p.nombre] || "#c9a84c";
+                                    return (
+                                        <div
+                                            key={p.id}
+                                            className={`config-extra-item${selPack === p.id ? " selected" : ""}`}
+                                            onClick={() => selectPack(p.id)}
+                                        >
+                                            <div className="config-extra-radio">
+                                                <div className={`config-radio-dot${selPack === p.id ? " active" : ""}`} />
+                                            </div>
+                                            <div className="config-extra-info">
+                                                <span>{p.nombre}</span>
+                                                <span className="config-extra-price">+{p.precio}€</span>
+                                            </div>
+                                            {p.descripcion && (
+                                                <button
+                                                    className="pack-info-btn"
+                                                    style={{ color }}
+                                                    onClick={e => { e.stopPropagation(); setPackInfo(p); }}
+                                                    title="Ver información"
+                                                >
+                                                    ⓘ
+                                                </button>
+                                            )}
                                         </div>
-                                        <div className="config-extra-info">
-                                            <span>{p.nombre}</span>
-                                            <span className="config-extra-price">+{p.precio}€</span>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
@@ -236,6 +284,13 @@ export default function Configurador({ traje, stock, onClose }) {
                     src={lightbox.src}
                     alt={lightbox.alt}
                     onClose={() => setLightbox(null)}
+                />
+            )}
+
+            {packInfo && (
+                <PackInfo
+                    pack={packInfo}
+                    onClose={() => setPackInfo(null)}
                 />
             )}
         </>

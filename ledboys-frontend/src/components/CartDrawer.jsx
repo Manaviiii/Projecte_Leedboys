@@ -19,9 +19,16 @@ function ImageLightbox({ src, alt, onClose }) {
     );
 }
 
+const PACK_COLORS = {
+    "Hora Loca Bronce":   "#cd7f32",
+    "Hora Loca Plata":    "#c0c0c0",
+    "Hora Loca Gold":     "#c9a84c",
+    "Hora Loca Platinum": "#00e5ff",
+};
+
 export default function CartDrawer() {
-    const { items, open, setOpen, removeItem, updateCantidad, total, count } = useCart();
-    const [lightbox, setLightbox] = useState(null); // { src, alt }
+    const { items, open, setOpen, removeItem, updateCantidad, total, count, packError } = useCart();
+    const [lightbox, setLightbox] = useState(null);
 
     return (
         <>
@@ -40,6 +47,12 @@ export default function CartDrawer() {
                     <button className="cart-drawer-close" onClick={() => setOpen(false)}>✕</button>
                 </div>
 
+                {packError && (
+                    <div className="cart-pack-error">
+                        ⚠ {packError}
+                    </div>
+                )}
+
                 <div className="cart-drawer-body">
                     {items.length === 0 ? (
                         <div className="cart-empty">
@@ -52,12 +65,20 @@ export default function CartDrawer() {
                         items.map(item => (
                             <div key={item.id} className="cart-item">
                                 <div
-                                    className={`cart-item-img${item.img ? " clickable" : ""}`}
+                                    className={`cart-item-img${item.img ? " clickable" : ""}${item.tipo === "Pack" ? " cart-item-img--pack" : ""}`}
                                     onClick={() => item.img && setLightbox({ src: item.img, alt: item.name })}
                                 >
                                     {item.img
                                         ? <img src={item.img} alt={item.name} />
-                                        : <div className="cart-item-img-placeholder" />
+                                        : item.tipo === "Pack"
+                                            ? (
+                                                <div className="cart-item-pack-placeholder">
+                                                    <span style={{ color: PACK_COLORS[item.name] || "#c9a84c" }}>
+                                                        {item.name.replace("Hora Loca ", "")}
+                                                    </span>
+                                                </div>
+                                            )
+                                            : <div className="cart-item-img-placeholder" />
                                     }
                                     {item.img && <div className="cart-item-img-zoom">🔍</div>}
                                 </div>
