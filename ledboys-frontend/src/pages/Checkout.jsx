@@ -329,7 +329,7 @@ function CheckoutForm({ onSuccess }) {
             });
             const data = await res.json();
             if (!data.clientSecret) {
-                setError("Error al crear el intento de pago.");
+                setError(data.message || "Error al crear el intento de pago.");
                 setLoading(false);
                 return;
             }
