@@ -1,9 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import "../styles/cartdrawer.less";
 
+function ImageLightbox({ src, alt, onClose }) {
+    useEffect(() => {
+        const handler = (e) => { if (e.key === "Escape") onClose(); };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, []);
+
+    return (
+        <div className="cart-lightbox" onClick={onClose}>
+            <button className="cart-lightbox-close" onClick={onClose}>✕</button>
+            <div className="cart-lightbox-img-wrap" onClick={e => e.stopPropagation()}>
+                <img src={src} alt={alt} />
+            </div>
+        </div>
+    );
+}
+
 export default function CartDrawer() {
     const { items, open, setOpen, removeItem, updateCantidad, total, count } = useCart();
+    const [lightbox, setLightbox] = useState(null); // { src, alt }
 
     return (
         <>
@@ -33,11 +51,15 @@ export default function CartDrawer() {
                     ) : (
                         items.map(item => (
                             <div key={item.id} className="cart-item">
-                                <div className="cart-item-img">
+                                <div
+                                    className={`cart-item-img${item.img ? " clickable" : ""}`}
+                                    onClick={() => item.img && setLightbox({ src: item.img, alt: item.name })}
+                                >
                                     {item.img
                                         ? <img src={item.img} alt={item.name} />
                                         : <div className="cart-item-img-placeholder" />
                                     }
+                                    {item.img && <div className="cart-item-img-zoom">🔍</div>}
                                 </div>
                                 <div className="cart-item-info">
                                     <h4>{item.name}</h4>
@@ -79,6 +101,14 @@ export default function CartDrawer() {
                     </div>
                 )}
             </div>
+
+            {lightbox && (
+                <ImageLightbox
+                    src={lightbox.src}
+                    alt={lightbox.alt}
+                    onClose={() => setLightbox(null)}
+                />
+            )}
         </>
     );
 }
