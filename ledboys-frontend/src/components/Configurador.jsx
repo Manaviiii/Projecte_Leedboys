@@ -2,6 +2,23 @@ import React, { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import "../styles/configurador.less";
 
+function ImageLightbox({ src, alt, onClose }) {
+    useEffect(() => {
+        const handler = (e) => { if (e.key === "Escape") onClose(); };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, []);
+
+    return (
+        <div className="cart-lightbox" onClick={onClose}>
+            <button className="cart-lightbox-close" onClick={onClose}>✕</button>
+            <div className="cart-lightbox-img-wrap" onClick={e => e.stopPropagation()}>
+                <img src={src} alt={alt} />
+            </div>
+        </div>
+    );
+}
+
 export default function Configurador({ traje, stock, onClose }) {
     const { addItem, items }          = useCart();
     const [cantidad, setCantidad]     = useState(1);
@@ -11,6 +28,7 @@ export default function Configurador({ traje, stock, onClose }) {
     const [selPack, setSelPack]       = useState(null);
     const [added, setAdded]           = useState(false);
     const [imgBase64, setImgBase64]   = useState(null);
+    const [lightbox, setLightbox]     = useState(null);
 
     useEffect(() => {
         fetch(`/api/fotos/traje/${traje.id}`)
@@ -22,7 +40,7 @@ export default function Configurador({ traje, stock, onClose }) {
             .catch(() => {});
     }, [traje.id]);
 
-    const enCarrito      = items.find(i => i.id === `traje-${traje.id}`)?.cantidad ?? 0;
+    const enCarrito       = items.find(i => i.id === `traje-${traje.id}`)?.cantidad ?? 0;
     const stockDisponible = stock - enCarrito;
 
     useEffect(() => {
@@ -63,7 +81,7 @@ export default function Configurador({ traje, stock, onClose }) {
             .forEach(a => addItem({
                 id:       `acc-${a.id}`,
                 name:     a.nombre,
-                img:       a.accesorio?.imagen ? `data:image/jpeg;base64,${a.accesorio.imagen}` : null,
+                img:      a.accesorio?.imagen ? `data:image/jpeg;base64,${a.accesorio.imagen}` : null,
                 precio:   parseFloat(a.precio),
                 cantidad: 1,
                 tipo:     "Accesorio",
@@ -82,6 +100,7 @@ export default function Configurador({ traje, stock, onClose }) {
                 stock:    999,
             }));
 
+        setLightbox(null);
         setAdded(true);
         setTimeout(() => onClose(), 800);
     };
@@ -100,11 +119,15 @@ export default function Configurador({ traje, stock, onClose }) {
                 <div className="config-body">
 
                     <div className="config-traje">
-                        <div className="config-traje-img">
+                        <div
+                            className={`config-traje-img${imgBase64 ? " clickable" : ""}`}
+                            onClick={() => imgBase64 && setLightbox({ src: imgBase64, alt: traje.nombre })}
+                        >
                             {imgBase64
                                 ? <img src={imgBase64} alt={traje.nombre} />
                                 : <div className="config-traje-placeholder" />
                             }
+                            {imgBase64 && <div className="cart-item-img-zoom">🔍</div>}
                         </div>
                         <div className="config-traje-info">
                             <h3>{traje.nombre}</h3>
@@ -150,8 +173,12 @@ export default function Configurador({ traje, stock, onClose }) {
                                             {selAccesorios.includes(a.id) && "✓"}
                                         </div>
                                         {a.accesorio?.imagen && (
-                                            <div className="config-extra-img">
+                                            <div
+                                                className="config-extra-img clickable"
+                                                onClick={e => { e.stopPropagation(); setLightbox({ src: `data:image/jpeg;base64,${a.accesorio.imagen}`, alt: a.nombre }); }}
+                                            >
                                                 <img src={`data:image/jpeg;base64,${a.accesorio.imagen}`} alt={a.nombre} />
+                                                <div className="cart-item-img-zoom">🔍</div>
                                             </div>
                                         )}
                                         <div className="config-extra-info">
@@ -203,6 +230,14 @@ export default function Configurador({ traje, stock, onClose }) {
                     </button>
                 </div>
             </div>
+
+            {lightbox && (
+                <ImageLightbox
+                    src={lightbox.src}
+                    alt={lightbox.alt}
+                    onClose={() => setLightbox(null)}
+                />
+            )}
         </>
     );
 }
