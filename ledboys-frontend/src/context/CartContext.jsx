@@ -2,6 +2,13 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext();
 
+const PACK_COLORS = {
+    "Hora Loca Bronce":   "#cd7f32",
+    "Hora Loca Plata":    "#c0c0c0",
+    "Hora Loca Gold":     "#c9a84c",
+    "Hora Loca Platinum": "#00e5ff",
+};
+
 export function CartProvider({ children }) {
     const [items, setItems] = useState(() => {
         try {
@@ -9,14 +16,25 @@ export function CartProvider({ children }) {
             return saved ? JSON.parse(saved) : [];
         } catch { return []; }
     });
-    const [open, setOpen] = useState(false);
+    const [open, setOpen]         = useState(false);
+    const [packError, setPackError] = useState(null);
 
-    // Guardar en localStorage cada vez que cambie
     useEffect(() => {
         localStorage.setItem("carrito", JSON.stringify(items));
     }, [items]);
 
     const addItem = (item) => {
+        // Si es un pack, comprobar que no haya otro pack ya en el carrito
+        if (item.tipo === "Pack") {
+            const packExistente = items.find(i => i.tipo === "Pack" && i.id !== item.id);
+            if (packExistente) {
+                setPackError(`Ya tienes "${packExistente.name}" en el carrito. Solo puede haber un pack por compra.`);
+                setOpen(true);
+                setTimeout(() => setPackError(null), 4000);
+                return;
+            }
+        }
+
         setItems(prev => {
             const exists = prev.find(i => i.id === item.id);
             if (exists) {
@@ -27,7 +45,7 @@ export function CartProvider({ children }) {
             }
             return [...prev, item];
         });
-        setOpen(true); // abre el drawer al añadir
+        setOpen(true);
     };
 
     const removeItem = (id) => setItems(prev => prev.filter(i => i.id !== id));
@@ -43,7 +61,7 @@ export function CartProvider({ children }) {
     const count  = items.reduce((sum, i) => sum + i.cantidad, 0);
 
     return (
-        <CartContext.Provider value={{ items, open, setOpen, addItem, removeItem, updateCantidad, clearCart, total, count }}>
+        <CartContext.Provider value={{ items, open, setOpen, addItem, removeItem, updateCantidad, clearCart, total, count, packError }}>
             {children}
         </CartContext.Provider>
     );
