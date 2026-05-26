@@ -548,3 +548,102 @@
     flex-shrink: 0;
     opacity: 0.6;
 }
+
+// BOTÓN VOLVER
+.checkout-page-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .checkout-back {
+        position: absolute;
+        top: 50%;
+        left: 2rem;
+        transform: translateY(-50%);
+    }
+}
+
+.checkout-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: @white;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, rgba(201,168,76,0.15), transparent);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s;
+    }
+
+    &:hover {
+        border-color: @gold;
+        color: @gold;
+        &::before { transform: scaleX(1); }
+    }
+
+    span { transition: transform 0.3s; }
+    &:hover span { transform: translateX(-4px); }
+}
+
+// PHONE INPUT
+.checkout-phone-wrap {
+    .PhoneInput {
+        display: flex;
+        align-items: center;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: border-color 0.3s;
+        &:focus-within { border-color: @gold; }
+    }
+
+    .PhoneInputCountry {
+        padding: 0 0.75rem;
+        border-right: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .PhoneInputCountrySelect {
+        background: transparent;
+        border: none;
+        color: @white;
+        outline: none;
+        cursor: pointer;
+        font-size: 0.85rem;
+        padding: 0.75rem 0;
+    }
+
+    .PhoneInputCountrySelectArrow { color: @text-muted; opacity: 0.6; }
+
+    .PhoneInputInput {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: @white;
+        padding: 0.75rem 1rem;
+        font-family: @font-body;
+        font-size: 0.85rem;
+        outline: none;
+        &::placeholder { color: rgba(255,255,255,0.2); }
+    }
+}
+
+.PhoneInputCountrySelect option { background: #1a1a1a !important; color: #ffffff !important; }
+.PhoneInputCountrySelect:focus  { background: #1a1a1a !important; }
