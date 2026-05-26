@@ -316,3 +316,54 @@
     grid-template-columns: 1fr;
   }
 }
+.ubicacion {
+  padding: 8rem 2rem;
+  text-align: center;
+  background: #0d0d0d;
+}
+.ubicacion h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  letter-spacing: 8px;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+.ubicacion h2 span {
+  color: #c9a84c;
+}
+.ubicacion-desc {
+  font-size: 0.85rem;
+  color: #888888;
+  letter-spacing: 2px;
+  max-width: 500px;
+  margin: 0 auto 3rem;
+  line-height: 1.8;
+}
+.ubicacion-mapa {
+  max-width: 900px;
+  height: 420px;
+  margin: 0 auto;
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  overflow: hidden;
+  position: relative;
+}
+.ubicacion-mapa::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #c9a84c, transparent);
+  z-index: 10;
+  pointer-events: none;
+}
+@media (max-width: 600px) {
+  .ubicacion-mapa {
+    height: 280px;
+  }
+}
+.leaflet-popup-content-wrapper {
+  background: #fff !important;
+  border-radius: 4px !important;
+}

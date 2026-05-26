@@ -120,3 +120,57 @@
 
 @media (max-width: 900px) { .form-row { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .categories-grid { grid-template-columns: 1fr; } }
+
+// SECCIÓN UBICACIÓN
+.ubicacion {
+    padding: 8rem 2rem;
+    text-align: center;
+    background: #0d0d0d;
+
+    h2 {
+        font-family: @font-display;
+        font-size: clamp(2.5rem, 6vw, 4.5rem);
+        letter-spacing: 8px;
+        color: @white;
+        margin-bottom: 1rem;
+
+        span { color: @gold; }
+    }
+}
+
+.ubicacion-desc {
+    font-size: 0.85rem;
+    color: @text-muted;
+    letter-spacing: 2px;
+    max-width: 500px;
+    margin: 0 auto 3rem;
+    line-height: 1.8;
+}
+
+.ubicacion-mapa {
+    max-width: 900px;
+    height: 420px;
+    margin: 0 auto;
+    border: 1px solid rgba(201,168,76,0.2);
+    overflow: hidden;
+    position: relative;
+
+    // Borde dorado superior
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(to right, transparent, @gold, transparent);
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    @media (max-width: 600px) { height: 280px; }
+}
+
+// Fix z-index popup Leaflet
+.leaflet-popup-content-wrapper {
+    background: #fff !important;
+    border-radius: 4px !important;
+}
