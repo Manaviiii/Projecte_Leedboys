@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import "../styles/home.less";
 
@@ -8,6 +8,71 @@ const CATEGORIES = [
     { label: "Eventos",    href: "/tipo/eventos",    img: "/images/opcion_eventos.png" },
     { label: "Pasacalles", href: "/tipo/eventos",    img: "/images/arboles.jpg" },
 ];
+
+function MapaUbicacion() {
+    useEffect(() => {
+        if (!document.getElementById("leaflet-css")) {
+            const link = document.createElement("link");
+            link.id   = "leaflet-css";
+            link.rel  = "stylesheet";
+            link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+            document.head.appendChild(link);
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+        script.onload = () => {
+            const L = window.L;
+            if (!L || document.getElementById("mapa-ubicacion")?._leaflet_id) return;
+
+            const map = L.map("mapa-ubicacion", {
+                center:          [41.5842, 1.6010], // Institut Milà i Fontanals
+                zoom:            15,
+                scrollWheelZoom: false,
+                zoomControl:     true,
+            });
+
+            L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
+                maxZoom: 19,
+            }).addTo(map);
+
+            const goldIcon = L.divIcon({
+                className: "",
+                html: `<div style="
+                    width: 16px; height: 16px;
+                    background: #c9a84c;
+                    border-radius: 50%;
+                    border: 3px solid rgba(201,168,76,0.4);
+                    box-shadow: 0 0 12px rgba(201,168,76,0.8);
+                "></div>`,
+                iconSize:   [16, 16],
+                iconAnchor: [8, 8],
+            });
+
+            L.marker([41.5842, 1.6010], { icon: goldIcon })
+                .addTo(map)
+                .bindPopup(`
+                    <div style="font-family:Arial;font-size:12px;color:#333;text-align:center;padding:4px;">
+                        <strong style="color:#c9a84c;">LEDBOYSS & LEDGIRLSS</strong><br/>
+                        Institut Milà i Fontanals<br/>
+                        Av. Emili Vallès, 4 · Igualada
+                    </div>
+                `)
+                .openPopup();
+        };
+        document.head.appendChild(script);
+
+        return () => {
+            const mapEl = document.getElementById("mapa-ubicacion");
+            if (mapEl && mapEl._leaflet_id) {
+                window.L?.map(mapEl)?.remove?.();
+            }
+        };
+    }, []);
+
+    return <div id="mapa-ubicacion" style={{ width: "100%", height: "100%" }} />;
+}
 
 export default function Home() {
     const [formData, setFormData] = useState({ nombre: "", email: "", telefono: "", tipo: "", mensaje: "" });
@@ -64,13 +129,24 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* PARTNERS */}
+            {/* DONDE HEMOS TRABAJADO */}
             <section className="partners">
                 <span className="section-label">Presencia nacional</span>
                 <div className="gold-divider" />
                 <h2>DONDE HEMOS<br /><span>TRABAJADO</span></h2>
                 <div className="partners-map">
                     <img src="/images/mapa_trabajo.png" alt="Mapa de trabajos realizados en España" />
+                </div>
+            </section>
+
+            {/* DONDE NOS UBICAMOS */}
+            <section className="ubicacion">
+                <span className="section-label">Nuestra sede</span>
+                <div className="gold-divider" />
+                <h2>DONDE NOS<br /><span>UBICAMOS</span></h2>
+                <p className="ubicacion-desc">Estamos en Igualada, Barcelona — listos para desplazarnos a cualquier punto de España.</p>
+                <div className="ubicacion-mapa">
+                    <MapaUbicacion />
                 </div>
             </section>
 

@@ -48,7 +48,6 @@ class PaymentController extends Controller
      */
     public function crearIntento(Request $request)
     {
-        // Validar todos los campos del formulario de pago
         $request->validate([
             'fecha'                  => 'required|date|after_or_equal:today',
             'hora'                   => 'nullable|date_format:H:i',
@@ -64,13 +63,17 @@ class PaymentController extends Controller
             'codigo_postal'          => 'nullable|string|max:10',
         ]);
 
-        // Verificar que el usuario autenticado tiene perfil de cliente
         $cliente = auth()->user()->cliente;
         if (!$cliente) {
             return response()->json(['message' => 'El usuario no tiene perfil de cliente'], 422);
         }
 
         Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        // Limpiar eventos borrador huérfanos (más de 30 min sin confirmar)
+        Evento::where('estado', 'borrador')
+            ->where('created_at', '<', now()->subMinutes(30))
+            ->delete();
 
         // Obtener los items de la BD y calcular el total sumando los precios
         $itemsDB      = Item::whereIn('id', $request->items)->get();
@@ -79,7 +82,6 @@ class PaymentController extends Controller
         $desglose     = $this->calcularDesglose($total);
 
         // Validar stock por fecha — solo para trajes
-        // Comprueba que no se supere el stock_total del traje para esa fecha
         foreach ($request->items as $itemId) {
             $item = $itemsDB->firstWhere('id', $itemId);
             if (!$item || $item->tipo !== 'traje') continue;
@@ -87,13 +89,11 @@ class PaymentController extends Controller
             $traje = $item->traje;
             if (!$traje) continue;
 
-            // Contar cuántas unidades de este traje ya están reservadas para esa fecha
             $stockOcupado = EventoItem::whereHas('evento', fn($q) =>
                 $q->whereDate('fecha', $request->fecha)
-                  ->whereIn('estado', ['pagado', 'pendiente', 'borrador'])
+                  ->whereIn('estado', ['pagado', 'pendiente'])
             )->where('item_id', $itemId)->sum('cantidad');
 
-            // Contar cuántas veces aparece este traje en el pedido actual
             $cantidadPedido = collect($request->items)->filter(fn($id) => $id === $itemId)->count();
 
             if ($stockOcupado + $cantidadPedido > $traje->stock_total) {
@@ -124,7 +124,7 @@ class PaymentController extends Controller
             ]);
         }
 
-        // Crear el PaymentIntent en Stripe con el importe en céntimos
+        // Crear el PaymentIntent en Stripe
         $intent = PaymentIntent::create([
             'amount'                    => (int) round($total * 100),
             'currency'                  => 'eur',
@@ -198,7 +198,6 @@ class PaymentController extends Controller
 
             $desglose = $this->calcularDesglose((float) $pago->amount);
 
-            // Enviar la factura en PDF al email del usuario
             $user = $pago->user;
             if ($user && $user->email) {
                 try {
