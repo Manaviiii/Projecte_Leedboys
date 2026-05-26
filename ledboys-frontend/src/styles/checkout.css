@@ -498,3 +498,105 @@
   flex-shrink: 0;
   opacity: 0.6;
 }
+.checkout-page-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.checkout-page-hero .checkout-back {
+  position: absolute;
+  top: 50%;
+  left: 2rem;
+  transform: translateY(-50%);
+}
+.checkout-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.checkout-back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.15), transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s;
+}
+.checkout-back:hover {
+  border-color: #c9a84c;
+  color: #c9a84c;
+}
+.checkout-back:hover::before {
+  transform: scaleX(1);
+}
+.checkout-back span {
+  transition: transform 0.3s;
+}
+.checkout-back:hover span {
+  transform: translateX(-4px);
+}
+.checkout-phone-wrap .PhoneInput {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: border-color 0.3s;
+}
+.checkout-phone-wrap .PhoneInput:focus-within {
+  border-color: #c9a84c;
+}
+.checkout-phone-wrap .PhoneInputCountry {
+  padding: 0 0.75rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.checkout-phone-wrap .PhoneInputCountrySelect {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  outline: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.75rem 0;
+}
+.checkout-phone-wrap .PhoneInputCountrySelectArrow {
+  color: #888888;
+  opacity: 0.6;
+}
+.checkout-phone-wrap .PhoneInputInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  outline: none;
+}
+.checkout-phone-wrap .PhoneInputInput::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+.PhoneInputCountrySelect option {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+}
+.PhoneInputCountrySelect:focus {
+  background: #1a1a1a !important;
+}

@@ -63,7 +63,7 @@ export default function Configurador({ traje, stock, onClose }) {
             .forEach(a => addItem({
                 id:       `acc-${a.id}`,
                 name:     a.nombre,
-                img:      null,
+                img:       a.accesorio?.imagen ? `data:image/jpeg;base64,${a.accesorio.imagen}` : null,
                 precio:   parseFloat(a.precio),
                 cantidad: 1,
                 tipo:     "Accesorio",
@@ -149,6 +149,11 @@ export default function Configurador({ traje, stock, onClose }) {
                                         <div className="config-extra-check">
                                             {selAccesorios.includes(a.id) && "✓"}
                                         </div>
+                                        {a.accesorio?.imagen && (
+                                            <div className="config-extra-img">
+                                                <img src={`data:image/jpeg;base64,${a.accesorio.imagen}`} alt={a.nombre} />
+                                            </div>
+                                        )}
                                         <div className="config-extra-info">
                                             <span>{a.nombre}</span>
                                             <span className="config-extra-price">+{a.precio}€</span>

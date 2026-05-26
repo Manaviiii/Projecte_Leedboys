@@ -22,14 +22,18 @@ class AccesorioController extends Controller
      */
     public function index()
     {
-        // has('accesorio') filtra solo los items que tienen un registro en item_accesorios
-        // with('accesorio') carga la relación para evitar N+1 queries
         $accesorios = Item::has('accesorio')
             ->with('accesorio')
             ->where('activo', true)
             ->get();
 
-        return response()->json($accesorios);
+        return response()->json($accesorios->map(function ($item) {
+            $data = $item->toArray();
+            if (!empty($item->accesorio->imagen)) {
+                $data['accesorio']['imagen'] = base64_encode($item->accesorio->imagen);
+            }
+                return $data;
+            }));
     }
 
     /**
@@ -49,7 +53,12 @@ class AccesorioController extends Controller
             return response()->json(['message' => 'Accesorio no encontrado'], 404);
         }
 
-        return response()->json($accesorio);
+        $data = $accesorio->toArray();
+        if (!empty($accesorio->accesorio->imagen)) {
+            $data['accesorio']['imagen'] = base64_encode($accesorio->accesorio->imagen);
+        }
+
+        return response()->json($data);
     }
 
     /**
@@ -63,15 +72,20 @@ class AccesorioController extends Controller
     {
         $query = $request->query('q');
 
-        // Búsqueda parcial con LIKE en nombre y descripción
         $resultados = Item::has('accesorio')
             ->with('accesorio')
             ->where(function($q) use ($query) {
                 $q->where('nombre', 'LIKE', "%{$query}%")
-                  ->orWhere('descripcion', 'LIKE', "%{$query}%");
+                ->orWhere('descripcion', 'LIKE', "%{$query}%");
             })
             ->get();
 
-        return response()->json($resultados);
+        return response()->json($resultados->map(function ($item) {
+            $data = $item->toArray();
+            if (!empty($item->accesorio->imagen)) {
+                $data['accesorio']['imagen'] = base64_encode($item->accesorio->imagen);
+            }
+            return $data;
+        }));
     }
 }

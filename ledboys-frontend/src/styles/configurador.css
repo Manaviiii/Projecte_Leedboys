@@ -334,3 +334,15 @@
 .config-radio-dot.active {
   background: #c9a84c;
 }
+.config-extra-img {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 2px;
+}
+.config-extra-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
